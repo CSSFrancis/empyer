@@ -8,4 +8,5 @@ setup(name='empyer',
       author_email='csfrancis@wisc.edu',
       liscense='UWMadison',
       packages=['empyer'],
+      install_requires=['hyperspy','numpy', 'matplotlib', 'h5py'],
       zip_safe=False)
