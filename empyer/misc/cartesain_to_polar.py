@@ -8,7 +8,8 @@ from empyer.misc.image import ellipsoid_list_to_cartesian, polar_list_to_cartesi
 def convert(img, mask=None, center=None, angle=None, foci=None, radius=None, phase_width=720):
     #  This function someday will be faster hopefully...
     """
-    :param img: a 2-d array for the image to convert to polar coordinates
+    :param img: a n by 2-d array for the image to convert to polar coordinates
+    :param mask: 2-d boolean array which excludes certain points
     :param center: x,y coordinates for the center of the image
     :param angle: angle of rotation if the sample is elliptical
     :param foci: The lengths of the foci of the ellipse
@@ -59,7 +60,7 @@ def convert(img, mask=None, center=None, angle=None, foci=None, radius=None, pha
             spline = RectBivariateSpline(initial_x, initial_y, img, kx=1, ky=1)  # bi-linear spline
             polar = np.array(spline.ev(final_x, final_y))
             polar_img[i] = np.reshape(polar, [r_final - r_inital, phase_width])
-        polar_img = np.reshape(polar_img, (*img_shape[:-2],radius, phase_width))
+        polar_img = np.reshape(polar_img, (*img_shape[:-2], radius, phase_width))
 
     else:
         spline = RectBivariateSpline(initial_x, initial_y, inten, kx=1, ky=1)  # bi-linear spline
