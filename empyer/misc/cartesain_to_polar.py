@@ -51,8 +51,7 @@ def convert(img, mask=None, center=None, angle=None, foci=None, radius=None, pha
     # setting masked values to negative values. Anything interpolated from masked values becomes negative
     if mask is not None:
         inten[mask] = -999999
-
-    # For higher than 2 dimensional arrays.  Speeds up computations a little but requires more ram
+    # For higher than 2 dimensional arrays.  Speeds up computations a little but requires more memory
     if len(img_shape) > 2:
         inten = np.reshape(inten, (-1, *img_shape[-2:]))
         polar_img = np.zeros((inten.shape[0],)+(r_final - r_inital, phase_width))

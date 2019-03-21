@@ -5,6 +5,7 @@ def readme():
     with open('README.rst') as f:
         return f.read()
 
+
 setup(name='empyer',
       version='0.1',
       description='Electron Microscopy tools for analyzing 4 and 5 dimensional STEM datasets',
@@ -14,7 +15,15 @@ setup(name='empyer',
       author='CSSFrancis',
       author_email='csfrancis@wisc.edu',
       liscense='UWMadison',
-      packages=['empyer'],
-      install_requires=['hyperspy','numpy', 'matplotlib', 'h5py','scipy'],
+      packages=['empyer',
+                'empyer.misc',
+                'empyer.signals',
+                'empyer.simulate',
+                'empyer.tests'],
+      install_requires=['hyperspy',
+                        'numpy',
+                        'matplotlib',
+                        'h5py',
+                        'scipy'],
       include_package_data=True,
       zip_safe=False)
