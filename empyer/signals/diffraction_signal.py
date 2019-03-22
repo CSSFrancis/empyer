@@ -68,6 +68,7 @@ class DiffractionSignal(EM_Signal):
                                 radius=radius,
                                 parallel=parallel,
                                 inplace=inplace)
+
         passed_meta_data = self.metadata.as_dictionary()
         if self.metadata.Signal.has_item('Ellipticity'):
             del(passed_meta_data['Signal']['Ellipticity'])
