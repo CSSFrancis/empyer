@@ -2,7 +2,7 @@
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
 
-from empyer.misc.image import ellipsoid_list_to_cartesian, polar_list_to_cartesian
+from empyer.misc.image import ellipsoid_list_to_cartesian, polar_list_to_cartesian, create_grid
 
 
 def convert(img, mask=None, center=None, angle=None, foci=None, radius=None, phase_width=720):
@@ -74,7 +74,7 @@ def convert(img, mask=None, center=None, angle=None, foci=None, radius=None, pha
 
     else:
         polar_mask = None
-    return polar_img, polar_mask
+    return polar_img
 
 
 

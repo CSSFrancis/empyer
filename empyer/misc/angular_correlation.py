@@ -30,14 +30,13 @@ def angular_correlation(r_theta_img, mask=None, binning=1, cut_off=0, normalize=
     # fast method uses a FFT and is a process which is O(n) = n log(n)
     I_fft = np.fft.fft(image, axis=1)
     a = np.fft.ifft(I_fft * np.conjugate(I_fft), axis=1).real
-    print(np.shape(a[1]))
     # this is to determine how many of the variables were non zero... This is really dumb.  but...
     # it works and I should stop trying to fix it (wreak it)
     if mask is not None:
         mask_boolean = ~mask  # inverting the boolean mask
-        print(mask_boolean)
         mask_fft = np.fft.fft(mask_boolean, axis=1)
         number_unmasked = np.fft.ifft(mask_fft*np.conjugate(mask_fft), axis=1).real
+        number_unmasked[number_unmasked==0]=1  # get rid of divide by zero error for completely masked rows
         a = np.multiply(np.divide(a, number_unmasked), 720)
 
     if normalize:
@@ -52,39 +51,18 @@ def angular_correlation(r_theta_img, mask=None, binning=1, cut_off=0, normalize=
             a = a_prime
     return a
 
-'''
 
-    # slow method is slow but kept for completeness sake... and is a process which is O(n) = n^2
-    if mask is not None:
-        image[mask] = np.nan
-    correlation = np.zeros(np.shape(image))
-    for k, row in enumerate(image):
-        i_avg = (np.nanmean(row)) ** 2
-        for phi, i_phi in enumerate(row):
-            I_k_phi = np.nanmean([np.multiply(i_theta,row[theta-phi])
-                                  for theta, i_theta in enumerate(row)])
-            if normalize:
-                I_k_phi = (I_k_phi - i_avg)/i_avg
-            correlation[k,phi]= I_k_phi
-    a = correlation
-'''
-
-
-def angular_power_correlation(correlation, method="FFT"):
+def power_spectrum(correlation, method="FFT"):
     """
     :param correlation: Taking the FFT of the angular correlation to find the symmetry present
     :param method: Right now this doesn't actually do anything but I want to add in other methods.
     :return: pow_spectrum: The resulting power spectrum from the angular correlation.  Gives indexes 0-180.
     """
-    pow_spectrum = []
 
     if method is "FFT":
-        for c in correlation:
-            power_s = np.fft.fft(c)
-            power_s = np.power(power_s, 2)
-            power_s = np.real(power_s)
-            pow_spectrum.append(np.ndarray.tolist(power_s))
-
+        print(np.shape(correlation))
+        pow_spectrum = np.fft.fft(correlation, axis=1)
+        pow_spectrum = np.power(pow_spectrum,2)
     return pow_spectrum
 
 
