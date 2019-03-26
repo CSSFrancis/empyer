@@ -9,9 +9,9 @@ def load(filenames=None,
          lazy=False,
          **kwds):
     return hsload(filenames=filenames,
-                      signal_type=signal_type,
-                      stack=stack,
-                      stack_axis=stack_axis,
-                      new_axis_name=new_axis_name,
-                      lazy=lazy,
-                      **kwds)
+                  signal_type=signal_type,
+                  stack=stack,
+                  stack_axis=stack_axis,
+                  new_axis_name=new_axis_name,
+                  lazy=lazy,
+                  **kwds)

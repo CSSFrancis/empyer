@@ -83,7 +83,7 @@ def find_center(img):
 
 
 def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False):
-    '''
+    """
     Takes a 2-d array image and allows you to solve for the equivalent ellipse.
     :param img:  2-d array image
     :param interactive: allows you to pick points for the ellipse instead of taking the top 2000 points
@@ -91,7 +91,7 @@ def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False)
     :return center:in cartesian coordinates or (x,y)!!!!!! arrays are in y,x
     :return lengths: the length in pixels of the major and minor axis
     :return angle: in cartesian coordinates
-    '''
+    """
 
     def fit_ellipse(x,y):
         x = x[:,np.newaxis]  # reshaping the x and y axis
@@ -135,74 +135,63 @@ def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False)
                 return np.pi/2 + np.arctan(2*b/(a-c))/2
     img_shape = np.shape(img)
     img_list = np.reshape(img, (-1, *img_shape[-2:]))
-    center = np.zeros((len(img_list),2))
-    lengths = np.zeros((len(img_list),2))
-    angle = np.zeros((len(img_list)))
 
-    for it, i in enumerate(img_list):
-        if mask is not None:
-            i[mask] = 0
-        coords = [[], []]
-        if interactive:
-            figure1 = plt.figure()
-            ax = figure1.add_subplot(111)
-            plt.imshow(i)
-            plt.text(x=-50, y=-20, s="Click to add points. Click again to remove points. You must have 5 points")
-
-            def add_point(event):
-                ix, iy = event.xdata, event.ydata
-                x_diff, y_diff = np.abs(np.subtract(coords[0], ix)), np.abs(np.subtract(coords[1], iy))
-                truth = list(np.multiply(x_diff < 10, y_diff < 10))
-                if not len(x_diff):
-                    coords[0].append(ix)
-                    coords[1].append(iy)
-                elif not any(truth):
-                    coords[0].append(ix)
-                    coords[1].append(iy)
-                else:
-                    truth = list(np.multiply(x_diff < 10, y_diff < 10)).index(True)
-                    coords[0].pop(truth)
-                    coords[1].pop(truth)
-
-                print(coords)
-                ax.clear()
-                ax.imshow(img)
-                ax.scatter(coords[0], coords[1], s=10, marker="o", color="crimson")
-                figure1.canvas.draw()
-
-
-            cid = figure1.canvas.mpl_connect('button_press_event', add_point)
-            plt.show()
-            print(coords[0])
-        #  non-interactive, works better if there is an intense ring
-        # TODO: Make method more robust with respect to obviously wrong points
-        else:
-            i_shape = np.shape(i)
-            print(i_shape)
-            flattened_array = i.flatten()
-            indexes = sorted(range(len(flattened_array)), key=flattened_array.__getitem__)
-            # take top 5000 points make sure exclude zero beam
-            coords[0] = np.remainder(indexes[-num_points:], i_shape[0])  # x axis (column)
-            coords[1] = np.floor_divide(indexes[-num_points:], i_shape[1])  # y axis (row)
-        a = fit_ellipse(np.array(coords[0]), np.array(coords[1]))
-        center[it] = ellipse_center(a)  # (x,y)
-        #  center = [center[1],center[0]] # array coordinates (y,x)
-        lengths[it] = ellipse_axis_length(a)
-        angle[it] = ellipse_angle_of_rotation(a)
-        #  angle = (np.pi/2)-angle # transforming to array coordinates
-        print("The center is:", center)
-        print("The major and minor axis lengths are:", lengths)
-        print("The angle of rotation is:", angle)
-        if plot:
-            ellipse = Ellipse((center[0], center[1]), lengths[0] * 2, lengths[1] * 2, angle=angle, fill=False)
-            fig = plt.figure()
-            axe = fig.add_subplot(111)
-            axe.imshow(img)
-            axe.add_patch(ellipse)
-            plt.show()
+    if mask is not None:
+        i[mask] = 0
+    coords = [[], []]
+    if interactive:
+        figure1 = plt.figure()
+        ax = figure1.add_subplot(111)
+        plt.imshow(i)
+        plt.text(x=-50, y=-20, s="Click to add points. Click again to remove points. You must have 5 points")
+        def add_point(event):
+            ix, iy = event.xdata, event.ydata
+            x_diff, y_diff = np.abs(np.subtract(coords[0], ix)), np.abs(np.subtract(coords[1], iy))
+            truth = list(np.multiply(x_diff < 10, y_diff < 10))
+            if not len(x_diff):
+                coords[0].append(ix)
+                coords[1].append(iy)
+            elif not any(truth):
+                coords[0].append(ix)
+                coords[1].append(iy)
+            else:
+                truth = list(np.multiply(x_diff < 10, y_diff < 10)).index(True)
+                coords[0].pop(truth)
+                coords[1].pop(truth)
+            print(coords)
+            ax.clear()
+            ax.imshow(img)
+            ax.scatter(coords[0], coords[1], s=10, marker="o", color="crimson")
+            figure1.canvas.draw()
+        cid = figure1.canvas.mpl_connect('button_press_event', add_point)
+        plt.show()
+        print(coords[0])
+    #  non-interactive, works better if there is an intense ring
+    # TODO: Make method more robust with respect to obviously wrong points
+    else:
+        i_shape = np.shape(img)
+        print(i_shape)
+        flattened_array = img.flatten()
+        indexes = sorted(range(len(flattened_array)), key=flattened_array.__getitem__)
+        # take top 5000 points make sure exclude zero beam
+        coords[0] = np.remainder(indexes[-num_points:], i_shape[0])  # x axis (column)
+        coords[1] = np.floor_divide(indexes[-num_points:], i_shape[1])  # y axis (row)
+    a = fit_ellipse(np.array(coords[0]), np.array(coords[1]))
+    center = ellipse_center(a)  # (x,y)
+    #  center = [center[1],center[0]] # array coordinates (y,x)
+    lengths = ellipse_axis_length(a)
+    angle = ellipse_angle_of_rotation(a)
+    #  angle = (np.pi/2)-angle # transforming to array coordinates
+    print("The center is:", center)
+    print("The major and minor axis lengths are:", lengths)
+    print("The angle of rotation is:", angle)
+    if plot:
+        ellipse = Ellipse((center[0], center[1]), lengths[0] * 2, lengths[1] * 2, angle=angle, fill=False)
+        fig = plt.figure()
+        axe = fig.add_subplot(111)
+        axe.imshow(img)
+        axe.add_patch(ellipse)
+        plt.show()
     print(img_shape)
-    center = np.reshape(center, (*img_shape[:-2],2))
-    lengths = np.reshape(lengths, (*img_shape[:-2],2))
-    angle = np.reshape(angle, (*img_shape[:-2],1))
     return center, lengths, angle
 
