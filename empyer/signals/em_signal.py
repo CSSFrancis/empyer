@@ -37,6 +37,7 @@ class EM_Signal(Signal2D):
             self.axes_manager[index].units = units
         if offset is not None:
             self.axes_manager[index].offset = offset
+
     def get_signal_axes_values(self):
         axis0 = np.linspace(start=self.axes_manager.signal_axes[0].offset,
                             stop=(self.axes_manager.signal_axes[0].size *

@@ -1,4 +1,8 @@
 from hyperspy.api import load as hsload
+from .signals.diffraction_signal import DiffractionSignal
+from .signals.polar_signal import PolarSignal
+from .signals.correlation_signal import CorrelationSignal
+from .signals.power_signal import PowerSignal
 
 
 def load(filenames=None,
@@ -15,3 +19,19 @@ def load(filenames=None,
                   new_axis_name=new_axis_name,
                   lazy=lazy,
                   **kwds)
+
+
+def to_diffraction_signal(signal=None):
+    print(signal.axes_manager.deepcopy())
+    ds = DiffractionSignal(signal,
+                           metadata=signal.metadata.as_dictionary(),
+                           axes=signal.axes_manager.as_dictionary())
+
+    return ds
+
+
+def to_polar_signal(signal=None):
+    ps = PolarSignal(signal,
+                     metadata=signal.metadata.as_dictionary(),
+                     axes=signal.axes_manager.as_dictionary())
+    return ps
