@@ -3,16 +3,20 @@ from empyer.misc.image import bin_2d
 
 
 def angular_correlation(r_theta_img, mask=None, binning=1, cut_off=0, normalize=True):
-    """
-    :param r_theta_img: 2-d array image.
-    :param mask: boolean array of same size as r_theta_image to mask some data
-    :param cut_off: integer, number of pixels to disregard (small k)
-    :param binning: bin the image
-    :param force_symmetry: force the symmetry by shifting the image 180 degrees
-    :param fast: use the fast method for computing the angular correlation
-    :param normalize: Use subtract  <I(\theta)>^2 and divide by <I(\theta)>^2
-    A program that takes a 2d image and then preforms an angular correlation on the image.
+    """A program that takes a 2d image and then preforms an angular correlation on the image.
 
+    Parameters
+    ----------
+    r_theta_img: array_like
+        The index of the axes
+    mask: boolean array
+        The name of the axis
+    binning : int
+        binning factor
+    cut_off : int
+        The cut off in pixels to
+    normalize: bool
+        Subtract <I(\theta)>^2 and divide by <I(\theta)>^2
     """
     image = r_theta_img
     if mask is not None:

@@ -8,10 +8,19 @@ def flatten_axis(array, axis):
 
 def bin_2d(image, binning_factor):
     """
-    -This function takes a 2d image and then linearly interpolates to find the intermediate value.
-    :param image:2d numpy array
-    :param binning_factor: factor for binning down image
-    :return: new_image: 2d image binned down by binning factor
+    Binning a 2-dimensional image  by some factor
+
+    Parameters
+    ----------
+    image : 2-d array
+
+    binning_factor : int
+
+    Returns
+    ----------
+    new_image : 2-d array
+
+
     """
     sh = np.shape(image)
 
@@ -40,6 +49,19 @@ def cartesian_to_polar(x, y, center):
 def polar_to_cartesian(r, theta, center):
     """
     A function that converts polar (r,theta) coordinates to cartesian(x,y) ones
+
+    Parameters
+    ----------
+    r: float
+        radius
+    theta: float
+        angle
+    center: array
+        center of the array [x,y]
+    Returns
+    ----------
+    x: float
+    y: float
     """
     x = center[0] + r*np.cos(theta)
     y = center[1] + r*np.sin(theta)
@@ -49,6 +71,19 @@ def polar_to_cartesian(r, theta, center):
 def cartesian_list_to_polar(x_list,y_list,center):
     """
     A function that converts a list of x,y coordinates to (r,theta)
+
+    Parameters
+    ----------
+    r: float
+        radius
+    theta: float
+        angle
+    center: array
+        center of the array [x,y]
+    Returns
+    ----------
+    theta_list: 2-d array
+    r_list: 2-d array
     """
     theta_list = []
     r_list = []
@@ -60,6 +95,21 @@ def cartesian_list_to_polar(x_list,y_list,center):
 
 
 def polar_list_to_cartesian(r_list, theta_list, center):
+    """
+    Parameters
+    ----------
+    r_list: array_like
+        radius
+    theta_list: array_like
+        angle
+    center: array
+        center of the array [x,y]
+    Returns
+    ----------
+    x_list: array
+    y_list: array
+
+    """
     x_list = []
     y_list = []
     for r, t in zip(r_list, theta_list):
@@ -71,7 +121,16 @@ def polar_list_to_cartesian(r_list, theta_list, center):
 
 def create_grid(dimension1, dimension2):
     """
-    Takes data from array of points turns it into a grid of coordinates
+    Parameters
+    ----------
+    dimension1 : array
+    dimension2 : array
+
+    Returns
+    ----------
+    a: array
+    b: array
+
     """
     dim1, dim2 = np.meshgrid(dimension1, dimension2)
     size = len(dimension1)*len(dimension2)
@@ -81,14 +140,30 @@ def create_grid(dimension1, dimension2):
 
 def ellipsoid_list_to_cartesian(r_list, theta_list, center, major, minor, angle, even_spaced=False):
     """
-    :param r_list: list of all of the radius.  Can either be all values or even_spaced
-    :param theta_list: list of all of the theta.  Can either be all values or even_spaced
-    :param center:
-    :param major:
-    :param minor:
-    :param angle:
-    :param even_spaced: if the r and t values are evenly spaced.  Speeds computation a lot...
-    :return: list of equivalent x and y values.
+    Take a list of ellipsoid points and then use then find their cartesian equivalent
+    Parameters
+    ----------
+    r_list: array
+        list of all of the radius.  Can either be all values or even_spaced
+    theta_list: array
+        list of all of the radius.  Can either be all values or even_spaced
+    center: array_like
+        center of the ellipsoid
+    major: float
+        length of the major axis
+    minor: float
+        length of the minor axis
+    angle: float
+        angle of the major axis in radians
+    even_spaced: bool
+        if the values are even spaced.
+
+    Returns
+    ----------
+    x_list: array_like
+        list of x points
+    y_list: array_like
+        list of y points
     """
     x_list = []
     y_list = []
