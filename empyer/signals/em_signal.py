@@ -4,9 +4,14 @@ from hyperspy.signals import Signal2D
 
 
 class EM_Signal(Signal2D):
-
+    """
+    The Diffraction Signal class extends the Hyperspy 2d signal class
+    """
+    _signal_type = "em_signal"
     def __init__(self, *args, **kwargs):
-        """Basic unit of data in the program. Spectrums can be any dimension of array but all of the data should be of the
+        """Basic unit of data in the program.
+
+        Spectrums can be any dimension of array but all of the data should be of the
         same type from the same area... (Maybe define this better later... You can use it kind of however you want though)
         Extends the Signal2D Class from hyperspy so there is that added functionality
 
@@ -33,8 +38,7 @@ class EM_Signal(Signal2D):
         Signal2D.__init__(self, *args, **kwargs)
 
     def set_axes(self, index, name=None, scale=None, units=None, offset=None):
-        """
-        Set axes of the signal
+        """Set axes of the signal
 
         Parameters
         ----------
@@ -86,8 +90,7 @@ class EM_Signal(Signal2D):
         return np.transpose(mask)
 
     def add_mask(self, name='mask', type='rectangle', data=[1,1,1,1]):
-        """
-        Add a mask by using four points to define a rectangle
+        """Add a mask by using four points to define a rectangle
 
         Parameters
         ----------

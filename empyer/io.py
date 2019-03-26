@@ -22,10 +22,10 @@ def load(filenames=None,
 
 
 def to_diffraction_signal(signal=None):
-    print(signal.axes_manager.deepcopy())
+    ax = signal.axes_manager.as_dictionary()
     ds = DiffractionSignal(signal,
-                           metadata=signal.metadata.as_dictionary(),
-                           axes=signal.axes_manager.as_dictionary())
+                           metadata=signal.metadata.as_dictionary())
+    ds.axes_manager.update_axes_attributes_from(ax)
 
     return ds
 
