@@ -1,6 +1,11 @@
 import numpy as np
 
 
+def flatten_axis(array, axis):
+    array_shape = np.shape(array)
+    np.reshape(array, (*array_shape[:axis-1], -1, *array_shape[-2:]))
+
+
 def bin_2d(image, binning_factor):
     """
     -This function takes a 2d image and then linearly interpolates to find the intermediate value.

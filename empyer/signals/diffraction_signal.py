@@ -6,7 +6,7 @@ import numpy as np
 
 class DiffractionSignal(Signal2D):
     """
-    The Diffraction Signal class extends the Spectrums class and the Hyperspy 2d signal class
+    The Diffraction Signal class extends the Hyperspy 2d signal class
     """
     _signal_type = "diffraction_signal"
 
