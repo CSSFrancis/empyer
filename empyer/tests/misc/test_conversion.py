@@ -1,7 +1,6 @@
 from unittest import TestCase
 import numpy as np
 from empyer.misc.cartesain_to_polar import convert
-import matplotlib.pyplot as plt
 
 
 class TestConvert(TestCase):
@@ -34,4 +33,4 @@ class TestConvert(TestCase):
 
     def test_elliptical(self):
         conversion,_ = convert(self.test2, center=[265, 250], angle=.4, foci=[100, 130], phase_width=720)
-        self.assertAlmostEqual(np.mean(conversion), 0.5, places =2 )
+        self.assertAlmostEqual(np.mean(conversion), 0.5, places=2)

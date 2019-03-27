@@ -22,16 +22,42 @@ def load(filenames=None,
 
 
 def to_diffraction_signal(signal=None):
+    """Hyperspy signal to diffraction_signal
+    """
     ax = signal.axes_manager.as_dictionary()
-    ds = DiffractionSignal(signal,
-                           metadata=signal.metadata.as_dictionary())
-    ds.axes_manager.update_axes_attributes_from(ax)
-
+    ax = [ax[key]for key in ax]
+    ds = DiffractionSignal(signal, metadata=signal.metadata.as_dictionary(), axes=ax)
     return ds
 
 
 def to_polar_signal(signal=None):
+    """Hyperspy signal to polar_signal
+     """
+    ax = signal.axes_manager.as_dictionary()
+    ax = [ax[key]for key in ax]
     ps = PolarSignal(signal,
                      metadata=signal.metadata.as_dictionary(),
-                     axes=signal.axes_manager.as_dictionary())
+                     axes=ax)
+    return ps
+
+
+def to_correlation_signal(signal=None):
+    """Hyperspy signal to correlation_signal
+     """
+    ax = signal.axes_manager.as_dictionary()
+    ax = [ax[key]for key in ax]
+    cs = CorrelationSignal(signal,
+                     metadata=signal.metadata.as_dictionary(),
+                     axes=ax)
+    return cs
+
+
+def to_power_signal(signal=None):
+    """Hyperspy signal to power_signal
+     """
+    ax = signal.axes_manager.as_dictionary()
+    ax = [ax[key]for key in ax]
+    ps = PowerSignal(signal,
+                     metadata=signal.metadata.as_dictionary(),
+                     axes=ax)
     return ps

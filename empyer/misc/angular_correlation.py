@@ -40,7 +40,7 @@ def angular_correlation(r_theta_img, mask=None, binning=1, cut_off=0, normalize=
         mask_boolean = ~mask  # inverting the boolean mask
         mask_fft = np.fft.fft(mask_boolean, axis=1)
         number_unmasked = np.fft.ifft(mask_fft*np.conjugate(mask_fft), axis=1).real
-        number_unmasked[number_unmasked==0]=1  # get rid of divide by zero error for completely masked rows
+        number_unmasked[number_unmasked == 0] = 1  # get rid of divide by zero error for completely masked rows
         a = np.multiply(np.divide(a, number_unmasked), 720)
 
     if normalize:

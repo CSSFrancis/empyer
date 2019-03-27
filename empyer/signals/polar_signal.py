@@ -1,6 +1,8 @@
+import numpy as np
 from empyer.signals.em_signal import EM_Signal
 from empyer.signals.correlation_signal import CorrelationSignal
 from empyer.misc.angular_correlation import angular_correlation
+from empyer.misc.image import square
 
 
 class PolarSignal(EM_Signal):
@@ -75,4 +77,35 @@ class PolarSignal(EM_Signal):
                          units=self.axes_manager[3].units,
                          offset=offset)
         return angular
+
+    def mask_data(self):
+        m = self.get_mask()
+        if m is not None:
+            self.map(np.ma.masked_array, mask=m)
+
+    def fem(self, version="omega"):
+        """Calculated the variance among some image
+        Parameters
+        ----------
+        version: str
+            The name of the FEM equation to use
+        """
+        if version is 'r':
+            self.mask_data()
+            var = self.nanmean(axis=3)
+            var.map(square)
+            var = var.nanmean()
+            center = self.nanmean(axis=3).nanmean()
+            center.map(square)
+            int_vs_k = (var-center)/center
+            print(int_vs_k.axes_manager)
+        elif version is 'omega':
+            self.mask_data()
+            var = self.map(square, inplace=False).nanmean().nanmean(axis=1)
+            center = self.nanmean(axis=3)
+            center.map(square)
+            center = center.nanmean()
+            int_vs_k = (var - center) / center
+            print(int_vs_k.axes_manager)
+        return int_vs_k
 

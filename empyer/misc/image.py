@@ -6,6 +6,10 @@ def flatten_axis(array, axis):
     np.reshape(array, (*array_shape[:axis-1], -1, *array_shape[-2:]))
 
 
+def square(array):
+    return np.power(array, 2)
+
+
 def bin_2d(image, binning_factor):
     """
     Binning a 2-dimensional image  by some factor

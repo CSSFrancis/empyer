@@ -1,7 +1,6 @@
 from unittest import TestCase
 import numpy as np
 from empyer.misc.image import bin_2d, ellipsoid_list_to_cartesian
-import matplotlib.pyplot as plt
 
 
 class TestBinning(TestCase):
@@ -22,9 +21,10 @@ class TestConversions(TestCase):
         self.radii = np.arange(1, 180)
 
     def test_ellipse_conversion(self):
-        x,y = ellipsoid_list_to_cartesian(self.radii,self.thetas,
-                                    center=[0,0],
-                                    major=10,
-                                    minor=20,
-                                    angle=.3,
-                                    even_spaced=True)
+        x, y = ellipsoid_list_to_cartesian(self.radii,
+                                          self.thetas,
+                                          center=[0,0],
+                                          major=10,
+                                          minor=20,
+                                          angle=.3,
+                                          even_spaced=True)

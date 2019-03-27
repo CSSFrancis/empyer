@@ -29,11 +29,7 @@ class PowerSignal(EM_Signal):
         """
         EM_Signal.__init__(self, *args, **kwargs)
 
-    def simplify_symmetry(self, scale=1):
-        scaled_power = [spectra > scale for spectra in self.data]
-        return scaled_power
-
-    def get_i_vs_k(self, normalize=True):
+    def get_i_vs_k(self, symmetry=None):
         """ Get the intensity versus k for the summed diffraction patterns
 
         Parameters
@@ -46,19 +42,14 @@ class PowerSignal(EM_Signal):
             k values for the
         i_vs_k: intensity
         """
-        images = self.data
-        signal_shapes = [axis.size for axis in self.axes_manager.signal_axes]
-        navigation_shapes = [axis.size for axis in self.axes_manager.navigation_axes]
-        unwrapped_length = [np.prod(navigation_shapes)]
-        images = np.reshape(images, (unwrapped_length + signal_shapes[::-1]))
-        if normalize:
-            i_vs_k = [np.divide(np.subtract(i, i.min()), (i.max()-i.min()))for i in images]
-        print(np.shape(i_vs_k))
-        i_vs_k = np.sum(i_vs_k, axis=0)
-        _, k = self.get_signal_axes_values()
-        return k, i_vs_k
+        if symmetry is None:
+            i = self.isig[:, :].sum(axis=[0,1,2])
+        else:
+            i = self.isig[:, symmetry].sum(axis=[0,1,2])
 
-    def get_map(self, k_region=[3, 6], normalize=True):
+        return i
+
+    def get_map(self, k_region=[3.0, 6.0], symmetry=None):
         """Creates a 2 dimensional map of from the power spectrum.
         Parameters
         ----------
@@ -71,16 +62,8 @@ class PowerSignal(EM_Signal):
         symmetry_map: 2-d array
             2 dimensional map of from the power spectrum
         """
-        images = self.data
-        if normalize:
-            images = [np.divide(np.subtract(i, i.min()), (i.max() - i.min())) for i in images]
-        signal_shapes = [axis.size for axis in self.axes_manager.signal_axes]
-        navigation_shapes = [axis.size for axis in self.axes_manager.navigation_axes]
-        unwrapped_length = [np.prod(navigation_shapes)]
-        images = np.reshape(images, (unwrapped_length + signal_shapes[::-1]))
-        _, k = self.get_signal_axes_values()
-        k = np.multiply(k > k_region[0], k < k_region[1])
-        sliced_images = images[:, k, :]
-        symmetry_map = np.sum(sliced_images, axis=1)
-        symmetry_map = np.reshape(symmetry_map, (navigation_shapes[::-1] + [self.axes_manager.signal_axes[0].size]))
-        return symmetry_map
+        if symmetry is None:
+            sym_map = self.isig[k_region[0]:k_region[1], :].sum(axis=[2, 3]).transpose()
+        else:
+            sym_map = self.isig[k_region[0]:k_region[1], symmetry].sum(axis=[2, 3]).transpose()
+        return sym_map
