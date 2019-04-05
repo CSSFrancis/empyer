@@ -12,8 +12,8 @@ class TestDiffractionSignal(TestCase):
         d[:, :, 356, 256] = 10
         d[:, :, 256, 156] = 10
         d[:, :, 256, 356] = 10
-        d[:,:, 255, 356] = 10
-        self.bs = BaseSignal(data=d)
+        d[:, :, 255, 356] = 10
+        self.bs = BaseSignal(data=d, lazy=True)
         self.s = Signal2D(self.bs)
         self.ds = DiffractionSignal(self.s)
         self.ds.determine_ellipse(num_points=5)

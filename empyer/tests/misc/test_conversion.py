@@ -10,7 +10,7 @@ class TestConvert(TestCase):
     def test_2d_convert(self):
         test1 = np.zeros((512, 512))
         test1[240:260, :] = 1
-        c, _ = convert(test1,
+        c= convert(test1,
                        center=[265, 250],
                        angle=0,
                        foci=[100, 100],
@@ -19,7 +19,7 @@ class TestConvert(TestCase):
         mask = np.zeros((512, 512), dtype=bool)
         mask[:240, 240:260] = 1
         mask[260:, 240:260] = 1
-        c_mask, _ = convert(test1,
+        c = convert(test1,
                             mask=mask,
                             center=[265, 250],
                             angle=0,
