@@ -19,18 +19,17 @@ class TestDiffractionSignal(TestCase):
         self.ds.determine_ellipse(num_points=5)
 
     def test_add_mask(self):
-        self.ds.add_mask(name='test', type='rectangle', data=[1, 1, 1, 1])
-        test_dict = [1, 1, 1, 1]
-        self.assertListEqual(self.ds.metadata.Masks['test']['data'],test_dict)
+        self.ds.mask_slice(1, 3, 1, 3)
+        self.assertEqual(self.ds.metadata.Mask[1, 1], True)
 
-    def test_get_mask(self):
-        self.ds.add_mask(name='test', type='rectangle', data=[0, 10, 1, 10])
-        self.ds.add_mask(name='test1', type='rectangle', data=[1, 20, -10, -1])
-        mask = self.ds.get_mask()
-        test = np.zeros((512,512), dtype=bool)
-        test[0:10, 1:10] = 1
-        test[1:20, -10:-1] = 1
-        self.assertEqual(0, np.sum(np.not_equal(test, mask)))
+    def test_unmask(self):
+        self.ds.mask_slice(1, 3, 1, 3)
+        self.ds.mask_slice(1, 3, 1, 3,unmask=True)
+        self.assertEqual(self.ds.metadata.Mask[1, 1], False)
+
+    def test_float_mask(self):
+        self.ds.mask_slice(1.1, 3.1, 1.1, 3.1)
+        self.assertEqual(self.ds.metadata.Mask[1, 3], False)
 
     def test_conversion(self):
         self.ds.calculate_polar_spectrum(phase_width=720,
@@ -45,8 +44,7 @@ class TestDiffractionSignal(TestCase):
                                          inplace=False)
 
     def test_conversion_and_mask(self):
-        self.ds.add_mask(name='test', type='rectangle', data=[0, 10, 1, 10])
-        self.ds.add_mask(name='test1', type='rectangle', data=[1, 20, -10, -1])
+        self.ds.mask_slice(10, 10, 1, 10)
         self.ds.calculate_polar_spectrum(phase_width=720,
                                          radius=None,
                                          parallel=False,

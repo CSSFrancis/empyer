@@ -8,6 +8,7 @@ class EM_Signal(Signal2D):
     The Diffraction Signal class extends the Hyperspy 2d signal class
     """
     _signal_type = "em_signal"
+
     def __init__(self, *args, **kwargs):
         """Basic unit of data in the program.
 
@@ -62,6 +63,57 @@ class EM_Signal(Signal2D):
         if offset is not None:
             self.axes_manager[index].offset = offset
 
+    def mask_below(self, value, unmask=False):
+        if not self.metadata.has_item('Mask'):
+            self.metadata.add_node('Mask')
+            mask = np.zeros(shape=self.axes_manager.signal_shape, dtype=bool)
+            self.metadata.Masks = mask
+        if unmask is False:
+            is_below = self.mean().data < value
+            self.metadata.Mask = self.metadata.Mask+(is_below*self.metadata.Mask == 0)
+        if unmask is True:
+            is_below = self.mean().data < value
+            self.metadata.Mask = self.metadata.Mask - (is_below * self.metadata.Mask)
+
+    def mask_shape(self,shape='rectangle', data=[1,1,1,1],unmask =False):
+        if shape is 'rectangle':
+            self.mask_slice(data[0], data[1], data[2], data[3], unmask=unmask)
+            return
+        if not self.metadata.has_item('Mask'):
+            self.metadata.add_node('Mask')
+            mask = np.zeros(shape=self.axes_manager.signal_shape, dtype=bool)
+            self.metadata.Masks = mask
+        if shape is 'circle':
+            if not all(isinstance(item, int) for item in data):
+                radius = self.axes_manager.signal_axes[0].value2index(data[0])
+                x = self.axes_manager.signal_axes[0].value2index(data[1])
+                y = self.axes_manager.signal_axes[1].value2index(data[2])
+            else:
+                radius = data[0]
+                x = data[1]
+                y = data[2]
+            x_ind, y_ind = np.meshgrid(range(radius, radius + 1), range(radius, radius + 1))
+            r = np.sqrt(x ** 2 + y ** 2)
+            inside = r < radius
+            x_ind, y_ind = x_ind[inside], y_ind[inside]
+            self.metadata.Mask[x_ind, y_ind] =True
+        return
+
+    def mask_slice(self, x1, x2, y1, y2, unmask=False):
+        if not self.metadata.has_item('Mask'):
+            self.metadata.add_node('Mask')
+            mask = np.zeros(shape=self.axes_manager.signal_shape, dtype=bool)
+            self.metadata.Mask = mask
+        if not all(isinstance(item, int) for item in [x1, x2, y1, y2]):
+            x1 = self.axes_manager.signal_axes[0].value2index(x1)
+            x2 = self.axes_manager.signal_axes[0].value2index(x2)
+            y1 = self.axes_manager.signal_axes[1].value2index(y1)
+            y2 = self.axes_manager.signal_axes[1].value2index(y2)
+        if unmask is False:
+            self.metadata.Mask[x1:x2, y1:y2] = True
+        if unmask is True:
+            self.metadata.Mask[x1:x2, y1:y2] = False
+
     def get_signal_axes_values(self):
         axis0 = np.linspace(start=self.axes_manager.signal_axes[0].offset,
                             stop=(self.axes_manager.signal_axes[0].size *
@@ -76,37 +128,8 @@ class EM_Signal(Signal2D):
         return axis0, axis1
 
     def get_mask(self):
-        if self.metadata.has_item('Masks'):
-            mask = np.zeros(shape=self.axes_manager.signal_shape, dtype=bool)
-            mask_dict = self.metadata.Masks.as_dictionary()
-            for key in mask_dict:
-                m = mask_dict[key]
-                if m['type'] is 'rectangle':
-                    mask[int(m['data'][0]):int(m['data'][1]),int(m['data'][2]):int(m['data'][3])] = True
-
+        if self.metadata.has_item('Mask'):
+            mask = self.metadata.Mask
         else:
             return None
-        print(np.shape(mask))
         return np.transpose(mask)
-
-    def add_mask(self, name='mask', type='rectangle', data=[1,1,1,1]):
-        """Add a mask by using four points to define a rectangle
-
-        Parameters
-        ----------
-        name : str
-           the name of the mask (overwriting the name replaces the mask)
-        type : str
-            The shape of the mask (rectangle...)
-        data : array_like
-            Description of the shape
-        """
-        data_shape = np.shape(data)
-        if len(data_shape) == 1:
-            pass
-        else:
-            raise ValueError("Navigation shape of the marker must be 1 or the same navigation shape as this signal.")
-        if not self.metadata.has_item('Masks'):
-            self.metadata.add_node('Masks')
-            self.metadata.Masks = {}
-        self.metadata.Masks[name]={'type':type,'data':data}
