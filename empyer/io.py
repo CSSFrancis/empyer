@@ -1,4 +1,5 @@
 from hyperspy.api import load as hsload
+from .signals.em_signal import EM_Signal
 from .signals.diffraction_signal import DiffractionSignal
 from .signals.polar_signal import PolarSignal
 from .signals.correlation_signal import CorrelationSignal
@@ -12,14 +13,33 @@ def load(filenames=None,
          new_axis_name='stack_element',
          lazy=False,
          **kwds):
-    return hsload(filenames=filenames,
-                  signal_type=signal_type,
-                  stack=stack,
-                  stack_axis=stack_axis,
-                  new_axis_name=new_axis_name,
-                  lazy=lazy,
-                  **kwds)
+    signal = hsload(filenames=filenames,
+                     signal_type=signal_type,
+                     stack=stack,
+                     stack_axis=stack_axis,
+                     new_axis_name=new_axis_name,
+                     lazy=lazy,
+                     **kwds)
+    if signal.metadata.Signal.signal_type == 'diffraction_signal':
+        signal = to_diffraction_signal(signal)
+        print('To diffraction')
+    if signal.metadata.Signal.signal_type == 'em_signal':
+        signal = to_em_signal(signal)
+    if signal.metadata.Signal.signal_type == 'polar_signal':
+        signal = to_polar_signal(signal)
+    if signal.metadata.Signal.signal_type == 'correlation_signal':
+        signal = to_correlation_signal(signal)
+    if signal.metadata.Signal.signal_type == 'power_signal':
+        signal = to_power_signal(signal)
+    return signal
 
+def to_em_signal(signal=None):
+    """Hyperspy signal to diffraction_signal
+    """
+    ax = signal.axes_manager.as_dictionary()
+    ax = [ax[key]for key in ax]
+    ds = EM_Signal(signal, metadata=signal.metadata.as_dictionary(), axes=ax)
+    return ds
 
 def to_diffraction_signal(signal=None):
     """Hyperspy signal to diffraction_signal

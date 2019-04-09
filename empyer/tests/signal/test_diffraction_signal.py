@@ -18,19 +18,6 @@ class TestDiffractionSignal(TestCase):
         self.ds = DiffractionSignal(self.s)
         self.ds.determine_ellipse(num_points=5)
 
-    def test_add_mask(self):
-        self.ds.mask_slice(1, 3, 1, 3)
-        self.assertEqual(self.ds.metadata.Mask[1, 1], True)
-
-    def test_unmask(self):
-        self.ds.mask_slice(1, 3, 1, 3)
-        self.ds.mask_slice(1, 3, 1, 3,unmask=True)
-        self.assertEqual(self.ds.metadata.Mask[1, 1], False)
-
-    def test_float_mask(self):
-        self.ds.mask_slice(1.1, 3.1, 1.1, 3.1)
-        self.assertEqual(self.ds.metadata.Mask[1, 3], False)
-
     def test_conversion(self):
         self.ds.calculate_polar_spectrum(phase_width=720,
                                          radius=None,

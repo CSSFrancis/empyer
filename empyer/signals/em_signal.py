@@ -63,6 +63,14 @@ class EM_Signal(Signal2D):
         if offset is not None:
             self.axes_manager[index].offset = offset
 
+    def set_mask(self, mask):
+        if not self.metadata.has_item('Mask'):
+            self.metadata.add_node('Mask')
+        if self.axes_manager.signal_shape == reversed(np.shape(mask)):
+            self.metadata.Mask = mask
+        else:
+            print('The mask shape must be the same shape as the signal')
+
     def mask_below(self, value, unmask=False):
         if not self.metadata.has_item('Mask'):
             self.metadata.add_node('Mask')
@@ -132,4 +140,4 @@ class EM_Signal(Signal2D):
             mask = self.metadata.Mask
         else:
             return None
-        return np.transpose(mask)
+        return mask

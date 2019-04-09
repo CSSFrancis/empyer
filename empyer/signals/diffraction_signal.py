@@ -106,14 +106,25 @@ class DiffractionSignal(EM_Signal):
                                 radius=radius,
                                 parallel=parallel,
                                 inplace=inplace)
+        if self.metadata.has_item('Mask'):
+            new_mask = convert(self.get_mask(),
+                               center=self.metadata.Signal.Ellipticity.center,
+                               angle=self.metadata.Signal.Ellipticity.angle,
+                               foci=self.metadata.Signal.Ellipticity.lengths,
+                               phase_width=phase_width,
+                               radius=radius)
+            new_mask = new_mask > 0
 
         passed_meta_data = self.metadata.as_dictionary()
         if self.metadata.Signal.has_item('Ellipticity'):
             del(passed_meta_data['Signal']['Ellipticity'])
-        if self.metadata.has_item('Masks'):
-            del (passed_meta_data['Masks'])
+        if self.metadata.has_item('Mask'):
+            del (passed_meta_data['Mask'])
 
         polar = PolarSignal(polar_signal, metadata=passed_meta_data)
+        print('singalshape', polar.axes_manager.signal_shape)
+        print('mask_shape', np.shape(new_mask))
+        polar.set_mask(mask=new_mask)
         polar.set_axes(0,
                        name=self.axes_manager[0].name,
                        scale=self.axes_manager[0].scale,
