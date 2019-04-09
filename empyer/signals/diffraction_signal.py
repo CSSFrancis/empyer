@@ -114,6 +114,7 @@ class DiffractionSignal(EM_Signal):
                                phase_width=phase_width,
                                radius=radius)
             new_mask = new_mask > 0
+            new_mask = np.transpose(new_mask)
 
         passed_meta_data = self.metadata.as_dictionary()
         if self.metadata.Signal.has_item('Ellipticity'):

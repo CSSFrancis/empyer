@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 from hyperspy.signals import Signal2D
 
@@ -66,10 +67,16 @@ class EM_Signal(Signal2D):
     def set_mask(self, mask):
         if not self.metadata.has_item('Mask'):
             self.metadata.add_node('Mask')
-        if self.axes_manager.signal_shape == reversed(np.shape(mask)):
+        if self.axes_manager.signal_shape == np.shape(mask):
             self.metadata.Mask = mask
         else:
             print('The mask shape must be the same shape as the signal')
+
+    def show_mask(self):
+        plt.figure()
+        plt.imshow(self.get_mask())
+        plt.show()
+        return
 
     def mask_below(self, value, unmask=False):
         if not self.metadata.has_item('Mask'):
@@ -94,16 +101,16 @@ class EM_Signal(Signal2D):
         if shape is 'circle':
             if not all(isinstance(item, int) for item in data):
                 radius = self.axes_manager.signal_axes[0].value2index(data[0])
-                x = self.axes_manager.signal_axes[0].value2index(data[1])
-                y = self.axes_manager.signal_axes[1].value2index(data[2])
+                y = self.axes_manager.signal_axes[0].value2index(data[1])
+                x = self.axes_manager.signal_axes[1].value2index(data[2])
             else:
                 radius = data[0]
-                x = data[1]
-                y = data[2]
-            x_ind, y_ind = np.meshgrid(range(radius, radius + 1), range(radius, radius + 1))
-            r = np.sqrt(x ** 2 + y ** 2)
+                y = data[1]
+                x = data[2]
+            x_ind, y_ind = np.meshgrid(range(-radius, radius + 1), range(-radius, radius + 1))
+            r = np.sqrt(x_ind ** 2 + y_ind ** 2)
             inside = r < radius
-            x_ind, y_ind = x_ind[inside], y_ind[inside]
+            x_ind, y_ind = x_ind[inside]+int(x), y_ind[inside]+int(y)
             self.metadata.Mask[x_ind, y_ind] =True
         return
 
@@ -118,9 +125,9 @@ class EM_Signal(Signal2D):
             y1 = self.axes_manager.signal_axes[1].value2index(y1)
             y2 = self.axes_manager.signal_axes[1].value2index(y2)
         if unmask is False:
-            self.metadata.Mask[x1:x2, y1:y2] = True
+            self.metadata.Mask[y1:y2, x1:x2] = True
         if unmask is True:
-            self.metadata.Mask[x1:x2, y1:y2] = False
+            self.metadata.Mask[y1:y2, x1:x2] = False
 
     def get_signal_axes_values(self):
         axis0 = np.linspace(start=self.axes_manager.signal_axes[0].offset,
