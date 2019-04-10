@@ -31,13 +31,15 @@ class TestDiffractionSignal(TestCase):
                                          inplace=False)
 
     def test_conversion_and_mask(self):
-        self.ds.mask_slice(10, 100, 1, 100)
+        self.ds.mask_slice(242, 262, 0, 512)
         ps = self.ds.calculate_polar_spectrum(phase_width=720,
                                               radius=None,
                                               parallel=False,
                                               inplace=False)
         ps.plot()
         ps.show_mask()
-
+        ac = ps.autocorrelation()
+        ac.plot()
         self.ds.show_mask()
+
 

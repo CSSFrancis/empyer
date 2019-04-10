@@ -67,21 +67,26 @@ class EM_Signal(Signal2D):
     def set_mask(self, mask):
         if not self.metadata.has_item('Mask'):
             self.metadata.add_node('Mask')
-        if self.axes_manager.signal_shape == np.shape(mask):
+        if tuple(reversed(self.axes_manager.signal_shape)) == np.shape(mask):
             self.metadata.Mask = mask
+        elif self.axes_manager.signal_shape == np.shape(mask):
+            self.metadata.Mask = np.transpose(mask)
         else:
             print('The mask shape must be the same shape as the signal')
 
     def show_mask(self):
-        plt.figure()
-        plt.imshow(self.get_mask())
+        ax = self.axes_manager.signal_axes
+        ax = [a.get_axis_dictionary() for a in reversed(ax)]
+        print(ax)
+        print(self.get_mask())
+        Signal2D(data=self.get_mask(), axes=ax).plot()
         plt.show()
         return
 
     def mask_below(self, value, unmask=False):
         if not self.metadata.has_item('Mask'):
             self.metadata.add_node('Mask')
-            mask = np.zeros(shape=self.axes_manager.signal_shape, dtype=bool)
+            mask = np.zeros(shape=tuple(reversed(self.axes_manager.signal_shape)), dtype=bool)
             self.metadata.Masks = mask
         if unmask is False:
             is_below = self.mean().data < value
@@ -96,7 +101,7 @@ class EM_Signal(Signal2D):
             return
         if not self.metadata.has_item('Mask'):
             self.metadata.add_node('Mask')
-            mask = np.zeros(shape=self.axes_manager.signal_shape, dtype=bool)
+            mask = np.zeros(shape=tuple(reversed(self.axes_manager.signal_shape)), dtype=bool)
             self.metadata.Masks = mask
         if shape is 'circle':
             if not all(isinstance(item, int) for item in data):
@@ -111,13 +116,14 @@ class EM_Signal(Signal2D):
             r = np.sqrt(x_ind ** 2 + y_ind ** 2)
             inside = r < radius
             x_ind, y_ind = x_ind[inside]+int(x), y_ind[inside]+int(y)
-            self.metadata.Mask[x_ind, y_ind] =True
+            self.metadata.Mask[x_ind, y_ind] = True
         return
 
     def mask_slice(self, x1, x2, y1, y2, unmask=False):
         if not self.metadata.has_item('Mask'):
             self.metadata.add_node('Mask')
-            mask = np.zeros(shape=self.axes_manager.signal_shape, dtype=bool)
+
+            mask = np.zeros(shape=tuple(reversed(self.axes_manager.signal_shape)), dtype=bool)
             self.metadata.Mask = mask
         if not all(isinstance(item, int) for item in [x1, x2, y1, y2]):
             x1 = self.axes_manager.signal_axes[0].value2index(x1)

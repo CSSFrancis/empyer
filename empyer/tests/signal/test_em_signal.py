@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 from hyperspy.signals import Signal2D, BaseSignal
 from empyer.signals.em_signal import EM_Signal
 
+
 class TestEMSignal(TestCase):
     def setUp(self):
-        d = np.random.rand(10, 10, 512, 512)
+        d = np.random.rand(10, 10, 500, 700)
         d[:, :, 156, 256] = 10
         d[:, :, 356, 256] = 10
         d[:, :, 256, 156] = 10
@@ -19,15 +20,13 @@ class TestEMSignal(TestCase):
     def test_add_mask(self):
         self.ds.mask_slice(1, 60.0, 1, 30)
         self.assertEqual(self.ds.metadata.Mask[1, 1], True)
-        self.ds.mask_shape(shape='circle', data=[10, 60, 305.5])
+        self.ds.mask_shape(shape='circle', data=[10, 60, 300])
         self.ds.plot()
-        plt.figure()
         self.ds.show_mask()
-
 
     def test_unmask(self):
         self.ds.mask_slice(1, 3, 1, 3)
-        self.ds.mask_slice(1, 3, 1, 3,unmask=True)
+        self.ds.mask_slice(1, 3, 1, 3, unmask=True)
         self.assertEqual(self.ds.metadata.Mask[1, 1], False)
 
     def test_float_mask(self):
