@@ -76,7 +76,6 @@ class DiffractionSignal(EM_Signal):
 
     def calculate_polar_spectrum(self, phase_width=720, radius=None, parallel=False, inplace=False):
         """Take the Diffraction Pattern and unwrap the diffraction pattern.
-        #ToDo Create a method which creates a new polar mask to be passed.
         Parameters
         ----------
         phase_width: int

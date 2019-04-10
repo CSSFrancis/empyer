@@ -65,6 +65,13 @@ class EM_Signal(Signal2D):
             self.axes_manager[index].offset = offset
 
     def set_mask(self, mask):
+        """Set a mask
+        Parameters
+        ----------
+        mask: n x m boolean array
+            A boolean array which is set as the mask for some signal.  Will overwrite the mask. Function accepts m x n
+            and n x m arrays and will take the transpose of the signal so that it matches the hyperspy signal axes.
+        """
         if not self.metadata.has_item('Mask'):
             self.metadata.add_node('Mask')
         if tuple(reversed(self.axes_manager.signal_shape)) == np.shape(mask):
@@ -75,6 +82,10 @@ class EM_Signal(Signal2D):
             print('The mask shape must be the same shape as the signal')
 
     def show_mask(self):
+        """Plots the mask in a separate window
+        #TODO:Show mask overlaid over the signal
+        """
+
         ax = self.axes_manager.signal_axes
         ax = [a.get_axis_dictionary() for a in reversed(ax)]
         print(ax)
@@ -84,6 +95,14 @@ class EM_Signal(Signal2D):
         return
 
     def mask_below(self, value, unmask=False):
+        """Applies a mask to every pixel with an average value below value
+        Parameters
+        ----------
+        value: float
+            The maximum pixel value to apply a mask to.
+        unmask: bool
+            Unmask any pixel with a value below value
+        """
         if not self.metadata.has_item('Mask'):
             self.metadata.add_node('Mask')
             mask = np.zeros(shape=tuple(reversed(self.axes_manager.signal_shape)), dtype=bool)
@@ -95,7 +114,19 @@ class EM_Signal(Signal2D):
             is_below = self.mean().data < value
             self.metadata.Mask = self.metadata.Mask - (is_below * self.metadata.Mask)
 
-    def mask_shape(self,shape='rectangle', data=[1,1,1,1],unmask =False):
+    def mask_shape(self, shape='rectangle', data=[1,1,1,1],unmask =False):
+        """Applies a mask to every pixel using a shape and the appropriate definition
+        #TODO: Add more shapes
+        Parameters
+        ----------
+        shape: str
+            Acceptable shapes ['rectangle, 'circle']
+        data: list
+            Define shapes. eg 'rectangle' -> [x1,x2,y1,y2] 'circle' -> [radius, x,y]
+            data allows indexing with floats and the axes described for the signal
+        unmask: bool
+            Unmask any pixels in the defined shape
+        """
         if shape is 'rectangle':
             self.mask_slice(data[0], data[1], data[2], data[3], unmask=unmask)
             return
@@ -120,6 +151,17 @@ class EM_Signal(Signal2D):
         return
 
     def mask_slice(self, x1, x2, y1, y2, unmask=False):
+        """Applies a mask to some slice of the data (same as mask_shape for shape= 'rectangle')
+
+        Parameters
+        ----------
+        x1: float or int
+        x2: float or int
+        y1: float or int
+        y2: float or int
+        unmask: bool
+            Unmask any pixels in the defined shape
+        """
         if not self.metadata.has_item('Mask'):
             self.metadata.add_node('Mask')
 
@@ -136,6 +178,15 @@ class EM_Signal(Signal2D):
             self.metadata.Mask[y1:y2, x1:x2] = False
 
     def get_signal_axes_values(self):
+        """ Returns the values for each pixel of the signal.  Useful for plotting without using hyperspy
+
+        Returns:
+        ----------
+        axis0: array-like
+            The values for axis 0
+        axis1: array-like
+            The values for axis 1
+        """
         axis0 = np.linspace(start=self.axes_manager.signal_axes[0].offset,
                             stop=(self.axes_manager.signal_axes[0].size *
                                   self.axes_manager.signal_axes[1].scale +
@@ -149,6 +200,12 @@ class EM_Signal(Signal2D):
         return axis0, axis1
 
     def get_mask(self):
+        """ Returns the defined mask for the signal or None if no mask is defined
+
+              Returns:
+              ----------
+              mask: array-like
+              """
         if self.metadata.has_item('Mask'):
             mask = self.metadata.Mask
         else:
