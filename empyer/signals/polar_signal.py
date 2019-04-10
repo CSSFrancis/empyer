@@ -79,19 +79,23 @@ class PolarSignal(EM_Signal):
         return angular
 
     def mask_data(self):
+        # TODO: Make a function for getting mean with a described mask without using numpy.
         m = self.get_mask()
         if m is not None:
             self.map(np.ma.masked_array, mask=m)
 
     def fem(self, version="omega"):
         """Calculated the variance among some image
+        #TODO:Add in gain correction
         Parameters
         ----------
         version: str
-            The name of the FEM equation to use
+            The name of the FEM equation to use. 'rings' calculates the mean of the variances of all the patterns at
+            some k.  'omega' calculates the variance of the annular means for every value of k.
         """
-        if version is 'r':
+        if version is 'rings':
             self.mask_data()
+            self.map()
             var = self.nanmean(axis=3)
             var.map(square)
             var = var.nanmean()

@@ -4,7 +4,7 @@ from empyer.signals.em_signal import EM_Signal
 
 
 class PowerSignal(EM_Signal):
-    _signal_type = "diffraction_signal"
+    _signal_type = "power_signal"
 
     def __init__(self, *args, **kwargs):
         """Create a  Power Signal from a numpy array.
@@ -28,24 +28,24 @@ class PowerSignal(EM_Signal):
             imported from the original data file.
         """
         EM_Signal.__init__(self, *args, **kwargs)
+        self.metadata.set_item("Signal.type", "power_signal")
 
     def get_i_vs_k(self, symmetry=None):
         """ Get the intensity versus k for the summed diffraction patterns
 
         Parameters
         ----------
-        normalize: bool
-            normalize the 2-d
+        symmetry: int or array-like
+            specific integers or list of symmetries to average over when creating the map of the correlations.
         Returns
         ----------
-        k: array
-            k values for the
-        i_vs_k: intensity
+        i: Signal-2D
+            The intensity as a function of k for some signal
         """
         if symmetry is None:
-            i = self.isig[:, :].sum(axis=[0,1,2])
+            i = self.isig[:, :].sum(axis=[0, 1, 2])
         else:
-            i = self.isig[:, symmetry].sum(axis=[0,1,2])
+            i = self.isig[:, symmetry].sum(axis=[0, 1, 2])
 
         return i
 
@@ -54,9 +54,9 @@ class PowerSignal(EM_Signal):
         Parameters
         ----------
         k_region: array-like
-           upper and lower k values to integrate over
-        normalize: bool
-            normalize the 2-d
+           upper and lower k values to integrate over, allows both ints and floats for indexing
+        symmetry: int or array-like
+            specific integers or list of symmetries to average over when creating the map of the correlations.
         Returns
         ----------
         symmetry_map: 2-d array

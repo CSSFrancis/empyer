@@ -14,12 +14,12 @@ def load(filenames=None,
          lazy=False,
          **kwds):
     signal = hsload(filenames=filenames,
-                     signal_type=signal_type,
-                     stack=stack,
-                     stack_axis=stack_axis,
-                     new_axis_name=new_axis_name,
-                     lazy=lazy,
-                     **kwds)
+                    signal_type=signal_type,
+                    stack=stack,
+                    stack_axis=stack_axis,
+                    new_axis_name=new_axis_name,
+                    lazy=lazy,
+                    **kwds)
     if signal.metadata.Signal.signal_type == 'diffraction_signal':
         signal = to_diffraction_signal(signal)
         print('To diffraction')
@@ -33,6 +33,7 @@ def load(filenames=None,
         signal = to_power_signal(signal)
     return signal
 
+
 def to_em_signal(signal=None):
     """Hyperspy signal to diffraction_signal
     """
@@ -40,6 +41,7 @@ def to_em_signal(signal=None):
     ax = [ax[key]for key in ax]
     ds = EM_Signal(signal, metadata=signal.metadata.as_dictionary(), axes=ax)
     return ds
+
 
 def to_diffraction_signal(signal=None):
     """Hyperspy signal to diffraction_signal

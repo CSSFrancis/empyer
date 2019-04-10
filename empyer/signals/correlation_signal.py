@@ -28,14 +28,16 @@ class CorrelationSignal(EM_Signal):
 
     def __init__(self, *args, **kwargs):
         EM_Signal.__init__(self, *args, **kwargs)
+        self.metadata.set_item("Signal.type", "correlation_signal")
 
     def get_power_spectrum(self, method="FFT"):
         """
         Calculate a power spectrum from the correlation signal
+        #TODO: Add more decomposition methods.
         Parameters
         ----------
-        Method: String
-            FFT- Fourier Transform
+        method: String
+            'FFT' gives fourier transformation of the angular power spectrum.  Currently the only method available
         """
         power_signal = self.map(power_spectrum,
                                 method=method,
