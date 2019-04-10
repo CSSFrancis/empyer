@@ -44,23 +44,25 @@ class DiffractionSignal(EM_Signal):
         """Determine the elliptical nature of the diffraction pattern.
         # ToDo: Determine if the elliptical nature changes from pattern to pattern.
         # ToDo: Allow for multiple ellipses to be associated with one diffraction pattern
+
         Parameters
         ----------
-        interactive: Boolean
+        interactive : Boolean
             Interactive nature means that points are chosen to create a ring
-        axis: int
+        axis : int
             axis to determine ellipse along
-        num_points: int
+        num_points : int
             number of points to define ellipse by (only used if interactive = False)
-        plot: Boolean
+        plot : Boolean
             Weather or not to plot the ellipse
+
         Returns
         ---------
-        center: array [x,y]
+        center : array [x,y]
             the center of the ellipse
-        lengths: array-like
+        lengths : array-like
             the length in pixels of the major and minor axes
-        angle: float
+        angle : float
             the angle of the major axes
         """
         center, lengths, angle = solve_ellipse(self.sum().data,

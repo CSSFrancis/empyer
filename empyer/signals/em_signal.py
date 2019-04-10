@@ -66,6 +66,7 @@ class EM_Signal(Signal2D):
 
     def set_mask(self, mask):
         """Set a mask
+
         Parameters
         ----------
         mask: n x m boolean array
@@ -83,6 +84,7 @@ class EM_Signal(Signal2D):
 
     def show_mask(self):
         """Plots the mask in a separate window
+
         #TODO:Show mask overlaid over the signal
         """
 
@@ -96,6 +98,7 @@ class EM_Signal(Signal2D):
 
     def mask_below(self, value, unmask=False):
         """Applies a mask to every pixel with an average value below value
+
         Parameters
         ----------
         value: float
@@ -116,6 +119,7 @@ class EM_Signal(Signal2D):
 
     def mask_shape(self, shape='rectangle', data=[1,1,1,1],unmask =False):
         """Applies a mask to every pixel using a shape and the appropriate definition
+
         #TODO: Add more shapes
         Parameters
         ----------
@@ -180,7 +184,7 @@ class EM_Signal(Signal2D):
     def get_signal_axes_values(self):
         """ Returns the values for each pixel of the signal.  Useful for plotting without using hyperspy
 
-        Returns:
+        Returns
         ----------
         axis0: array-like
             The values for axis 0
