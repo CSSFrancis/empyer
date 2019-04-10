@@ -1,7 +1,7 @@
 from unittest import TestCase
 import numpy as np
 import matplotlib.pyplot as plt
-from empyer.misc.angular_correlation import angular_correlation, angular_power_correlation
+from empyer.misc.angular_correlation import angular_correlation, power_spectrum
 
 
 class TestBinning(TestCase):

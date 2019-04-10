@@ -8,12 +8,17 @@ from matplotlib.patches import Ellipse
 
 
 def find_center(img):
-    '''
-    Function which finds the center of a diffraction pattern using an algorithm described in T.C. Patterson et al.
-    Ultramicroscopy 103, 275 (2005).
-    The algorithm assumes the sample is circularly symmetric.
-    Takes a random sampling of positions in a cropped region and compares to other points
-    '''
+    """
+    Function which finds the center of a diffraction pattern
+
+    Using an algorithm described in T.C. Patterson et al. Ultramicroscopy 103, 275 (2005). The algorithm assumes the
+    sample is circularly symmetric.Takes a random sampling of positions in a cropped region and compares to other points
+
+    Parameters
+    ---------
+    img: array-like
+        An input image with an imposed circle of higher intensity
+    """
     def mean_squared_displacement(iterations, mask_x, mask_y, center, img, no_mask=True):
         count = 0
         msd = 0
@@ -83,14 +88,24 @@ def find_center(img):
 
 
 def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False):
-    """
-    Takes a 2-d array image and allows you to solve for the equivalent ellipse.
-    :param img:  2-d array image
-    :param interactive: allows you to pick points for the ellipse instead of taking the top 2000 points
-    :param plot: plots the unwrapped image as well as a super imposed ellipse
-    :return center:in cartesian coordinates or (x,y)!!!!!! arrays are in y,x
-    :return lengths: the length in pixels of the major and minor axis
-    :return angle: in cartesian coordinates
+    """Takes a 2-d array image and allows you to solve for the equivalent ellipse.
+
+    Parameters
+    ----------
+    img : array-like
+        Image with ellipse with more intense
+    interactive: bool
+        Allows you to pick points for the ellipse instead of taking the top 2000 points
+    plot: bool
+        plots the unwrapped image as well as a super imposed ellipse
+    Returns
+    ----------
+    center: array-like
+        In cartesian coordinates or (x,y)!!!!!! arrays are in y,x
+    lengths:array-like
+        The 'length' in pixels of the major and minor axis
+    angle:float
+        In radians based on the major axis
     """
 
     def fit_ellipse(x,y):

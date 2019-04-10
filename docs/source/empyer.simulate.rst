@@ -1,4 +1,4 @@
-empyer.simulate package
+empyer.simulate
 =======================
 
 Module contents

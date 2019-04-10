@@ -1,8 +1,9 @@
 import numpy as np
 
 
-def fem(r_theta_imgs, version="omega", binning=1, cut = 40):
+def fem(r_theta_imgs, version="omega", binning=1, cut=40):
     """Calculated the variance among some image
+
     Parameters
     ----------
     r_theta_imgs: array_like
@@ -13,7 +14,6 @@ def fem(r_theta_imgs, version="omega", binning=1, cut = 40):
         binning factor
     cut : int
         The cut off in pixels to not consider
-
     """
     imgs = r_theta_imgs
     imgs = imgs[:, cut // binning:len(imgs), :]

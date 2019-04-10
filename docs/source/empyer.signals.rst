@@ -1,4 +1,4 @@
-empyer.signals package
+empyer.signals
 ======================
 
 Submodules

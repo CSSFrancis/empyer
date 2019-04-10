@@ -1,4 +1,4 @@
-empyer.misc package
+empyer.misc
 ===================
 
 Submodules
@@ -44,13 +44,6 @@ empyer.misc.image module
     :undoc-members:
     :show-inheritance:
 
-empyer.misc.mask module
------------------------
-
-.. automodule:: empyer.misc.mask
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 
 Module contents

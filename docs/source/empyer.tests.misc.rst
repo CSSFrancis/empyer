@@ -1,4 +1,4 @@
-empyer.tests.misc package
+empyer.tests.misc
 =========================
 
 Submodules

@@ -1,4 +1,4 @@
-empyer.tests.io package
+empyer.tests.io
 =======================
 
 Submodules

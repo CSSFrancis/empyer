@@ -11,9 +11,7 @@ def square(array):
 
 
 def bin_2d(image, binning_factor):
-    """
-    Binning a 2-dimensional image  by some factor
-
+    """Binning a 2-dimensional image  by some factor
     Parameters
     ----------
     image : 2-d array
@@ -23,8 +21,6 @@ def bin_2d(image, binning_factor):
     Returns
     ----------
     new_image : 2-d array
-
-
     """
     sh = np.shape(image)
 
@@ -39,8 +35,7 @@ def bin_2d(image, binning_factor):
 
 
 def cartesian_to_polar(x, y, center):
-    """
-    A function that converts the x,y coordinates to polar ones.
+    """A function that converts the x,y coordinates to polar ones.
     -Does not do the circular correction
     """
     corrected_x = x-center[0]
@@ -51,8 +46,7 @@ def cartesian_to_polar(x, y, center):
 
 
 def polar_to_cartesian(r, theta, center):
-    """
-    A function that converts polar (r,theta) coordinates to cartesian(x,y) ones
+    """A function that converts polar (r,theta) coordinates to cartesian(x,y) ones
 
     Parameters
     ----------
@@ -73,8 +67,7 @@ def polar_to_cartesian(r, theta, center):
 
 
 def cartesian_list_to_polar(x_list,y_list,center):
-    """
-    A function that converts a list of x,y coordinates to (r,theta)
+    """A function that converts a list of x,y coordinates to (r,theta)
 
     Parameters
     ----------
@@ -134,7 +127,6 @@ def create_grid(dimension1, dimension2):
     ----------
     a: array
     b: array
-
     """
     dim1, dim2 = np.meshgrid(dimension1, dimension2)
     size = len(dimension1)*len(dimension2)
@@ -143,8 +135,7 @@ def create_grid(dimension1, dimension2):
 
 
 def ellipsoid_list_to_cartesian(r_list, theta_list, center, major, minor, angle, even_spaced=False):
-    """
-    Take a list of ellipsoid points and then use then find their cartesian equivalent
+    """Takes a list of ellipsoid points and then use then find their cartesian equivalent
     Parameters
     ----------
     r_list: array

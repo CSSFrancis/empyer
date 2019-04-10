@@ -5,29 +5,13 @@ Subpackages
 -----------
 
 .. toctree::
+    :maxdepth: 2
 
-    empyer.io_plugins
-    empyer.misc
+    empyer.io
     empyer.signals
+    empyer.misc
     empyer.simulate
     empyer.tests
 
-Submodules
-----------
-
-empyer.io module
-----------------
-
-.. automodule:: empyer.io
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 
-Module contents
----------------
-
-.. automodule:: empyer
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -34,6 +34,7 @@ class PolarSignal(EM_Signal):
 
     def autocorrelation(self, binning_factor=1, cut=0, normalize=True):
         """Create a Correlation Signal from a numpy array.
+
         Parameters
         ----------
         binning_factor : int
@@ -86,10 +87,10 @@ class PolarSignal(EM_Signal):
 
     def fem(self, version="omega"):
         """Calculated the variance among some image
-        #TODO:Add in gain correction
+
         Parameters
         ----------
-        version: str
+        version : str
             The name of the FEM equation to use. 'rings' calculates the mean of the variances of all the patterns at
             some k.  'omega' calculates the variance of the annular means for every value of k.
         """

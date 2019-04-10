@@ -1,4 +1,4 @@
-empyer.tests package
+empyer.tests
 ====================
 
 Subpackages

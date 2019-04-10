@@ -206,7 +206,7 @@ class EM_Signal(Signal2D):
     def get_mask(self):
         """ Returns the defined mask for the signal or None if no mask is defined
 
-              Returns:
+              Returns
               ----------
               mask: array-like
               """
