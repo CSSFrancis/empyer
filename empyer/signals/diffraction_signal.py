@@ -14,20 +14,21 @@ class DiffractionSignal(EM_Signal):
 
     def __init__(self, *args, **kwargs):
         """Create a Diffraction Signal from a numpy array.
+
         Parameters
-        ----------
+        -------
         data : numpy array
            The signal data. It can be an array of any dimensions.
-        axes : dictionary (optional)
+        axes : dictionary, optional
             Dictionary to define the axes (see the
             documentation of the AxesManager class for more details).
-        attributes : dictionary (optional)
+        attributes : dictionary, optional
             A dictionary whose items are stored as attributes.
-        metadata : dictionary (optional)
+        metadata : dictionary, optional
             A dictionary containing a set of parameters
             that will to stores in the `metadata` attribute.
             Some parameters might be mandatory in some cases.
-        original_metadata : dictionary (optional)
+        original_metadata : dictionary, optional
             A dictionary containing a set of parameters
             that will to stores in the `original_metadata` attribute. It
             typically contains all the parameters that has been
@@ -42,25 +43,23 @@ class DiffractionSignal(EM_Signal):
 
     def determine_ellipse(self, num_points=500, interactive=False, plot=False):
         """Determine the elliptical nature of the diffraction pattern.
-        # ToDo: Determine if the elliptical nature changes from pattern to pattern.
-        # ToDo: Allow for multiple ellipses to be associated with one diffraction pattern
 
         Parameters
-        ----------
+        -------
         interactive : Boolean
-            Interactive nature means that points are chosen to create a ring
+            'interactive' nature means that points are chosen to create a ring
         axis : int
-            axis to determine ellipse along
+            'axis' to determine ellipse along
         num_points : int
             number of points to define ellipse by (only used if interactive = False)
         plot : Boolean
             Weather or not to plot the ellipse
 
         Returns
-        ---------
-        center : array [x,y]
+        -------
+        center : list of int
             the center of the ellipse
-        lengths : array-like
+        lengths : list of int
             the length in pixels of the major and minor axes
         angle : float
             the angle of the major axes
@@ -79,7 +78,7 @@ class DiffractionSignal(EM_Signal):
     def calculate_polar_spectrum(self, phase_width=720, radius=None, parallel=False, inplace=False):
         """Take the Diffraction Pattern and unwrap the diffraction pattern.
         Parameters
-        ----------
+        -------
         phase_width: int
             The number of pixels in the x direction
         radius: int
@@ -91,7 +90,7 @@ class DiffractionSignal(EM_Signal):
             replaces diffraction pattern data with polar equivalent
 
         Returns
-        ----------
+        -------
         polar: PolarSignal
             Polar signal returned
         """

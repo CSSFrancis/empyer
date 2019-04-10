@@ -1,6 +1,20 @@
 empyer package
 ==============
 
+Subpackages
+-----------
+
+.. toctree::
+
+    empyer.io_plugins
+    empyer.misc
+    empyer.signals
+    empyer.simulate
+    empyer.tests
+
+Submodules
+----------
+
 empyer.io module
 ----------------
 
@@ -9,12 +23,11 @@ empyer.io module
     :undoc-members:
     :show-inheritance:
 
-Subpackages
------------
 
-.. toctree::
+Module contents
+---------------
 
-    empyer.misc
-    empyer.signals
-    empyer.simulate
-
+.. automodule:: empyer
+    :members:
+    :undoc-members:
+    :show-inheritance:
