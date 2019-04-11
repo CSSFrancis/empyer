@@ -3,7 +3,7 @@
 Empyer is an extension of the hyperspy_ package.  It provides additional functionality related to analyzing 4 and 5
 dimensional data sets.  Especially STEM diffraction patterns from metallic glasses.
 
-Documenation can be found
+Documenation can be found hosted here_.
 
 *Quick Start Guide:*
 
@@ -22,3 +22,4 @@ Documenation can be found
     plt.show()
 
 .. _hyperspy: https://github.com/hyperspy
+.. _here: https://empyer.readthedocs.io/en/latest/
