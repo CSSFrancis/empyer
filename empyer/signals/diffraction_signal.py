@@ -123,8 +123,8 @@ class DiffractionSignal(EM_Signal):
             del (passed_meta_data['Mask'])
 
         polar = PolarSignal(polar_signal, metadata=passed_meta_data)
-        print('singalshape', polar.axes_manager.signal_shape)
-        print('mask_shape', np.shape(new_mask))
+        print('signal shape', polar.axes_manager.signal_shape)
+        print('mask shape', np.shape(new_mask))
         polar.set_mask(mask=new_mask)
         polar.set_axes(0,
                        name=self.axes_manager[0].name,
