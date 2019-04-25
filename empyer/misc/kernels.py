@@ -23,14 +23,13 @@ def s_g_kernel(kernel_size, d_hkl, cluster_size, voltage):
     print(d_hkl)
     #sg_1 = np.power(sg,-1)
     dot = np.subtract(2*wavelength*d_hkl, np.multiply(sg, d_hkl))
-    mag_1 = ((wavelength**2 + d_hkl**2)**.5)
-    mag_2 = np.power(np.add(np.power(np.subtract(wavelength, sg)**2,2), d_hkl**2),.5)
-    mag = np. add(mag_1, mag_2)
-    ang = np.divide(dot, mag)
-    angles = np.arccos(ang)
-    print(angles)
-    plt.plot(angles)
-    plt.show()
+    #mag_1 = ((wavelength**2 + d_hkl**2)**.5)
+    #mag_2 = np.power(np.add(np.power(np.subtract(wavelength, sg)**2,2), d_hkl**2),.5)
+    #mag = np.multiply(mag_1, mag_2)
+    #ang = np.divide(dot, mag)
+    #d = np.subtract(wavelength, sg)
+    #mag = np.power(np.subtract(wavelength**2, np.multiply(cos)),.5)
+    angles = np.divide(sg, d_hkl)
     sg_surf = np.multiply(sg, (2 * np.pi * cluster_size))
     kernel = np.power(np.multiply(np.divide((np.sin(sg_surf) -
                                              np.multiply(sg_surf,
@@ -44,8 +43,15 @@ def s_g_kernel(kernel_size, d_hkl, cluster_size, voltage):
 
 
 def s_g_kern_toAng(kern, d_hkl):
+    factor = (d_hkl*np.pi/180)
+    dict0 = {'size':  kern.axes_manager[0].size, 'name': 's_x', 'units': 'degrees',
+             'scale': kern.axes_manager[0].scale/factor, 'offset': 0}
+    dict1 = {'size': kern.axes_manager[0].size, 'name': 's_y', 'units': 'degrees',
+             'scale': kern.axes_manager[0].scale/factor,'offset': 0}
+    ang = hs.signals.Signal2D(data=kern.data, axes=[dict0,dict1] )
+    return ang
 
-    return
+
 def atomic_displacement_kernel(kernel_size, displacement_factor):
     ax = np.arange(-kernel_size // 2 + 1., kernel_size// 2 + 1.)
     xx, yy = np.meshgrid(ax, ax)
