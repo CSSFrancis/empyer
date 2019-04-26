@@ -26,4 +26,4 @@ class TestPolarSignal(TestCase):
 
     def test_fem(self):
         self.ps.fem(version='omega')
-        self.ps.fem(version='r')
+        self.ps.fem(version='rings')

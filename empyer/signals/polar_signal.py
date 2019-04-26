@@ -59,20 +59,13 @@ class PolarSignal(EM_Signal):
             del (passed_meta_data['Masks'])
         angular = CorrelationSignal(correlation, metadata=passed_meta_data)
         shift = cut // binning_factor
-        angular.set_axes(0,
-                         name=self.axes_manager[0].name,
-                         scale=self.axes_manager[0].scale,
-                         units=self.axes_manager[0].units)
-        angular.set_axes(1,
-                         name=self.axes_manager[1].name,
-                         scale=self.axes_manager[1].scale,
-                         units=self.axes_manager[1].units)
-        angular.set_axes(2,
+        angular.axes_manager.navigation_axes = self.axes_manager.navigation_axes
+        angular.set_axes(-2,
                          name="Radians",
                          scale=self.axes_manager[2].scale*binning_factor,
                          units="rad")
         offset = shift * self.axes_manager[3].scale*binning_factor
-        angular.set_axes(3,
+        angular.set_axes(-1,
                          name="k",
                          scale=self.axes_manager[3].scale*binning_factor,
                          units=self.axes_manager[3].units,
@@ -96,7 +89,6 @@ class PolarSignal(EM_Signal):
         """
         if version is 'rings':
             self.mask_data()
-            self.map()
             var = self.nanmean(axis=3)
             var.map(square)
             var = var.nanmean()

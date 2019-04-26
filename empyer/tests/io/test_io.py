@@ -1,6 +1,5 @@
 from unittest import TestCase
 import numpy as np
-import tempfile
 
 from hyperspy.signals import Signal2D
 from empyer.io import load, to_diffraction_signal, to_correlation_signal,to_polar_signal, to_power_signal
@@ -47,3 +46,4 @@ class TestIOSignal(TestCase):
     def test_save_and_load(self):
         self.ds.save(filename='temp', overwrite=True, extension='hdf5')
         ds_2 = load('temp.hdf5')
+        self.assertEqual("diffraction_signal", ds_2.metadata.Signal.signal_type)

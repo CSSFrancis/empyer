@@ -126,19 +126,13 @@ class DiffractionSignal(EM_Signal):
 
         polar = PolarSignal(polar_signal, metadata=passed_meta_data)
         polar.set_mask(mask=new_mask)
-        polar.set_axes(0,
-                       name=self.axes_manager[0].name,
-                       scale=self.axes_manager[0].scale,
-                       units=self.axes_manager[0].units)
-        polar.set_axes(1,
-                       name=self.axes_manager[1].name,
-                       scale=self.axes_manager[1].scale,
-                       units=self.axes_manager[1].units)
-        polar.set_axes(2,
+
+        polar.axes_manager.navigation_axes = self.axes_manager.navigation_axes
+        polar.set_axes(-2,
                        name="Radians",
                        scale=2*np.pi/phase_width,
                        units="rad")
-        polar.set_axes(3,
+        polar.set_axes(-1,
                        name="k",
                        scale=self.axes_manager[3].scale,
                        units=self.axes_manager[3].units)

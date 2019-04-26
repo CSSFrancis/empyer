@@ -22,7 +22,6 @@ def load(filenames=None,
                     **kwds)
     if signal.metadata.Signal.signal_type == 'diffraction_signal':
         signal = to_diffraction_signal(signal)
-        print('To diffraction')
     if signal.metadata.Signal.signal_type == 'em_signal':
         signal = to_em_signal(signal)
     if signal.metadata.Signal.signal_type == 'polar_signal':
@@ -31,6 +30,8 @@ def load(filenames=None,
         signal = to_correlation_signal(signal)
     if signal.metadata.Signal.signal_type == 'power_signal':
         signal = to_power_signal(signal)
+    if signal.metadata.Signal.has_item('signal_type'):
+        print(signal.metadata.Signal.signal_type, " loaded!")
     return signal
 
 
