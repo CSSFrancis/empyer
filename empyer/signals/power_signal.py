@@ -7,6 +7,7 @@ class PowerSignal(EM_Signal):
     _signal_type = "power_signal"
 
     def __init__(self, *args, **kwargs):
+        # TODO: Add in particle analysis to maps
         """Create a  Power Signal from a numpy array.
         Parameters
         ----------
@@ -51,6 +52,7 @@ class PowerSignal(EM_Signal):
 
     def get_map(self, k_region=[3.0, 6.0], symmetry=None):
         """Creates a 2 dimensional map of from the power spectrum.
+
         Parameters
         ----------
         k_region: array-like

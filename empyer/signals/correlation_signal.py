@@ -5,6 +5,7 @@ from empyer.misc.angular_correlation import power_spectrum
 
 class CorrelationSignal(EM_Signal):
     """Create a  Correlation Signal from a numpy array.
+
     Parameters
     ----------
     data : numpy array

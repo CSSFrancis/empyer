@@ -10,8 +10,9 @@ Quick Start
 .. toctree::
    :maxdepth: 2
 
-   source/Quickstart
-
+   UserGuide/gettingStarted.rst
+   source/quickstart.rst
+   UserGuide/angularCorrelations.rst
 
 Contents
 ===================

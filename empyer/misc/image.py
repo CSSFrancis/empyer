@@ -12,6 +12,7 @@ def square(array):
 
 def bin_2d(image, binning_factor):
     """Binning a 2-dimensional image  by some factor
+
     Parameters
     ----------
     image : 2-d array
@@ -136,6 +137,7 @@ def create_grid(dimension1, dimension2):
 
 def ellipsoid_list_to_cartesian(r_list, theta_list, center, major, minor, angle, even_spaced=False):
     """Takes a list of ellipsoid points and then use then find their cartesian equivalent
+
     Parameters
     ----------
     r_list: array

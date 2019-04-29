@@ -109,12 +109,12 @@ def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False)
     """
 
     def fit_ellipse(x,y):
-        x = x[:,np.newaxis]  # reshaping the x and y axis
-        y = y[:,np.newaxis]
+        x = x[:, np.newaxis]  # reshaping the x and y axis
+        y = y[:, np.newaxis]
         D = np.hstack((x*x, x*y, y*y, x, y, np.ones_like(x)))
-        S = np.dot(D.T,D)
+        S = np.dot(D.T, D)
         C = np.zeros([6,6])
-        C[0,2] = C[2,0] = 2; C[1,1] = -1
+        C[0, 2] = C[2, 0] = 2; C[1, 1] = -1
         E, V = eig(np.dot(inv(S), C))
         n = np.argmax(np.abs(E))
         a = V[:, n]
@@ -159,6 +159,7 @@ def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False)
         ax = figure1.add_subplot(111)
         plt.imshow(i)
         plt.text(x=-50, y=-20, s="Click to add points. Click again to remove points. You must have 5 points")
+
         def add_point(event):
             ix, iy = event.xdata, event.ydata
             x_diff, y_diff = np.abs(np.subtract(coords[0], ix)), np.abs(np.subtract(coords[1], iy))

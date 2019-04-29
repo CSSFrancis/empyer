@@ -14,8 +14,8 @@ Downloading EMpyer is easy.  You can download the latest version of EMpyer from 
     $pip install empyer
 
 Assuming you are looking at Diffraction patterns from a STEM you can easily view the data by just sending the plot
-command to a _diffraction_signal object.  Utalizing the plotting and loading abilities from hyperspy_ the signal will be
-shown.
+command to a  :class:`~empyer.signals.diffraction_signal` object.  Utilizing the plotting and loading abilities from hyperspy_ the signal will be
+shown. The norm= 'log' command just plots on a logarithmic scale.
 
 .. code:: python
 

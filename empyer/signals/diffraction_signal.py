@@ -42,6 +42,8 @@ class DiffractionSignal(EM_Signal):
             self.metadata.set_item("Signal.type", "diffraction_signal")
 
     def determine_ellipse(self, num_points=500, interactive=False, plot=False):
+        # TODO: Identify if there needs to be a drift correction applied.
+        # TODO: Exclude the zero beam if it isn't masked.
         """Determine the elliptical nature of the diffraction pattern.
 
         Parameters
@@ -77,6 +79,7 @@ class DiffractionSignal(EM_Signal):
 
     def calculate_polar_spectrum(self, phase_width=720, radius=None, parallel=False, inplace=False):
         """Take the Diffraction Pattern and unwrap the diffraction pattern.
+
         Parameters
         -------
         phase_width: int

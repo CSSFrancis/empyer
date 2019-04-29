@@ -84,10 +84,8 @@ class EM_Signal(Signal2D):
 
     def show_mask(self):
         """Plots the mask in a separate window
-
-        #TODO:Show mask overlaid over the signal
         """
-
+        # TODO:Show mask overlaid over the signal
         ax = self.axes_manager.signal_axes
         ax = [a.get_axis_dictionary() for a in reversed(ax)]
         print(ax)
@@ -109,7 +107,7 @@ class EM_Signal(Signal2D):
         if not self.metadata.has_item('Mask'):
             self.metadata.add_node('Mask')
             mask = np.zeros(shape=tuple(reversed(self.axes_manager.signal_shape)), dtype=bool)
-            self.metadata.Masks = mask
+            self.metadata.Mask = mask
         if unmask is False:
             is_below = self.mean().data < value
             self.metadata.Mask = self.metadata.Mask+(is_below*self.metadata.Mask == 0)
@@ -117,10 +115,11 @@ class EM_Signal(Signal2D):
             is_below = self.mean().data < value
             self.metadata.Mask = self.metadata.Mask - (is_below * self.metadata.Mask)
 
-    def mask_shape(self, shape='rectangle', data=[1,1,1,1],unmask =False):
+    def mask_shape(self, shape='rectangle', data=[1, 1, 1, 1], unmask=False):
+        # TODO: Add more shapes
         """Applies a mask to every pixel using a shape and the appropriate definition
 
-        #TODO: Add more shapes
+
         Parameters
         ----------
         shape: str
@@ -137,7 +136,7 @@ class EM_Signal(Signal2D):
         if not self.metadata.has_item('Mask'):
             self.metadata.add_node('Mask')
             mask = np.zeros(shape=tuple(reversed(self.axes_manager.signal_shape)), dtype=bool)
-            self.metadata.Masks = mask
+            self.metadata.Mask = mask
         if shape is 'circle':
             if not all(isinstance(item, int) for item in data):
                 radius = self.axes_manager.signal_axes[0].value2index(data[0])

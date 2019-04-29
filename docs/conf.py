@@ -27,7 +27,7 @@ author = 'Carter Francis'
 # The short X.Y version
 version = ''
 # The full version, including alpha/beta/rc tags
-release = '.12'
+release = '.13'
 
 
 # -- General configuration ---------------------------------------------------
@@ -42,12 +42,15 @@ release = '.12'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.napoleon'
+    'sphinx.ext.napoleon',
+    'sphinx.ext.imgmath'
 ]
 
 napoleon_google_docstring = False
 napoleon_use_param = False
 napoleon_use_ivar = True
+
+imgmath_image_format = 'png'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -137,7 +140,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'empyer.tex', 'empyer Documentation',
-     'Carter Francis', 'manual'),
+     'Carter Francis', 'manual',),
 ]
 
 

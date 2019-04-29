@@ -13,6 +13,26 @@ def load(filenames=None,
          new_axis_name='stack_element',
          lazy=False,
          **kwds):
+    """Extends the hyperspy loading functionality with additional ability to load empyer signals.
+
+    Parameters
+    ---------------------
+    filenames:list
+        The list of file paths or single file to be loaded
+    signal_type: str
+        The type of signal to be loaded. Can be read from file or given
+    stack: bool
+        Stack creates a new axis and loads a list of files into one signal
+    new_axis_name: str
+        The name of the new axis created with stack
+    lazy: bool
+        Load the signal into memory or load chunks.  May effect performance, but useful for large datasets.
+
+    Returns
+    ---------------------
+    signal:
+        A signal of type signal_type
+    """
     signal = hsload(filenames=filenames,
                     signal_type=signal_type,
                     stack=stack,
@@ -36,7 +56,7 @@ def load(filenames=None,
 
 
 def to_em_signal(signal=None):
-    """Hyperspy signal to diffraction_signal
+    """Hyperspy signal to em_signal
     """
     ax = signal.axes_manager.as_dictionary()
     ax = [ax[key]for key in ax]
