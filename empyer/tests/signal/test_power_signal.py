@@ -1,6 +1,6 @@
 from unittest import TestCase
 import numpy as np
-
+import matplotlib.pyplot as plt
 from hyperspy.signals import Signal2D
 from empyer.signals.power_signal import PowerSignal
 
@@ -31,5 +31,8 @@ class TestPowerSignal(TestCase):
         self.ps.get_i_vs_k(symmetry=[6])
 
     def test_get_map(self):
-        self.ps.get_map()
-        self.ps.get_map(symmetry=[6, 8, 10])
+        mapped = self.ps.get_map()
+        print(mapped)
+        mapped.plot()
+        plt.show()
+        self.ps.get_map(symmetry=[10])

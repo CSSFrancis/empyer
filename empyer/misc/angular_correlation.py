@@ -21,15 +21,18 @@ def angular_correlation(r_theta_img, mask=None, binning=1, cut_off=0, normalize=
     image = r_theta_img
     if mask is not None:
         image[mask] = 0
+        if cut_off is not 0:
+            mask = mask[cut_off:len(mask), :]
 
     if cut_off is not 0:
-        image = image[cut_off:len(image)]
+        image = image[cut_off:len(image), :]
 
     if binning is not 1:
         image = bin_2d(image, binning)
+        if mask is not None:
+            mask = bin_2d(mask, binning) != 0
 
-    if cut_off is not 0:
-        image = image[cut_off // binning:len(image)]
+
 
     # fast method uses a FFT and is a process which is O(n) = n log(n)
     I_fft = np.fft.fft(image, axis=1)
@@ -64,7 +67,6 @@ def power_spectrum(correlation, method="FFT"):
     """
 
     if method is "FFT":
-        print(np.shape(correlation))
         pow_spectrum = np.fft.fft(correlation, axis=1).real
         pow_spectrum = np.power(pow_spectrum, 2)
     return pow_spectrum
@@ -78,5 +80,5 @@ def get_S_Q(r_theta_img,plot=False):
     if plot:
         plt.plot(S_Q)
         plt.show()
-    print(S_Q)
     return S_Q
+

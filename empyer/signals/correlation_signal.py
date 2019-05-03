@@ -56,9 +56,12 @@ class CorrelationSignal(EM_Signal):
                        offset=2.5)
         power.set_axes(-1,
                        name="k",
-                       scale=self.axes_manager[3].scale,
-                       units=self.axes_manager[3].units,
-                       offset=self.axes_manager[3].offset)
+                       scale=self.axes_manager[-1].scale,
+                       units=self.axes_manager[-1].units,
+                       offset=self.axes_manager[-1].offset)
         return power
 
-
+    def get_summed_power_spectrum(self):
+        # TODO: Add in the ability to get the summed power spectrum over an axis.
+        summed_pow = self.sum().get_power_spectrum()
+        return summed_pow

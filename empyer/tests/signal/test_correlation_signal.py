@@ -14,3 +14,7 @@ class TestPolarSignal(TestCase):
     def test_power_spectrum(self):
         self.ps.get_power_spectrum()
 
+    def test_summed_power_spectrum(self):
+        print(self.ps)
+        sum_power = self.ps.get_summed_power_spectrum()
+        print(sum_power)

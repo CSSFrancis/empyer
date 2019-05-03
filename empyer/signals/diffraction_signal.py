@@ -137,6 +137,6 @@ class DiffractionSignal(EM_Signal):
                        units="rad")
         polar.set_axes(-1,
                        name="k",
-                       scale=self.axes_manager[3].scale,
-                       units=self.axes_manager[3].units)
+                       scale=self.axes_manager[-1].scale,
+                       units=self.axes_manager[-1].units)
         return polar

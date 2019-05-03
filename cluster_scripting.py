@@ -23,13 +23,13 @@ OPTIONS:
 
 def correlation(signal_file):
     ds = empyer.load(signal_file, signal_type='diffraction_signal')
+    file_name = os.path.splitext(signal_file)[0]
     ps = ds.calculate_polar_spectrum()
-    file_name = os.path.basename(signal_file).split('.')[0]
-    ps.save(filename=file_name+'_polar.hdf5')
+    ps.save(filename=file_name+'_polar.hdf5', overwrite=True)
     acs = ps.autocorrelation()
-    acs.save(filename=file_name + '_angular.hdf5')
+    acs.save(filename=file_name + '_angular.hdf5', overwrite=True)
     pow_s = acs.get_power_spectrum()
-    pow_s.save(file_name=file_name+'_angularPower.hdf5')
+    pow_s.save(filename=file_name+'_angularPower.hdf5', overwrite=True)
     return
 
 

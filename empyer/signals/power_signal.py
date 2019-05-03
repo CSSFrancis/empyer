@@ -51,6 +51,7 @@ class PowerSignal(EM_Signal):
         return i
 
     def get_map(self, k_region=[3.0, 6.0], symmetry=None):
+        # TODO: symmetry is still broken :/ I don't know why it doesn't like using arrays to slice....
         """Creates a 2 dimensional map of from the power spectrum.
 
         Parameters
@@ -65,7 +66,9 @@ class PowerSignal(EM_Signal):
             2 dimensional map of from the power spectrum
         """
         if symmetry is None:
-            sym_map = self.isig[k_region[0]:k_region[1], :].sum(axis=[2, 3]).transpose()
+
+            sym_map = self.isig[k_region[0]:k_region[1], :].sum(axis=[-1,-2]).transpose()
         else:
-            sym_map = self.isig[k_region[0]:k_region[1], symmetry].sum(axis=[2, 3]).transpose()
+            print(self.isig[k_region[0]:k_region[1],:].isig[:,[5,6]])
+            sym_map = self.isig[k_region[0]:k_region[1], symmetry].sum(axis=[-1, -2]).transpose()
         return sym_map

@@ -33,14 +33,15 @@ class PolarSignal(EM_Signal):
         self.metadata.set_item("Signal.type", "polar_signal")
 
     def autocorrelation(self, binning_factor=1, cut=0, normalize=True):
+        # TODO: Add the ability to cutoff like slicing (maybe use np.s)
         """Create a Correlation Signal from a numpy array.
 
         Parameters
         ----------
         binning_factor : int
             Binning factor to speed up calculations
-        cut : int
-            The number of pixels to cut off from the center of radial image
+        cut : int or float
+            The number of pixels or distance to cut off image
         normalize : boolean
             normalize with autocorrelation
         Returns
@@ -48,6 +49,8 @@ class PolarSignal(EM_Signal):
         angle : CorrelationSignal
 
         """
+        if isinstance(cut, float):
+            cut = self.axes_manager.signal_axes[-3].value2index(cut)
         correlation = self.map(angular_correlation,
                                mask=self.get_mask(),
                                binning=binning_factor,
@@ -55,20 +58,20 @@ class PolarSignal(EM_Signal):
                                normalize=normalize,
                                inplace=False)
         passed_meta_data = self.metadata.as_dictionary()
-        if self.metadata.has_item('Masks'):
-            del (passed_meta_data['Masks'])
+        if self.metadata.has_item('Mask'):
+            del (passed_meta_data['Mask'])
         angular = CorrelationSignal(correlation, metadata=passed_meta_data)
         shift = cut // binning_factor
         angular.axes_manager.navigation_axes = self.axes_manager.navigation_axes
         angular.set_axes(-2,
                          name="Radians",
-                         scale=self.axes_manager[2].scale*binning_factor,
+                         scale=self.axes_manager[-2].scale*binning_factor,
                          units="rad")
-        offset = shift * self.axes_manager[3].scale*binning_factor
+        offset = shift * self.axes_manager[-1].scale*binning_factor
         angular.set_axes(-1,
                          name="k",
-                         scale=self.axes_manager[3].scale*binning_factor,
-                         units=self.axes_manager[3].units,
+                         scale=self.axes_manager[-1].scale*binning_factor,
+                         units=self.axes_manager[-1].units,
                          offset=offset)
         return angular
 
@@ -89,17 +92,17 @@ class PolarSignal(EM_Signal):
         """
         if version is 'rings':
             self.mask_data()
-            var = self.nanmean(axis=3)
+            var = self.nanmean(axis=-1)
             var.map(square)
             var = var.nanmean()
-            center = self.nanmean(axis=3).nanmean()
+            center = self.nanmean(axis=-1).nanmean()
             center.map(square)
             int_vs_k = (var-center)/center
             print(int_vs_k.axes_manager)
         elif version is 'omega':
             self.mask_data()
             var = self.map(square, inplace=False).nanmean().nanmean(axis=1)
-            center = self.nanmean(axis=3)
+            center = self.nanmean(axis=-1)
             center.map(square)
             center = center.nanmean()
             int_vs_k = (var - center) / center
