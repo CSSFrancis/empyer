@@ -16,9 +16,7 @@ class TestPowerSignal(TestCase):
                          units='nm^-1')
 
     def test_add_mask(self):
-        self.ps.mask_shape(shape='rectangle', data=[1, 1, 1, 1])
-        test_dict = [1, 1, 1, 1]
-        self.assertListEqual(self.ps.metadata.Masks['test']['data'],test_dict)
+        self.ps.mask_shape(shape='rectangle', data=[1, 10, 1, 10])
 
     def test_get_mask(self):
         self.ps.mask_shape(shape='rectangle', data=[0, 10, 1, 10])

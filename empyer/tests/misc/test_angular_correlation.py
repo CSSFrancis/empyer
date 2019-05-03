@@ -21,7 +21,7 @@ class TestBinning(TestCase):
     def test_power_spectrum(self):
         ac1 = angular_correlation(self.test1, normalize=False)
         ac2 = angular_correlation(self.test1, self.mask)
-        plt.imshow(angular_power_correlation(ac2))
+        plt.imshow(power_spectrum(ac2))
         plt.show()
-        angular_power_correlation(ac1)
+        power_spectrum(ac1)
 

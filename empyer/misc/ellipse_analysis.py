@@ -152,7 +152,7 @@ def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False)
     img_list = np.reshape(img, (-1, *img_shape[-2:]))
 
     if mask is not None:
-        i[mask] = 0
+        img[mask] = 0
     coords = [[], []]
     if interactive:
         figure1 = plt.figure()

@@ -88,8 +88,6 @@ class EM_Signal(Signal2D):
         # TODO:Show mask overlaid over the signal
         ax = self.axes_manager.signal_axes
         ax = [a.get_axis_dictionary() for a in reversed(ax)]
-        print(ax)
-        print(self.get_mask())
         Signal2D(data=self.get_mask(), axes=ax).plot()
         plt.show()
         return
@@ -110,10 +108,10 @@ class EM_Signal(Signal2D):
             self.metadata.Mask = mask
         if unmask is False:
             is_below = self.mean().data < value
-            self.metadata.Mask = self.metadata.Mask+(is_below*self.metadata.Mask == 0)
+            self.metadata.Mask[is_below] = True
         if unmask is True:
             is_below = self.mean().data < value
-            self.metadata.Mask = self.metadata.Mask - (is_below * self.metadata.Mask)
+            self.metadata.Mask[is_below] = False
 
     def mask_shape(self, shape='rectangle', data=[1, 1, 1, 1], unmask=False):
         # TODO: Add more shapes
