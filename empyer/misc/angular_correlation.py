@@ -67,6 +67,7 @@ def power_spectrum(correlation, method="FFT"):
     """
 
     if method is "FFT":
+        print(np.shape(correlation))
         pow_spectrum = np.fft.fft(correlation, axis=1).real
         pow_spectrum = np.power(pow_spectrum, 2)
     return pow_spectrum

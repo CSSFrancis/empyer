@@ -53,7 +53,7 @@ class CorrelationSignal(EM_Signal):
                        name="FourierCoefficient",
                        scale=1,
                        units="a.u.",
-                       offset=2.5)
+                       offset=.5)
         power.set_axes(-1,
                        name="k",
                        scale=self.axes_manager[-1].scale,

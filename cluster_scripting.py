@@ -23,6 +23,7 @@ OPTIONS:
 
 def correlation(signal_file):
     ds = empyer.load(signal_file, signal_type='diffraction_signal')
+    ds.mask_below(300)
     file_name = os.path.splitext(signal_file)[0]
     ps = ds.calculate_polar_spectrum()
     ps.save(filename=file_name+'_polar.hdf5', overwrite=True)

@@ -1,20 +1,25 @@
 from unittest import TestCase
 import numpy as np
+import matplotlib.pyplot as plt
 
 from hyperspy.signals import Signal2D
 from empyer.signals.correlation_signal import CorrelationSignal
+from empyer.io import load
 
 
 class TestPolarSignal(TestCase):
     def setUp(self):
-        d = np.random.rand(10, 10, 720, 180)
-        self.s = Signal2D(d)
-        self.ps = CorrelationSignal(self.s)
+        self.ps = load('/media/hdd/home/FEMImages_Angular_analyzed/20180415_ZCA-HH-_50W_3.8mT_RT_78s-0.22nm_sec_295/15.49.20 Spectrum image_pos01_angular.hdf5')
 
     def test_power_spectrum(self):
-        self.ps.get_power_spectrum()
+        power = self.ps.get_power_spectrum()
+        power.isig[2:12, 3.0:6.0].plot()
+        plt.show()
 
     def test_summed_power_spectrum(self):
         print(self.ps)
         sum_power = self.ps.get_summed_power_spectrum()
-        print(sum_power)
+        sum_power.isig[2:12, 3.0:6.0].plot()
+        plt.show()
+        sum_power.isig[6,3.0:8.0].plot()
+        plt.show()
