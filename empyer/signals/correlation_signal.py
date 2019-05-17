@@ -42,7 +42,8 @@ class CorrelationSignal(EM_Signal):
         """
         power_signal = self.map(power_spectrum,
                                 method=method,
-                                inplace=False)
+                                inplace=False,
+                                show_progressbar=False)
         passed_meta_data = self.metadata.as_dictionary()
         if self.metadata.has_item('Masks'):
             del (passed_meta_data['Masks'])
