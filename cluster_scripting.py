@@ -1,8 +1,6 @@
 #!/usr/bin/python
 import os
 import glob
-import re
-import numpy as np
 import empyer
 import argparse
 
@@ -14,10 +12,6 @@ import argparse
 """
 OPTIONS:
 -d = cwd :directory
--f = cwd :output filename
--p : prismatic param file
--b = 2 : beamsize
-
 """
 
 
