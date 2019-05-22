@@ -79,7 +79,7 @@ class PolarSignal(EM_Signal):
         # TODO: Make a function for getting mean with a described mask without using numpy.
         m = self.get_mask()
         if m is not None:
-            self.map(np.ma.masked_array, mask=m)
+            self.map(np.ma.masked_array, mask=m, show_progressbar=False)
 
     def fem(self, version="omega"):
         """Calculated the variance among some image
@@ -101,7 +101,7 @@ class PolarSignal(EM_Signal):
             print(int_vs_k.axes_manager)
         elif version is 'omega':
             self.mask_data()
-            var = self.map(square, inplace=False).nanmean().nanmean(axis=1)
+            var = self.map(square,show_progressbar=False, inplace=False).nanmean().nanmean(axis=1)
             center = self.nanmean(axis=-1)
             center.map(square)
             center = center.nanmean()

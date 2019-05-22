@@ -108,7 +108,8 @@ class DiffractionSignal(EM_Signal):
                                 phase_width=phase_width,
                                 radius=radius,
                                 parallel=parallel,
-                                inplace=inplace)
+                                inplace=inplace,
+                                show_progressbar=False)
         if self.metadata.has_item('Mask'):
             new_mask = convert(self.get_mask(),
                                center=self.metadata.Signal.Ellipticity.center,

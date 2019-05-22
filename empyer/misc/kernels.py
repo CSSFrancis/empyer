@@ -1,5 +1,7 @@
 import hyperspy.api as hs
 import numpy as np
+import random
+
 import matplotlib.pyplot as plt
 
 
@@ -14,7 +16,7 @@ def s_g_kernel(kernel_size, d_hkl, cluster_size, voltage):
     cluster_size: float
         The size of the cluster being calculated.
     """
-    wavelength = 1/(6.626*10**-34/np.sqrt(2*9.109*10**-31*voltage*1000*1.602*10**-19*(1+voltage/511))*10**9)
+    wavelength = 1/(6.626*10**-34/np.sqrt(2*9.109*10**-31*voltage*1000*1.602*10**-19*(1+voltage/(2*511)))*10**9)
     print(wavelength)
     ax = np.arange(-kernel_size // 2 + 1., kernel_size // 2 + 1.)
     xx, yy = np.divide(np.meshgrid(ax, ax), kernel_size / 3 * cluster_size)
@@ -56,3 +58,58 @@ def atomic_displacement_kernel(kernel_size, displacement_factor):
     ax = np.arange(-kernel_size // 2 + 1., kernel_size// 2 + 1.)
     xx, yy = np.meshgrid(ax, ax)
     return
+
+def random_rotation():
+    u = random.uniform(0, 1)
+    v = random.uniform(0, 1)
+    p = random.uniform(0, 1)
+    alpha = 2 * np.pi * u
+    beta = np.arccos(2 * v -1)
+    rotation_vector = (np.cos(alpha)*np.sin(beta),np.sin(beta), np.sin(alpha)*np.cos(beta))
+    theta =  2 * np.pi * p
+    return rotation_vector, theta
+
+def sg(acc_voltage,rotation_vector, theta, k0=(4,0,0),r=1, I=1):
+    """
+    Parameters
+    ----------------
+    accelerating_voltage: int
+        In kV the voltage of the instrument for calculating Ewald's sphere
+    theta: float
+        The
+    phi: float
+        The size of the cluster being calculated.
+    omega: float
+        The size of the cluster being calculated.
+    k: float
+        The k spacing for the speckle
+    r: float
+        The radius of the particle
+    """
+    Rad = get_wavelength(acc_voltage)
+    q1 = np.array([0, k0[0], k0[1], k0[2]])
+    q2 = np.array([np.cos(theta/2),
+          rotation_vector[0]*np.sin(theta/2),
+          rotation_vector[1]*np.sin(theta/2),
+          rotation_vector[2]*np.sin(theta/2)])
+    q2_conj = np.array([q2[0], -1*q2[1], -1*q2[2], -1*q2[3]])
+
+    q3 = q2*q1*q2_conj
+    return q3
+
+
+def get_wavelength(acc_voltage):
+    h = 6.626*10**-34
+    m0 = 9.109*10**-31
+    e = 1.602*10**-19
+    wavelength = h/np.sqrt(2*m0*acc_voltage*1000*e*(1+acc_voltage/(2*511)))*10**9
+    return wavelength
+
+
+def mult_quaternions(Q1,Q2):
+    w0,x0,y0,z0 = Q1   # unpack
+    w1,x1,y1,z1 = Q2
+    return([-x1*x0 - y1*y0 - z1*z0 + w1*w0,
+            x1*w0 + y1*z0 - z1*y0 + w1*x0,
+            -x1*z0 + y1*w0 + z1*x0 + w1*y0,
+            x1*y0 - y1*x0 + z1*w0 +w1*z0])

@@ -3,7 +3,7 @@ from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
 import numpy as np
 import matplotlib.pyplot as plt
 
-from empyer.misc.kernels import s_g_kernel, s_g_kern_toAng
+from empyer.misc.kernels import s_g_kernel, s_g_kern_toAng,get_wavelength,sg
 
 
 class TestConvert(TestCase):
@@ -23,3 +23,10 @@ class TestConvert(TestCase):
         a2.plot()
 
         plt.show()
+
+    def test_wavelength(self):
+        self.assertAlmostEqual(2.51*10**-3, get_wavelength(200), 2)
+        self.assertAlmostEqual(1.96 * 10 ** -3, get_wavelength(300), 2)
+
+    def test_sg(self):
+        print(sg(200,rotation_vector=(1, 0, 0), theta=(np.pi/4)))
