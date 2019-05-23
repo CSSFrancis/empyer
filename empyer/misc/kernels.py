@@ -1,6 +1,7 @@
 import hyperspy.api as hs
 import numpy as np
 import random
+from empyer.misc.angular_correlation import angular_correlation
 
 import matplotlib.pyplot as plt
 
@@ -59,6 +60,8 @@ def atomic_displacement_kernel(kernel_size, displacement_factor):
     xx, yy = np.meshgrid(ax, ax)
     return
 
+
+# Functions for simulating rotations
 def random_rotation():
     u = random.uniform(0, 1)
     v = random.uniform(0, 1)
@@ -69,7 +72,8 @@ def random_rotation():
     theta =  2 * np.pi * p
     return rotation_vector, theta
 
-def sg(acc_voltage,rotation_vector, theta, k0=(4,0,0),r=1, I=1):
+
+def sg(acc_voltage, rotation_vector, theta, k0=(4,0,0)):
     """
     Parameters
     ----------------
@@ -86,16 +90,26 @@ def sg(acc_voltage,rotation_vector, theta, k0=(4,0,0),r=1, I=1):
     r: float
         The radius of the particle
     """
-    Rad = get_wavelength(acc_voltage)
+    es_radius = 1/get_wavelength(acc_voltage)
+
     q1 = np.array([0, k0[0], k0[1], k0[2]])
     q2 = np.array([np.cos(theta/2),
-          rotation_vector[0]*np.sin(theta/2),
-          rotation_vector[1]*np.sin(theta/2),
-          rotation_vector[2]*np.sin(theta/2)])
+                   rotation_vector[0]*np.sin(theta/2),
+                   rotation_vector[1]*np.sin(theta/2),
+                   rotation_vector[2]*np.sin(theta/2)])
     q2_conj = np.array([q2[0], -1*q2[1], -1*q2[2], -1*q2[3]])
 
-    q3 = q2*q1*q2_conj
-    return q3
+    q3 = mult_quaternions(mult_quaternions(q2,q1),q2_conj)
+    q3 = q3[1:]
+    dist = np.sqrt(q3[0]**2+q3[1]**2+(-es_radius - q3[2])**2)
+    s = dist-es_radius
+    return s
+
+
+def shape_function(r, s,):
+    C = 2*np.pi*s*r
+    n = ((3*(np.sin(C)-C*np.cos(C)))/C**3)**2
+    return n
 
 
 def get_wavelength(acc_voltage):
@@ -113,3 +127,16 @@ def mult_quaternions(Q1,Q2):
             x1*w0 + y1*z0 - z1*y0 + w1*x0,
             -x1*z0 + y1*w0 + z1*x0 + w1*y0,
             x1*y0 - y1*x0 + z1*w0 +w1*z0])
+
+
+def simulate_symmetry(symmetry=4, I=1, k=4, r=1, iter = 1000):
+    angle = (2*np.pi)/symmetry
+    k = [[np.cos(angle*i)*k, np.sin(angle*i)*k, 0] for i in range(symmetry)]
+    observed_int = np. zeros(shape=(iter,symmetry))
+    for i in range(iter):
+        rotation_vector, theta =random_rotation()
+        for j, speckle in enumerate(k):
+            s = sg(acc_voltage=200, rotation_vector=rotation_vector, theta=theta, k0=speckle)
+            observed_int[i, j] = I*shape_function(r=r, s=s)
+
+    return observed_int

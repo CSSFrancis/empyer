@@ -90,6 +90,10 @@ def find_center(img):
 def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False):
     """Takes a 2-d array image and allows you to solve for the equivalent ellipse.
 
+    Fitzgibbon, A. W., Fisher, R. B., Hill, F., & Eh, E. (1999). Direct Least Squres Fitting of Ellipses.
+        IEEE Transactions on Pattern Analysis and Machine Intelligence, 21(5), 476–480.
+    http://nicky.vanforeest.com/misc/fitEllipse/fitEllipse.html
+
     Parameters
     ----------
     img : array-like
@@ -111,12 +115,13 @@ def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False)
     def fit_ellipse(x,y):
         x = x[:, np.newaxis]  # reshaping the x and y axis
         y = y[:, np.newaxis]
-        D = np.hstack((x*x, x*y, y*y, x, y, np.ones_like(x)))
-        S = np.dot(D.T, D)
+
+        D = np.hstack((x*x, x*y, y*y, x, y, np.ones_like(x)))  # Design matrix [x^2, xy, y^2, x,y,1]
+        S = np.dot(D.T, D)  # Scatter Matrix
         C = np.zeros([6,6])
         C[0, 2] = C[2, 0] = 2; C[1, 1] = -1
-        E, V = eig(np.dot(inv(S), C))
-        n = np.argmax(np.abs(E))
+        E, V = eig(np.dot(inv(S), C)) # eigen decomposition to solve constrained minimization probelm
+        n = np.argmax(np.abs(E))  # maximum eigenvalue solution
         a = V[:, n]
         return a
 
@@ -145,9 +150,9 @@ def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False)
                 return np.pi/2
         else:
             if a > c:
-                return np.arctan(2*b/(a-c))/2
+                return np.pi/2+(np.pi/2-np.arctan(2*b/(a-c)))/2
             else:
-                return np.pi/2 + np.arctan(2*b/(a-c))/2
+                return (np.pi/2-np.arctan(2*b/(a-c)))/2
     img_shape = np.shape(img)
     img_list = np.reshape(img, (-1, *img_shape[-2:]))
 

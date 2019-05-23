@@ -3,7 +3,7 @@ from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
 import numpy as np
 import matplotlib.pyplot as plt
 
-from empyer.misc.kernels import s_g_kernel, s_g_kern_toAng,get_wavelength,sg
+from empyer.misc.kernels import s_g_kernel, s_g_kern_toAng,get_wavelength, sg, shape_function,simulate_symmetry
 
 
 class TestConvert(TestCase):
@@ -29,4 +29,14 @@ class TestConvert(TestCase):
         self.assertAlmostEqual(1.96 * 10 ** -3, get_wavelength(300), 2)
 
     def test_sg(self):
-        print(sg(200,rotation_vector=(1, 0, 0), theta=(np.pi/4)))
+        print(sg(200, rotation_vector=(0, 1, 0), theta=0))
+
+    def test_shape_function(self):
+        plt.plot([shape_function(1, (i/100)+.00001)for i in range(100)])
+        plt.show()
+
+    def test_simulate_symmetry(self):
+        s = simulate_symmetry(iter=100000)
+        plt.hist(np.mean(s, axis=1), bins =20)
+        plt.show()
+
