@@ -41,7 +41,7 @@ class DiffractionSignal(EM_Signal):
         if not hasattr(self.metadata.Signal, 'type'):
             self.metadata.set_item("Signal.type", "diffraction_signal")
 
-    def determine_ellipse(self, num_points=500, interactive=False):
+    def determine_ellipse(self, num_points=500, interactive=False, plot=False):
         # TODO: Identify if there needs to be a drift correction applied.
         # TODO: Exclude the zero beam if it isn't masked.
         """Determine the elliptical nature of the diffraction pattern.
@@ -66,10 +66,17 @@ class DiffractionSignal(EM_Signal):
         angle : float
             the angle of the major axes
         """
-        center, lengths, angle = self.sum().map(solve_ellipse,
+
+        center, lengths, angle = solve_ellipse(np.transpose(self.sum().data),
                                                mask=self.get_mask(),
                                                num_points=num_points,
-                                               interactive=interactive)
+                                               interactive=interactive,
+                                               plot=plot)
+        # Accounting for some weird change of axis....
+        angle = np.pi/2-angle
+        if angle < 0:
+            angle = np.pi+angle
+
         self.metadata.set_item("Signal.Ellipticity.center", center)
         self.metadata.set_item("Signal.Ellipticity.angle", angle)
         self.metadata.set_item("Signal.Ellipticity.lengths", lengths)

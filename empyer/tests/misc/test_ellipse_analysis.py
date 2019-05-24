@@ -1,7 +1,8 @@
 from unittest import TestCase
 import numpy as np
 from empyer.misc.ellipse_analysis import solve_ellipse
-
+from empyer.misc.cartesain_to_polar import convert
+import matplotlib.pyplot as plt
 
 class TestConvert(TestCase):
     def setUp(self):
@@ -27,3 +28,5 @@ class TestConvert(TestCase):
         self.assertAlmostEqual(l[0], max(self.lengths), places=-1)
         self.assertAlmostEqual(l[1], min(self.lengths), places=-1)
         self.assertAlmostEqual(a, self.angle, places=1)
+        plt.imshow(convert(self.ellipse,angle=a,foci=l,center=c))
+        plt.show()

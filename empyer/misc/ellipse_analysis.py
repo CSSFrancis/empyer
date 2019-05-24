@@ -87,7 +87,7 @@ def find_center(img):
     return center
 
 
-def solve_ellipse(img, mask=None, interactive=False, num_points=500):
+def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False):
     """Takes a 2-d array image and allows you to solve for the equivalent ellipse.
 
     Fitzgibbon, A. W., Fisher, R. B., Hill, F., & Eh, E. (1999). Direct Least Squres Fitting of Ellipses.
@@ -150,7 +150,12 @@ def solve_ellipse(img, mask=None, interactive=False, num_points=500):
                 return np.pi / 2
         else:
             if a > c:
-                return - np.arctan(2 * b / (a - c)) / 2
+                print('a>c')
+                ang = - np.arctan(2 * b / (a - c)) / 2
+                if ang > 0:
+                    return ang
+                else:
+                    return np.pi+ang
             else:
                 return np.pi / 2 - np.arctan(2 * b / (a - c)) / 2
 
@@ -208,13 +213,13 @@ def solve_ellipse(img, mask=None, interactive=False, num_points=500):
     print("The center is:", center)
     print("The major and minor axis lengths are:", lengths)
     print("The angle of rotation is:", angle)
-    '''if plot:
+    if plot:
         ellipse = Ellipse((center[0], center[1]), lengths[0] * 2, lengths[1] * 2, angle=angle, fill=False)
         fig = plt.figure()
         axe = fig.add_subplot(111)
         axe.imshow(img)
         axe.add_patch(ellipse)
-        plt.show()'''
+        plt.show()
     print(img_shape)
     return center, lengths, angle
 
