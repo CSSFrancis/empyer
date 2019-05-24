@@ -113,15 +113,15 @@ def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False)
     """
 
     def fit_ellipse(x,y):
-        x = x[:, np.newaxis]  # reshaping the x and y axis
+        x = x[:, np.newaxis]
         y = y[:, np.newaxis]
-
-        D = np.hstack((x*x, x*y, y*y, x, y, np.ones_like(x)))  # Design matrix [x^2, xy, y^2, x,y,1]
+        D = np.hstack((x * x, x * y, y * y, x, y, np.ones_like(x)))   # Design matrix [x^2, xy, y^2, x,y,1]
         S = np.dot(D.T, D)  # Scatter Matrix
-        C = np.zeros([6,6])
-        C[0, 2] = C[2, 0] = 2; C[1, 1] = -1
-        E, V = eig(np.dot(inv(S), C)) # eigen decomposition to solve constrained minimization probelm
-        n = np.argmax(np.abs(E))  # maximum eigenvalue solution
+        C = np.zeros([6, 6])
+        C[0, 2] = C[2, 0] = 2;
+        C[1, 1] = -1
+        E, V = eig(np.dot(inv(S), C))  # eigen decomposition to solve constrained minimization probelm
+        n = np.argmax(np.abs(E))   # maximum eigenvalue solution
         a = V[:, n]
         return a
 
@@ -141,18 +141,20 @@ def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False)
         res2 = np.sqrt(up / down2)
         return np.array([res1, res2])
 
-    def ellipse_angle_of_rotation( a ):
-        b,c,d,f,g,a = a[1]/2, a[2], a[3]/2, a[4]/2, a[5], a[0]
+    def ellipse_angle_of_rotation(a):
+        b, c, d, f, g, a = a[1] / 2, a[2], a[3] / 2, a[4] / 2, a[5], a[0]
         if b == 0:
             if a > c:
                 return 0
             else:
-                return np.pi/2
+                return np.pi / 2
         else:
             if a > c:
-                return (np.pi/2)+((np.pi/2)-np.arctan((a-c)/(2*b)))/2  # pi/2+0.5*cot^-1((a-c)/2b)
+                return - np.arctan(2 * b / (a - c)) / 2
             else:
-                return (np.pi/2-np.arctan((a-c)/(2*b)))/2
+                return np.pi / 2 - np.arctan(2 * b / (a - c)) / 2
+
+
     img_shape = np.shape(img)
     img_list = np.reshape(img, (-1, *img_shape[-2:]))
 
@@ -200,7 +202,7 @@ def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False)
     a = fit_ellipse(np.array(coords[0]), np.array(coords[1]))
     center = ellipse_center(a)  # (x,y)
     #  center = [center[1],center[0]] # array coordinates (y,x)
-    lengths = ellipse_axis_length(a)
+    lengths = sorted(ellipse_axis_length(a), reverse=True)
     angle = ellipse_angle_of_rotation(a)
     #  angle = (np.pi/2)-angle # transforming to array coordinates
     print("The center is:", center)

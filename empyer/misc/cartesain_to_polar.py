@@ -37,7 +37,6 @@ def convert(img, mask=None, center=None, angle=None, foci=None, radius=None, pha
         final_x, final_y = polar_list_to_cartesian(final_r, final_theta, center)
     # for elliptical conversions
     else:
-        angle = (np.pi/2)-angle  # converting to y,x or array coordinates
         final_the = np.linspace(-1*np.pi, np.pi, num=phase_width)
         final_rad = np.arange(r_inital, r_final, 1)
         final_x, final_y = ellipsoid_list_to_cartesian(final_rad,
