@@ -64,5 +64,5 @@ class CorrelationSignal(EM_Signal):
 
     def get_summed_power_spectrum(self):
         # TODO: Add in the ability to get the summed power spectrum over an axis.
-        summed_pow = self.sum().get_power_spectrum()
-        return summed_pow
+        summed_pow = self.sum(axis=(0, 1))
+        return summed_pow.get_power_spectrum()

@@ -157,7 +157,7 @@ def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False)
                 else:
                     return np.pi+ang
             else:
-                return np.pi / 2 - np.arctan(2 * b / (a - c)) / 2
+                return np.pi - np.arctan(2 * b / (a - c)) / 2
 
 
     img_shape = np.shape(img)
@@ -221,5 +221,6 @@ def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False)
         axe.add_patch(ellipse)
         plt.show()
     print(img_shape)
+    center = list(reversed(center))
     return center, lengths, angle
 

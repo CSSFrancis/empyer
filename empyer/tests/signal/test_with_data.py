@@ -6,21 +6,30 @@ import empyer as em
 
 class TestPowerSignal(TestCase):
     def setUp(self):
-        self.d = em.load('/media/hdd/home/FEMImages_Angular_analyzed/20170328_ZCA(HH)_50W_3.8mT_170C_78s/ZrCuAl_50W_3.hdf5')
-        self.d.mask_below(200)
-        print(self.d)
-        self.ps = self.d.calculate_polar_spectrum()
-        self.ps.save('/media/hdd/home/FEMImages_Angular_analyzed/20170328_ZCA(HH)_50W_3.8mT_170C_78s/ZrCuAl_50W_3_polar.hdf5',overwrite=True)
-        self.ac = self.ps.autocorrelation()
-        self.ac.save('/media/hdd/home/FEMImages_Angular_analyzed/20170328_ZCA(HH)_50W_3.8mT_170C_78s/ZrCuAl_50W_3_angular.hdf5',overwrite=True)
-        self.power = self.ac.get_power_spectrum()
-        self.power.save('/media/hdd/home/FEMImages_Angular_analyzed/20170328_ZCA(HH)_50W_3.8mT_170C_78s/ZrCuAl_50W_3_angularPower.hdf5',overwrite=True)
+        file = '/media/hdd/home/Zr65Cu27.5Al7.5FEM/HighTDatasets/Zr65Cu27.5Al7.5_1.19nmpsec(300W_3.8mT_170C_13sec)/19.38.03 Spectrum image_pos01.hdf5'
+        file2 = '/media/hdd/home/Zr65Cu27.5Al7.5FEM/HighTDatasets/Zr65Cu27.5Al7.5_1.19nmpsec(300W_3.8mT_170C_13sec)/19.50.51 Spectrum image_pos01.hdf5'
 
+        self.d = em.load(file)
+        self.d.mask_below(300)
+        self.d2 = em.load(file2)
+        self.d2.mask_below(300)
     def test_mask(self):
         self.d.show_mask()
 
+    def test_ellipse(self):
+        self.d.determine_ellipse(num_points=500)
+
     def test_polar_unwrapping(self):
-        self.ps.plot()
+        self.d.determine_ellipse()
+        p = self.d.calculate_polar_spectrum()
+        a = p.autocorrelation()
+
+        self.d2.determine_ellipse()
+        p2 = self.d2.calculate_polar_spectrum()
+        a2 = p2.autocorrelation()
+
+        a.get_summed_power_spectrum().isig[2, 3.25:5.5].plot()
+        a2.get_summed_power_spectrum().isig[2, 3.25:5.5].plot()
         plt.show()
 
     def test_angular_correlation(self):

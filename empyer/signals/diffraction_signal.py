@@ -77,6 +77,7 @@ class DiffractionSignal(EM_Signal):
         if angle < 0:
             angle = np.pi+angle
 
+
         self.metadata.set_item("Signal.Ellipticity.center", center)
         self.metadata.set_item("Signal.Ellipticity.angle", angle)
         self.metadata.set_item("Signal.Ellipticity.lengths", lengths)
