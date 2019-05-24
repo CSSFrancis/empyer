@@ -13,6 +13,7 @@ Quick Start
    UserGuide/gettingStarted.rst
    source/quickstart.rst
    UserGuide/angularCorrelations.rst
+   UserGuide/detailedExplanations.rst
 
 Contents
 ===================
