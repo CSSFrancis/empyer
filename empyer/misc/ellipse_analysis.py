@@ -150,9 +150,9 @@ def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False)
                 return np.pi/2
         else:
             if a > c:
-                return (np.pi/2-np.arctan((a-c)/(2*b)))/2
+                return (np.pi/2)+((np.pi/2)-np.arctan((a-c)/(2*b)))/2  # pi/2+0.5*cot^-1((a-c)/2b)
             else:
-                return ((np.pi/2-np.arctan((a-c)/(2*b)))/2)-np.pi/2
+                return (np.pi/2-np.arctan((a-c)/(2*b)))/2
     img_shape = np.shape(img)
     img_list = np.reshape(img, (-1, *img_shape[-2:]))
 
