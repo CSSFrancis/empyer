@@ -1,8 +1,6 @@
 from unittest import TestCase
 import numpy as np
 from empyer.misc.ellipse_analysis import solve_ellipse
-from empyer.misc.cartesain_to_polar import convert
-import matplotlib.pyplot as plt
 
 
 class TestConvert(TestCase):
@@ -14,7 +12,7 @@ class TestConvert(TestCase):
         rand_angle = np.random.rand(1000)*2*np.pi
         rand_points = [[(np.cos(ang)*self.lengths[0]), np.sin(ang)*self.lengths[1]] for ang in rand_angle]
         rand_points = np.array([[int(point[0]*np.cos(self.angle)-point[1]*np.sin(self.angle)+self.center[0]),
-                       int(point[1] * np.cos(self.angle) + point[0] * np.sin(self.angle)+self.center[1])]
+                                 int(point[1] * np.cos(self.angle) + point[0] * np.sin(self.angle)+self.center[1])]
                                 for point in rand_points])
         self.ellipse[rand_points[:, 0], rand_points[:, 1]] = 100
         self.ellipse = np.random.poisson(self.ellipse)
