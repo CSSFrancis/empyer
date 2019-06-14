@@ -36,7 +36,7 @@ class TestConvert(TestCase):
         plt.show()
 
     def test_simulate_symmetry(self):
-        s = simulate_symmetry(iter=100000)
-        plt.hist(np.mean(s, axis=1), bins =20)
+        sim = simulate_symmetry(symmetry=6, iterations=10000)
+        power_sim = np.mean([np.fft.fft(s).real**2 for s in sim], axis=0)
+        plt.plot(power_sim)
         plt.show()
-

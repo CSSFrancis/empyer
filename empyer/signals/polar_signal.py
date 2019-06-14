@@ -90,6 +90,9 @@ class PolarSignal(EM_Signal):
             The name of the FEM equation to use. 'rings' calculates the mean of the variances of all the patterns at
             some k.  'omega' calculates the variance of the annular means for every value of k.
         """
+        if not self.metadata.has_item('HAADF'):
+            print("No thickness filter applied...")
+
         if version is 'rings':
             self.mask_data()
             var = self.nanmean(axis=-1)
