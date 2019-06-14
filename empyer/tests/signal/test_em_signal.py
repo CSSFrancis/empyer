@@ -1,10 +1,11 @@
 from unittest import TestCase
 import numpy as np
+import numpy.testing as nptest
 import time
 import matplotlib.pyplot as plt
 
 from hyperspy.signals import Signal2D, BaseSignal
-from empyer.signals.em_signal import EM_Signal
+from empyer.signals.emsignal import EMSignal
 import empyer as em
 
 
@@ -18,49 +19,67 @@ class TestEMSignal(TestCase):
         d[:, :,  2, 3] = 10
         self.s = Signal2D(data=d)
 
-        self.ds = EM_Signal(self.s)
-        self.ds.save("test.hdf5", overwrite=True)
-        self.ds = em.load('test.hdf5', lazy=True)
-        print("done")
-        self.ds.metadata
+        self.ds = EMSignal(self.s)
+        #self.ds.save("test.hdf5", overwrite=True)
+        #self.ds = em.load('test.hdf5')
+        #print("done")
+        #self.ds.metadata
 
     def test_mask_slicing(self):
-        self.ds.manav[(2,4,5), :].masig[1:3, 2:5] = True
-        print(self.ds.data.mask)
-        self.ds.plot()
-        plt.show()
+        self.ds.manav[:, :].masig[:, :] = True
+        np.testing.assert_array_equal(self.ds.inav[:, :].isig[:, :].data.mask,
+                                      np.ones((8, 9, 10, 11), dtype=bool))
+
+    def test_mask_slicing2(self):
+        self.ds.manav[:, 1].masig[2:5, 3:10] = True
+        np.testing.assert_array_equal(self.ds.inav[:, 1].isig[2:5, 3:10].data.mask,
+                                      np.ones((9, 7, 3), dtype=bool))
 
     def test_mask_below(self):
-        self.ds.manav[(2,4,5), :].masig[1:3, :].mask_below(.5)
-        print(self.ds.data.mask)
+        self.ds.mask_below(value=0.5)
+        self.assertGreater(self.ds.min(axis=(0, 1, 2, 3)).data,0.5)
 
     def test_slice_mask_below(self):
-        self.ds.masig[0:2, 0:2].mask_below(value=1)
-        print(self.ds.data.mask)
+        self.ds.manav[0:2, 0:2].mask_below(.5)
+        self.assertGreater(self.ds.inav[0:2, 0:2].min(axis=(0, 1, 2, 3)).data, 0.5)
+        self.assertLess(self.ds.min(axis=(0, 1, 2, 3)).data, 0.5)
 
-    def test_add_mask(self):
-        self.ds.mask_slice(1, 60.0, 1, 30)
-        self.assertEqual(self.ds.metadata.Mask[1, 1], True)
-        self.ds.mask_shape(shape='circle', data=[10, 60, 300])
-        self.ds.plot()
-        self.ds.show_mask()
+    def test_slice_mask_below2(self):
+        self.ds.manav[0:2, 0:2].masig[1:2, :].mask_below(.5)
+        self.assertGreater(self.ds.inav[0:2, 0:2].isig[1:2, :].min(axis=(0, 1, 2, 3)).data, 0.5)
+        self.assertLess(self.ds.min(axis=(0, 1, 2, 3)).data, 0.5)
 
-    def test_unmask(self):
-        self.ds.mask_slice(1, 3, 1, 3)
-        self.ds.mask_slice(1, 3, 1, 3, unmask=True)
-        self.assertEqual(self.ds.metadata.Mask[1, 1], False)
+    def test_mask_above(self):
+        self.ds.mask_above(value=0.5)
+        self.assertLess(self.ds.max(axis=(0, 1, 2, 3)).data, 0.5)
 
-    def test_float_mask(self):
-        self.ds.mask_slice(1.1, 3.1, 1.1, 3.1)
-        print(self.ds.metadata.Mask)
-        self.assertEqual(self.ds.metadata.Mask[2,2], True)
+    def test_slice_mask_above(self):
+        self.ds.manav[0:2, 0:2].mask_above(.5)
+        self.assertLess(self.ds.inav[0:2, 0:2].max(axis=(0, 1, 2, 3)).data, 0.5)
+        self.assertGreater(self.ds.max(axis=(0, 1, 2, 3)).data, 0.5)
+
+    def test_slice_mask_above2(self):
+        self.ds.manav[0:2, 0:2].masig[1:2, :].mask_above(.5)
+        self.assertLess(self.ds.inav[0:2, 0:2].isig[1:2, :].max(axis=(0, 1, 2, 3)).data, 0.5)
+        self.assertGreater(self.ds.max(axis=(0, 1, 2, 3)).data, 0.5)
+
+    def test_slice_mask_where(self):
+        self.ds.manav[0:2, 0:2].masig[1:5, :].mask_where(self.ds.inav[0:2, 0:2].isig[1:5, :].data == 10)
+        self.assertLess(self.ds.inav[0:2, 0:2].isig[1:5, :].max(axis=(0, 1, 2, 3)).data, 1)
+
+    def test_mask_circle_slice(self):
+        self.ds.manav[0:2, 0:2].mask_circle(center=(5, 5), radius=3)
+        self.assertTrue(self.ds.inav[1, 1].isig[5, 5].data.mask)
+        self.assertTrue(self.ds.inav[1, 1].isig[7, 5].data.mask)
+        self.assertFalse(self.ds.inav[1, 1].isig[1:2, 5].data.mask)
+        self.assertFalse(self.ds.inav[1, 3].isig[5:6, 5].data.mask)
 
     def test_HAADF_mask(self):
-        self.ds.add_hdaaf_intensities(np.ones((8, 9)), 1.4)
-        print(self.ds.metadata.HAADF.intensity)
+        self.ds.add_hdaaf_intensities(np.ones((8, 9)), 1.4,-.76)
+
     def test_HAADF(self):
         self.ds.add_hdaaf_intensities(np.random.normal(size=(8, 9)), 1.5, .1)
-        print(self.ds.thickness_filter())
+
 
 
 

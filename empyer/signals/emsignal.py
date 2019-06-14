@@ -5,7 +5,7 @@ from hyperspy.signals import Signal2D
 from hyperspy.misc.slicing import SpecialSlicers
 
 
-class EM_Signal(Signal2D):
+class EMSignal(Signal2D):
     """
     The Diffraction Signal class extends the Hyperspy 2d signal class
     """
@@ -113,9 +113,7 @@ class EM_Signal(Signal2D):
         unmask: bool
             Unmask any pixel with a value below value
         """
-        if not isinstance(self.data, np.ma.masked_array):
-            self.data = np.ma.asarray(self.data)
-            self.data.mask = np.zeros(shape=self.data.shape, dtype=bool)
+        self.add_mask()
         self.data.mask[self.data < value] = not unmask
 
     def mask_above(self, value, unmask=False):
@@ -128,12 +126,15 @@ class EM_Signal(Signal2D):
         unmask: bool
             Unmask any pixel with a value above value
         """
-        if not isinstance(self.data, np.ma.masked_array):
-            self.data = np.ma.asarray(self.data)
-            self.data.mask = np.zeros(shape=self.data.shape, dtype=bool)
+        self.add_mask()
         self.data.mask[self.data > value] = not unmask
 
-    def mask_shape(self, shape='rectangle', data=[1, 1, 1, 1], unmask=False):
+    def add_mask(self):
+        if not isinstance(self.data, np.ma.masked_array):
+            self.data = np.ma.asarray(self.data)
+            self.data.mask = False  # setting all values to unmasked
+
+    def mask_circle(self, center, radius, unmask=False):
         # TODO: Add more shapes
         """Applies a mask to every pixel using a shape and the appropriate definition
 
@@ -147,57 +148,18 @@ class EM_Signal(Signal2D):
         unmask: bool
             Unmask any pixels in the defined shape
         """
-        if shape is 'rectangle':
-            self.mask_slice(data[0], data[1], data[2], data[3], unmask=unmask)
-            return
-        if not self.metadata.has_item('Mask'):
-            self.metadata.add_node('Mask')
-            mask = np.zeros(shape=tuple(reversed(self.axes_manager.signal_shape)), dtype=bool)
-            self.metadata.Mask = mask
-        if shape is 'circle':
-            if not all(isinstance(item, int) for item in data):
-                radius = self.axes_manager.signal_axes[0].value2index(data[0])
-                y = self.axes_manager.signal_axes[0].value2index(data[1])
-                x = self.axes_manager.signal_axes[1].value2index(data[2])
-            else:
-                radius = data[0]
-                y = data[1]
-                x = data[2]
-            x_ind, y_ind = np.meshgrid(range(-radius, radius + 1), range(-radius, radius + 1))
-            r = np.sqrt(x_ind ** 2 + y_ind ** 2)
-            inside = r < radius
-            x_ind, y_ind = x_ind[inside]+int(x), y_ind[inside]+int(y)
-            self.metadata.Mask[x_ind, y_ind] = True
+        self.add_mask()
+        if not all(isinstance(item, int) for item in center):
+            center = (self.axes_manager.signal_axes[1].value2index(center[1]),
+                     self.axes_manager.signal_axes[0].value2index(center[0]))
+        if not isinstance(radius, int):
+            radius = self.axes_manager.signal_axes[0].value2index(radius)
+        x_ind, y_ind = np.meshgrid(range(-radius, radius + 1), range(-radius, radius + 1))
+        r = np.sqrt(x_ind ** 2 + y_ind ** 2)
+        inside = r < radius
+        x_ind, y_ind = x_ind[inside]+int(center[0]), y_ind[inside]+int(center[1])
+        self.data.mask[x_ind, y_ind] = True
         return
-
-    def mask_slice(self, x1, x2, y1, y2, unmask=False):
-        """Applies a mask to some slice of the data (same as mask_shape for shape= 'rectangle')
-
-            Does not support inav and isig if they are changed...
-        Parameters
-        ----------
-        x1: float or int
-        x2: float or int
-        y1: float or int
-        y2: float or int
-        unmask: bool
-            Unmask any pixels in the defined shape
-        """
-
-        if not isinstance(self.data, np.ma.masked_array):
-            self.data = np.ma.asarray(self.data)
-            self.data.mask = np.zeros(shape=self.data.shape, dtype=bool)
-
-        if not all(isinstance(item, int) for item in [x1, x2, y1, y2]):
-            x1 = self.axes_manager.signal_axes[0].value2index(x1)
-            x2 = self.axes_manager.signal_axes[0].value2index(x2)
-            y1 = self.axes_manager.signal_axes[1].value2index(y1)
-            y2 = self.axes_manager.signal_axes[1].value2index(y2)
-
-        if unmask is False:
-            self.data.mask[..., y1:y2, x1:x2] = True
-        if unmask is True:
-            self.metadata.Mask[..., y1:y2, x1:x2] = False
 
     def get_signal_axes_values(self):
         """ Returns the values for each pixel of the signal.  Useful for plotting without using hyperspy
@@ -221,70 +183,23 @@ class EM_Signal(Signal2D):
                             num=self.axes_manager.signal_axes[1].size)
         return axis0, axis1
 
-    def get_mask(self):
-        """ Returns the defined mask for the signal or None if no mask is defined
-
-              Returns
-              ----------
-              mask: array-like
-              """
-        if self.metadata.has_item('Mask'):
-            mask = self.metadata.Mask
-        else:
-            return None
-        return mask
-
-    def mean(self, axis=None, out=None, rechunk=True, mask=True):
-        """Returns the signal average over an axis.
-
-        Parameters
-        ----------
-        axis %s
-        %s
-        %s
-
-        Returns
-        -------
-        s : Signal
-
-        See also
-        --------
-        max, min, sum, std, var, indexmax, valuemax, amax
-
-        Examples
-        --------
-        >>> import numpy as np
-        >>> s = BaseSignal(np.random.random((64,64,1024)))
-        >>> s.data.shape
-        (64,64,1024)
-        >>> s.mean(-1).data.shape
-        (64,64)
-
-        """
-        if axis is None:
-            axis = self.axes_manager.navigation_axes
-        #if mask is True and self.metadata.has_item('Mask'):
-
-        return self._apply_function_on_data_and_remove_axis(
-            np.mean, axis, out=out, rechunk=rechunk)
-
 
 class MaskSlicer(SpecialSlicers):
-
+    """
+    Expansion of the Special Slicer class. Used for applying a mask
+    """
     def __setitem__(self, key, value):
         if isinstance(self.obj, MaskPasser):
             array_slices = self.obj.signal._get_array_slices(key, self.isNavigation)
             if self.isNavigation == self.obj.isNavigation:
                 print("You can't used masig or manav twice")
-            if not isinstance(self.obj.signal.data, np.ma.masked_array):
-                self.obj.signal.data = np.ma.asarray(self.obj.signal.data)
-                self.obj.signal.data.mask = False  # setting all values to unmasked
-            self.obj.signal.data.mask[self.obj.slice][array_slices] = value
+            self.obj.signal.add_mask()
+            array_slices = tuple([slice1 if not (slice1 == slice(None, None, None)) else slice2 for
+                                  slice1, slice2 in zip(self.obj.slice, array_slices)])
+            self.obj.signal.data.mask[array_slices] = value
         else:
             array_slices = self.obj._get_array_slices(key, self.isNavigation)
-            if not isinstance(self.obj.data, np.ma.masked_array):
-                self.obj.data = np.ma.asarray(self.obj.data)
-                self.obj.data.mask = False  # setting all values to unmasked
+            self.obj.add_mask()
             self.obj.data.mask[array_slices] = value
 
     def __getitem__(self, key, out=None):
@@ -309,25 +224,67 @@ class MaskPasser():
         self.manav = MaskSlicer(self, isNavigation=True)
         self.masig = MaskSlicer(self, isNavigation=False)
 
-    def mask_below(self, max):
-        if not isinstance(self.signal.data, np.ma.masked_array):
-            self.signal.data = np.ma.asarray(self.signal.data)
-            self.signal.data.mask = False  # setting all values to unmasked
-            print(self.slice)
-            print(self.signal.data[self.slice] < min)
-        self.signal.data.mask[self.slice][(self.signal.data[self.slice] < max)] = True
+    def mask_below(self, maximum):
+        """Mask below the max value
+
+        Parameters:
+        -------------
+        maximum: float
+            Mask any values in the slice below the maximum value
+        """
+        self.signal.add_mask()
+        self.signal.data.mask[self.slice][(self.signal.data[self.slice] < maximum)] = True
         return
 
-    def mask_above(self, min):
-        if not isinstance(self.signal.data, np.ma.masked_array):
-            self.signal.data = np.ma.asarray(self.obj.data)
-            self.signal.data.mask = False  # setting all values to unmasked
-        self.signal.data.mask[self.slice][(self.signal.data[self.slice] > min)] = True
+    def mask_above(self, minimum):
+        """Mask above the minimum value
+
+        Parameters:
+        -------------
+        minimum: float
+            Mask any values in the slice above the minimum value
+        """
+        self.signal.add_mask()
+        self.signal.data.mask[self.slice][(self.signal.data[self.slice] > minimum)] = True
         return
 
     def mask_where(self, condition):
-        if not isinstance(self.signal.data, np.ma.masked_array):
-            self.signal.data = np.ma.asarray(self.obj.data)
-            self.signal.data.mask = False  # setting all values to unmasked
-        self.signal.data.mask[self.slice][(condition)] = True
+        """Mask at some condition
+
+        Parameters:
+        -------------
+        condition: array_like
+            Masking condition
+
+        """
+        self.signal.add_mask()
+        self.signal.data.mask[self.slice][condition] = True
         return
+
+    def mask_circle(self, center, radius, unmask=False):
+        # TODO: Add more shapes
+        """Applies a mask to every pixel using a shape and the appropriate definition
+
+        Parameters
+        ----------
+        shape: str
+            Acceptable shapes ['rectangle, 'circle']
+        data: list
+            Define shapes. eg 'rectangle' -> [x1,x2,y1,y2] 'circle' -> [radius, x,y]
+            data allows indexing with floats and the axes described for the signal
+        unmask: bool
+            Unmask any pixels in the defined shape
+        """
+        self.signal.add_mask()
+        if not all(isinstance(item, int) for item in center):
+            center = (self.signal.axes_manager.signal_axes[1].value2index(center[1]),
+                     self.signal.axes_manager.signal_axes[0].value2index(center[0]))
+        if not isinstance(radius, int):
+            radius = self.signal.axes_manager.signal_axes[0].value2index(radius)
+        x_ind, y_ind = np.meshgrid(range(-radius, radius + 1), range(-radius, radius + 1))
+        r = np.sqrt(x_ind ** 2 + y_ind ** 2)
+        inside = r < radius
+        x_ind, y_ind = x_ind[inside]+int(center[0]), y_ind[inside]+int(center[1])
+        self.signal.data.mask[self.slice][..., x_ind, y_ind] = not unmask
+        return
+

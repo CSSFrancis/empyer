@@ -1,9 +1,9 @@
 import numpy as np
 
-from empyer.signals.em_signal import EM_Signal
+from empyer.signals.emsignal import EMSignal
 
 
-class PowerSignal(EM_Signal):
+class PowerSignal(EMSignal):
     _signal_type = "power_signal"
 
     def __init__(self, *args, **kwargs):
@@ -28,7 +28,7 @@ class PowerSignal(EM_Signal):
             typically contains all the parameters that has been
             imported from the original data file.
         """
-        EM_Signal.__init__(self, *args, **kwargs)
+        EMSignal.__init__(self, *args, **kwargs)
         self.metadata.set_item("Signal.type", "power_signal")
 
     def get_i_vs_k(self, symmetry=None):

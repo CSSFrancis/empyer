@@ -12,14 +12,14 @@ class TestDiffractionSignal(TestCase):
         self.center = [276, 256]
         self.lengths = sorted(np.random.rand(2) * 100 + 100, reverse=True)
         self.angle = np.random.rand() * np.pi
-        rand_angle = np.random.rand(1000) * 2 * np.pi
+        rand_angle = np.random.rand(2000) * 2 * np.pi
 
         rand_points = [[(np.cos(ang) * self.lengths[0]), np.sin(ang) * self.lengths[1]] for ang in rand_angle]
-        rand_points = np.array([[int(point[0] * np.cos(self.angle) - point[1] * np.sin(self.angle) + self.center[0]),
-                                 int(point[1] * np.cos(self.angle) + point[0] * np.sin(self.angle) + self.center[1])]
+        rand_points = np.array([[int(point[1] * np.cos(self.angle) + point[0] * np.sin(self.angle) + self.center[1]),
+                                 int(point[0] * np.cos(self.angle) - point[1] * np.sin(self.angle) + self.center[0])]
                                 for point in rand_points])
-        d[:, rand_points[:, 0], rand_points[:, 1]] = 100
-        d = np.random.poisson(d)
+        d[:, rand_points[:, 0], rand_points[:, 1]] = 1000
+        #d = np.random.poisson(d)
 
         self.bs = BaseSignal(data=d, lazy=False)
         self.s = Signal2D(self.bs)
@@ -34,12 +34,13 @@ class TestDiffractionSignal(TestCase):
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.angle, self.angle, places=1)
 
     def test_conversion(self):
-         converted = self.ds.calculate_polar_spectrum(phase_width=720,
-                                         radius=None,
-                                         parallel=False,
-                                         inplace=False)
-         converted.plot()
-         plt.show()
+        converted = self.ds.calculate_polar_spectrum(phase_width=720, radius=None, parallel=False, inplace=False)
+        self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.center[0], self.center[1], places=-1)
+        self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.center[1], self.center[0], places=-1)
+        self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.lengths[0], max(self.lengths), places=-1)
+        self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.lengths[1], min(self.lengths), places=-1)
+        self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.angle, self.angle, places=1)
+        self.assertLess((converted.sum(axis=(0, 1)).data > 5000).sum(), 7)
 
     def test_parallel_conversion(self):
         self.ds.calculate_polar_spectrum(phase_width=720,
@@ -48,13 +49,15 @@ class TestDiffractionSignal(TestCase):
                                          inplace=False)
 
     def test_conversion_and_mask(self):
-        self.ds.mask_slice(242, 262, 0, 511)
-        self.ds.show_mask()
+        self.ds.masig[240:260, 0:256] = True
+        print(self.ds.data.mask)
+        self.ds.inav[1].plot()
+        plt.show()
         converted = self.ds.calculate_polar_spectrum(phase_width=720,
                                                      radius=None,
                                                      parallel=False,
                                                      inplace=False)
+        print(converted.data)
         converted.plot()
         plt.show()
-        converted.show_mask()
         plt.show()

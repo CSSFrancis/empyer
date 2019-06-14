@@ -2,11 +2,11 @@ import numpy as np
 
 from empyer.misc.ellipse_analysis import solve_ellipse
 from empyer.misc.cartesain_to_polar import convert
-from empyer.signals.em_signal import EM_Signal
+from empyer.signals.emsignal import EMSignal
 from empyer.signals.polar_signal import PolarSignal
 
 
-class DiffractionSignal(EM_Signal):
+class DiffractionSignal(EMSignal):
     """
     The Diffraction Signal class extends the Hyperspy 2d signal class
     """
@@ -34,7 +34,7 @@ class DiffractionSignal(EM_Signal):
             typically contains all the parameters that has been
             imported from the original data file.
         """
-        EM_Signal.__init__(self, *args, **kwargs)
+        EMSignal.__init__(self, *args, **kwargs)
         if not hasattr(self.metadata.Signal, 'Ellipticity.calibrated'):
             self.metadata.set_item("Signal.Ellipticity.calibrated", False)
 
@@ -67,8 +67,7 @@ class DiffractionSignal(EM_Signal):
             the angle of the major axes
         """
 
-        center, lengths, angle = solve_ellipse(np.transpose(self.sum().data),
-                                               mask=self.get_mask(),
+        center, lengths, angle = self.sum().map(solve_ellipse,
                                                num_points=num_points,
                                                interactive=interactive,
                                                plot=plot)
@@ -108,7 +107,6 @@ class DiffractionSignal(EM_Signal):
         if not self.metadata.Signal.Ellipticity.calibrated:
             self.determine_ellipse()
         polar_signal = self.map(convert,
-                                mask=self.get_mask(),
                                 center=self.metadata.Signal.Ellipticity.center,
                                 angle=self.metadata.Signal.Ellipticity.angle,
                                 foci=self.metadata.Signal.Ellipticity.lengths,
@@ -117,26 +115,12 @@ class DiffractionSignal(EM_Signal):
                                 parallel=parallel,
                                 inplace=inplace,
                                 show_progressbar=False)
-        if self.metadata.has_item('Mask'):
-            new_mask = convert(self.get_mask(),
-                               center=self.metadata.Signal.Ellipticity.center,
-                               angle=self.metadata.Signal.Ellipticity.angle,
-                               foci=self.metadata.Signal.Ellipticity.lengths,
-                               phase_width=phase_width,
-                               radius=radius)
-            new_mask = new_mask > 0
-            new_mask = np.transpose(new_mask)
-        else:
-            new_mask = None
 
         passed_meta_data = self.metadata.as_dictionary()
         if self.metadata.Signal.has_item('Ellipticity'):
             del(passed_meta_data['Signal']['Ellipticity'])
-        if self.metadata.has_item('Mask'):
-            del (passed_meta_data['Mask'])
 
         polar = PolarSignal(polar_signal, metadata=passed_meta_data)
-        polar.set_mask(mask=new_mask)
 
         polar.axes_manager.navigation_axes = self.axes_manager.navigation_axes
         polar.set_axes(-2,

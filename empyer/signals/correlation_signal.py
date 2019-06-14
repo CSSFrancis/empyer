@@ -1,9 +1,9 @@
-from empyer.signals.em_signal import EM_Signal
+from empyer.signals.emsignal import EMSignal
 from empyer.signals.power_signal import PowerSignal
 from empyer.misc.angular_correlation import power_spectrum
 
 
-class CorrelationSignal(EM_Signal):
+class CorrelationSignal(EMSignal):
     """Create a  Correlation Signal from a numpy array.
 
     Parameters
@@ -28,7 +28,7 @@ class CorrelationSignal(EM_Signal):
     _signal_type = "correlation_signal"
 
     def __init__(self, *args, **kwargs):
-        EM_Signal.__init__(self, *args, **kwargs)
+        EMSignal.__init__(self, *args, **kwargs)
         self.metadata.set_item("Signal.type", "correlation_signal")
 
     def get_power_spectrum(self, method="FFT"):

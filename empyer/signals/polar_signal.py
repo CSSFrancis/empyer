@@ -1,11 +1,11 @@
 import numpy as np
-from empyer.signals.em_signal import EM_Signal
+from empyer.signals.emsignal import EMSignal
 from empyer.signals.correlation_signal import CorrelationSignal
 from empyer.misc.angular_correlation import angular_correlation
 from empyer.misc.image import square
 
 
-class PolarSignal(EM_Signal):
+class PolarSignal(EMSignal):
     _signal_type = "polar_signal"
 
     def __init__(self, *args, **kwargs):
@@ -29,7 +29,7 @@ class PolarSignal(EM_Signal):
             typically contains all the parameters that has been
             imported from the original data file.
         """
-        EM_Signal.__init__(self, *args, **kwargs)
+        EMSignal.__init__(self, *args, **kwargs)
         self.metadata.set_item("Signal.type", "polar_signal")
 
     def autocorrelation(self, binning_factor=1, cut=0, normalize=True):
@@ -75,11 +75,6 @@ class PolarSignal(EM_Signal):
                          offset=offset)
         return angular
 
-    def mask_data(self):
-        # TODO: Make a function for getting mean with a described mask without using numpy.
-        m = self.get_mask()
-        if m is not None:
-            self.map(np.ma.masked_array, mask=m, show_progressbar=False)
 
     def fem(self, version="omega"):
         """Calculated the variance among some image
@@ -94,7 +89,6 @@ class PolarSignal(EM_Signal):
             print("No thickness filter applied...")
 
         if version is 'rings':
-            self.mask_data()
             var = self.nanmean(axis=-1)
             var.map(square)
             var = var.nanmean()

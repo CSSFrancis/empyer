@@ -1,5 +1,5 @@
 from hyperspy.api import load as hsload
-from .signals.em_signal import EM_Signal
+from .signals.emsignal import EMSignal
 from .signals.diffraction_signal import DiffractionSignal
 from .signals.polar_signal import PolarSignal
 from .signals.correlation_signal import CorrelationSignal
@@ -60,7 +60,7 @@ def to_em_signal(signal=None):
     """
     ax = signal.axes_manager.as_dictionary()
     ax = [ax[key]for key in ax]
-    ds = EM_Signal(signal, metadata=signal.metadata.as_dictionary(), axes=ax)
+    ds = EMSignal(signal, metadata=signal.metadata.as_dictionary(), axes=ax)
     return ds
 
 

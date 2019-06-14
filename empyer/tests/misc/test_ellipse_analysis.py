@@ -4,6 +4,7 @@ from empyer.misc.ellipse_analysis import solve_ellipse
 from empyer.misc.cartesain_to_polar import convert
 import matplotlib.pyplot as plt
 
+
 class TestConvert(TestCase):
     def setUp(self):
         self.ellipse = np.random.rand(512, 512)
@@ -28,5 +29,15 @@ class TestConvert(TestCase):
         self.assertAlmostEqual(l[0], max(self.lengths), places=-1)
         self.assertAlmostEqual(l[1], min(self.lengths), places=-1)
         self.assertAlmostEqual(a, self.angle, places=1)
-        plt.imshow(convert(self.ellipse,angle=a,foci=l,center=c))
-        plt.show()
+
+    def test_solve_ellipse_mask(self):
+        e = np.ma.masked_array(self.ellipse)
+        e.mask = False
+        e.mask[230:275, 0:256] = True
+        e.mask[0:10, 0:256] = True
+        c, l, a = solve_ellipse(e, num_points=100)
+        self.assertAlmostEqual(c[0], self.center[0], places=-1)
+        self.assertAlmostEqual(c[1], self.center[1], places=-1)
+        self.assertAlmostEqual(l[0], max(self.lengths), places=-1)
+        self.assertAlmostEqual(l[1], min(self.lengths), places=-1)
+        self.assertAlmostEqual(a, self.angle, places=1)

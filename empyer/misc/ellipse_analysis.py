@@ -87,7 +87,7 @@ def find_center(img):
     return center
 
 
-def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False):
+def solve_ellipse(img, interactive=False, num_points=500, plot=False):
     """Takes a 2-d array image and allows you to solve for the equivalent ellipse.
 
     Fitzgibbon, A. W., Fisher, R. B., Hill, F., & Eh, E. (1999). Direct Least Squres Fitting of Ellipses.
@@ -149,22 +149,16 @@ def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False)
             else:
                 return np.pi / 2
         else:
+            ang = - np.arctan(2 * b / (a - c))/2
             if a > c:
                 print('a>c')
-                ang = - np.arctan(2 * b / (a - c)) / 2
                 if ang > 0:
                     return ang
                 else:
-                    return np.pi+ang
+                    return ang + np.pi
             else:
-                return np.pi - np.arctan(2 * b / (a - c)) / 2
+                return np.pi/2 + ang
 
-
-    img_shape = np.shape(img)
-    img_list = np.reshape(img, (-1, *img_shape[-2:]))
-
-    if mask is not None:
-        img[mask] = 0
     coords = [[], []]
     if interactive:
         figure1 = plt.figure()
@@ -198,9 +192,10 @@ def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False)
     # TODO: Make method more robust with respect to obviously wrong points
     else:
         i_shape = np.shape(img)
-        print(i_shape)
         flattened_array = img.flatten()
-        indexes = sorted(range(len(flattened_array)), key=flattened_array.__getitem__)
+        indexes = np.argsort(flattened_array)
+        if isinstance(flattened_array, np.ma.masked_array):
+            indexes = indexes[flattened_array.mask[indexes] == False]
         # take top 5000 points make sure exclude zero beam
         coords[0] = np.remainder(indexes[-num_points:], i_shape[0])  # x axis (column)
         coords[1] = np.floor_divide(indexes[-num_points:], i_shape[1])  # y axis (row)
@@ -220,7 +215,6 @@ def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False)
         axe.imshow(img)
         axe.add_patch(ellipse)
         plt.show()
-    print(img_shape)
     center = list(reversed(center))
     return center, lengths, angle
 
