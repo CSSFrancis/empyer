@@ -75,6 +75,7 @@ class TestEMSignal(TestCase):
 
     def test_HAADF(self):
         self.ds.add_hdaaf_intensities(np.random.normal(size=(8, 9)), 1.5, .1)
+        print(self.ds.thickness_filter())
 
 
 

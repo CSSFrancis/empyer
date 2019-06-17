@@ -12,16 +12,18 @@ class TestBinning(TestCase):
 
     def test_angular_correlation(self):
         ac1 = angular_correlation(self.test1)
-        ac2 = angular_correlation(self.test1, self.mask)
+
         self.assertAlmostEqual(np.mean(ac1[:, 0]), .33, places=1)
         self.assertAlmostEqual(np.mean(ac1[:, 360]), 0, places=2)
         self.assertAlmostEqual(np.mean(ac2[:, 0]), .33, places=1)
         self.assertAlmostEqual(np.mean(ac2[:, 360]), 0, places=2)
 
+    def test_angular_correlation_mask(self):
+        test = np.ma.masked_array(np.random.rand(10, 10))
+        test.mask= np.zeros((10, 10), dtype=bool)
+        test.mask[0:5, 2:4] = True
+        ac1 = angular_correlation(test)
+
     def test_power_spectrum(self):
         ac1 = angular_correlation(self.test1, normalize=False)
         ac2 = angular_correlation(self.test1, self.mask)
-        plt.imshow(power_spectrum(ac2))
-        plt.show()
-        power_spectrum(ac1)
-

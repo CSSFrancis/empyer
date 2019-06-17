@@ -67,16 +67,10 @@ class DiffractionSignal(EMSignal):
             the angle of the major axes
         """
 
-        center, lengths, angle = solve_ellipse(np.transpose(self.sum().data),
+        center, lengths, angle = solve_ellipse(self.sum().data,
                                                num_points=num_points,
                                                interactive=interactive,
                                                plot=plot)
-        # Accounting for some weird change of axis....
-        angle = np.pi/2-angle
-        if angle < 0:
-            angle = np.pi+angle
-
-
         self.metadata.set_item("Signal.Ellipticity.center", center)
         self.metadata.set_item("Signal.Ellipticity.angle", angle)
         self.metadata.set_item("Signal.Ellipticity.lengths", lengths)
@@ -121,6 +115,7 @@ class DiffractionSignal(EMSignal):
             del(passed_meta_data['Signal']['Ellipticity'])
 
         polar = PolarSignal(polar_signal, metadata=passed_meta_data)
+        polar.mask_below(value=.001)
 
         polar.axes_manager.navigation_axes = self.axes_manager.navigation_axes
         polar.set_axes(-2,

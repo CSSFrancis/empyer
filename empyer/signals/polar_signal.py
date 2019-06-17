@@ -56,9 +56,8 @@ class PolarSignal(EMSignal):
                                cut_off=cut,
                                normalize=normalize,
                                inplace=False)
+        correlation.mask_where(condition=(correlation.data ==0))
         passed_meta_data = self.metadata.as_dictionary()
-        if self.metadata.has_item('Mask'):
-            del (passed_meta_data['Mask'])
         angular = CorrelationSignal(correlation, metadata=passed_meta_data)
         shift = cut // binning_factor
         angular.axes_manager.navigation_axes = self.axes_manager.navigation_axes
@@ -74,7 +73,6 @@ class PolarSignal(EMSignal):
                          offset=offset)
         return angular
 
-
     def fem(self, version="omega"):
         """Calculated the variance among some image
 
@@ -86,22 +84,44 @@ class PolarSignal(EMSignal):
         """
         if not self.metadata.has_item('HAADF'):
             print("No thickness filter applied...")
-
-        if version is 'rings':
-            var = self.nanmean(axis=-1)
-            var.map(square)
-            var = var.nanmean()
-            center = self.nanmean(axis=-1).nanmean()
-            center.map(square)
-            int_vs_k = (var-center)/center
-            print(int_vs_k.axes_manager)
-        elif version is 'omega':
-            self.mask_data()
-            var = self.map(square,show_progressbar=False, inplace=False).nanmean().nanmean(axis=1)
-            center = self.nanmean(axis=-1)
-            center.map(square)
-            center = center.nanmean()
-            int_vs_k = (var - center) / center
-            print(int_vs_k.axes_manager)
+            if version is 'rings':
+                var = self.nanmean(axis=-1)
+                var.map(square)
+                var = var.nanmean()
+                center = self.nanmean(axis=-1).nanmean()
+                center.map(square)
+                int_vs_k = (var - center) / center
+                print(int_vs_k.axes_manager)
+            elif version is 'omega':
+                var = self.map(square, show_progressbar=False, inplace=False).nanmean().nanmean(axis=1)
+                center = self.nanmean(axis=-1)
+                center.map(square)
+                center = center.nanmean()
+                int_vs_k = (var - center) / center
+                print(int_vs_k.axes_manager)
+        else:
+            filter, thickness = self.thickness_filter()
+            with self.unfolded(unfold_navigation=True, unfold_signal=False):
+                if version is 'rings':
+                    int_vs_k = []
+                    for i, th in enumerate(thickness):
+                        var = self.inav[filter == i].nanmean(axis=-1)
+                        var.map(square)
+                        var = var.nanmean()
+                        center = self.nanmean(axis=-1).nanmean()
+                        center.map(square)
+                        int_vs_k = int_vs_k.append((var - center) / center)
+                elif version is 'omega':
+                    int_vs_k = []
+                    for i, th in enumerate(thickness):
+                        index = np.where(filter.flatten(0)==i+1)[0]
+                        print(tuple(index))
+                        var = self.inav[tuple(index)].map(square,
+                                                         show_progressbar=False,
+                                                         inplace=False).nanmean().nanmean(axis=1)
+                        center = self.nanmean(axis=-1)
+                        center.map(square)
+                        center = center.nanmean()
+                        int_vs_k.append((var - center) / center)
         return int_vs_k
 

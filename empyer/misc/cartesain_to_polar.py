@@ -21,7 +21,6 @@ def convert(img, center=None, angle=None, foci=None, radius=None, phase_width=72
     img_shape = np.shape(img)
     if center is None:
         center = np.true_divide(img_shape[-2:], 2)
-    center = [center[1], center[0]]  # converting to y,x or array coordinates
     if radius is None:
         radius = int(min(img_shape[-2:]) - max(np.abs(np.subtract(img_shape[-2:], center)))-5)
         if foci is not None:
@@ -69,13 +68,7 @@ def convert(img, center=None, angle=None, foci=None, radius=None, phase_width=72
         polar_img = np.reshape(polar_img, (radius, phase_width))
 
     # outputting new mask
-    try:
-        img.mask
-        polar_mask = polar_img < 0
-        polar_img = np.ma.masked_array(polar_img)
-        polar_img.mask = polar_mask
-    except AttributeError:
-        pass
+    polar_img[polar_img < 0] =0
     return polar_img
 
 

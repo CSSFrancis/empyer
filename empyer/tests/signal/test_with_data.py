@@ -13,11 +13,15 @@ class TestPowerSignal(TestCase):
         self.d.mask_below(300)
         self.d2 = em.load(file2)
         self.d2.mask_below(300)
-    def test_mask(self):
-        self.d.show_mask()
 
     def test_ellipse(self):
         self.d.determine_ellipse(num_points=500)
+
+    def test_polar_unwrapping(self):
+        p = self.d.calculate_polar_spectrum()
+        print(p)
+        p.plot()
+        plt.show()
 
     def test_polar_unwrapping(self):
         self.d.determine_ellipse()

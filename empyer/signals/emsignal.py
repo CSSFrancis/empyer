@@ -70,13 +70,30 @@ class EMSignal(Signal2D):
 
     def thickness_filter(self):
         """Filter based on HAADF intensities
-        :return:
+
+        Returns
+        ------------------
+        th_filter: array-like
+            Integers which are used to filter into different thicknesses. Basically used to bin the
+            signal
+        thicknesses: 1-d array
+            The thicknesses for the signal at every integer.
         """
         thickness = self.get_thicknesses()
         twosigma = 2 * np.std(thickness)
-        deviation = np.abs(np.subtract(thickness,np.mean(thickness)))
-        outside = deviation > twosigma
-        return outside, np.mean(thickness), deviation
+        deviation = np.subtract(thickness, np.mean(thickness))
+        th_filter = thickness
+        th_filter[deviation > twosigma] = 0
+        th_filter[deviation < twosigma] = 0
+        th_filter[(-twosigma < deviation) & (deviation <= -twosigma/2)] = 1
+        th_filter[(-twosigma / 2 < deviation) & (deviation <= 0)] = 2
+        th_filter[(0 < deviation) & (deviation <= twosigma/2)] = 3
+        th_filter[(twosigma / 2 < deviation) & (deviation <= twosigma)] = 4
+        thickness = [np.mean(thickness) - 3*twosigma/2,
+                     np.mean(thickness) - twosigma/2,
+                     np.mean(thickness) +twosigma/2,
+                     np.mean(thickness) + 3 * twosigma / 2]
+        return th_filter, thickness
 
     def set_axes(self, index, name=None, scale=None, units=None, offset=None):
         """Set axes of the signal
@@ -128,6 +145,19 @@ class EMSignal(Signal2D):
         """
         self.add_mask()
         self.data.mask[self.data > value] = not unmask
+
+    def mask_where(self, condition):
+        """Mask at some condition
+
+        Parameters:
+        -------------
+        condition: array_like
+            Masking condition
+
+        """
+        self.add_mask()
+        self.data.mask[condition] = True
+        return
 
     def add_mask(self):
         if not isinstance(self.data, np.ma.masked_array):

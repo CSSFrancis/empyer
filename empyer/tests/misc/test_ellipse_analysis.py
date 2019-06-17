@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 class TestConvert(TestCase):
     def setUp(self):
         self.ellipse = np.random.rand(512, 512)
-        self.center = [256, 256]
+        self.center = [270, 256]
         self.lengths = sorted(np.random.rand(2)*100+100, reverse=True)
         self.angle = np.random.rand()*np.pi
         rand_angle = np.random.rand(1000)*2*np.pi
@@ -24,6 +24,7 @@ class TestConvert(TestCase):
         print(self.lengths)
         print(self.angle)
         c, l, a = solve_ellipse(self.ellipse, num_points=500)
+        print(c)
         self.assertAlmostEqual(c[0], self.center[0], places=-1)
         self.assertAlmostEqual(c[1], self.center[1], places=-1)
         self.assertAlmostEqual(l[0], max(self.lengths), places=-1)

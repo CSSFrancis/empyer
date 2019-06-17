@@ -14,19 +14,23 @@ class TestPolarSignal(TestCase):
                          name="k",
                          scale=1,
                          units='nm^-1')
-        self.ps.masig[0:10, 1:10]= True
 
     def test_autocorrelation(self):
         self.ps.autocorrelation()
 
     def test_autocorrelation_mask(self):
-        self.ps.masig[0:720, 0:1] = True
+        self.ps.masig[:, 0:20] = True
         self.ps.plot()
         plt.show()
         ac = self.ps.autocorrelation()
-        ac2 = self.ps.autocorrelation(cut=50)
-        ac2 = self.ps.autocorrelation(cut=50, binning_factor=2)
+        ac.plot()
+        plt.show()
 
     def test_fem(self):
         self.ps.fem(version='omega')
         self.ps.fem(version='rings')
+
+    def test_fem_with_filter(self):
+        self.ps.add_hdaaf_intensities(np.random.normal(size=(10, 10)), 1.5, .1)
+        self.ps.fem(version="omega")
+        self.ps.fem(version="rings")

@@ -31,5 +31,5 @@ class TestConvert(TestCase):
         self.assertAlmostEqual(np.mean(conversion), 0.5, places=2)
 
     def test_elliptical(self):
-        conversion  = convert(self.test2, center=[265, 250], angle=.4, foci=[100, 130], phase_width=720)
+        conversion = convert(self.test2, center=[265, 250], angle=.4, foci=[100, 130], phase_width=720)
         self.assertAlmostEqual(np.mean(conversion), 0.5, places=2)
