@@ -20,10 +20,6 @@ class TestEMSignal(TestCase):
         self.s = Signal2D(data=d)
 
         self.ds = EMSignal(self.s)
-        #self.ds.save("test.hdf5", overwrite=True)
-        #self.ds = em.load('test.hdf5')
-        #print("done")
-        #self.ds.metadata
 
     def test_mask_slicing(self):
         self.ds.manav[:, :].masig[:, :] = True

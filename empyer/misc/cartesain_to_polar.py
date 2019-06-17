@@ -18,7 +18,6 @@ def convert(img, center=None, angle=None, foci=None, radius=None, phase_width=72
     :param plot: Plot the image after converting it...
     :return: polar_img r vs. theta
     """
-    print(img)
     img_shape = np.shape(img)
     if center is None:
         center = np.true_divide(img_shape[-2:], 2)
@@ -72,7 +71,6 @@ def convert(img, center=None, angle=None, foci=None, radius=None, phase_width=72
     # outputting new mask
     try:
         img.mask
-        print("Here")
         polar_mask = polar_img < 0
         polar_img = np.ma.masked_array(polar_img)
         polar_img.mask = polar_mask

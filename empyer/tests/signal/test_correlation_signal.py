@@ -21,5 +21,5 @@ class TestPolarSignal(TestCase):
         sum_power = self.ps.get_summed_power_spectrum()
         sum_power.isig[2:12, 3.0:6.0].plot()
         plt.show()
-        sum_power.isig[6,3.0:8.0].plot()
+        sum_power.isig[6, 3.0:8.0].plot()
         plt.show()

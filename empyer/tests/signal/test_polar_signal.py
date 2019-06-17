@@ -14,14 +14,13 @@ class TestPolarSignal(TestCase):
                          name="k",
                          scale=1,
                          units='nm^-1')
-        self.ps.mask_shape(shape='rectangle', data=[0, 10, 1, 10])
+        self.ps.masig[0:10, 1:10]= True
 
     def test_autocorrelation(self):
         self.ps.autocorrelation()
 
     def test_autocorrelation_mask(self):
-        self.ps.mask_shape(shape='rectangle', data=[0, 720, 0, 1])
-        self.ps.mask_shape(shape='rectangle', data=[1, 20, 0, 10])
+        self.ps.masig[0:720, 0:1] = True
         self.ps.plot()
         plt.show()
         ac = self.ps.autocorrelation()

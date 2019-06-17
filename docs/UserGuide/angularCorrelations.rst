@@ -26,3 +26,26 @@ As result efficient methods for convolution can be applied in which the actual c
    C(\phi,k,n)=\frac{IFFT[FFT(I(\theta,k,n))_\theta * Conj(FFT(I(\theta,k,n)))_\theta]}{<I(\theta,k,n)>^2}
 
 Which speeds up the calculation more than 100x
+
+
+*Calculating the Angular Correlations*
+
+In order to calculate angular correlations, start by loading a 4-D data set.
+
+.. code:: python
+
+    import empyer
+    import matplotlib.pyplot as plt
+
+    dif_signal = empyer.load(file, signal_type ='diffraction_signal')
+
+    # adding a mask to the signal for to block the beam stop
+    dif_signal.mask_below(.1)
+    dif_signal.show_mask()
+
+    # correcting for not elliptical diffraction patterns. Make sure there is not wobbling from pattern to pattern
+    dif_signal.determine_ellipse()
+    pol_signal = dif_signal.calculate_polar_spectrum()
+    ang_signal = polar_signal.autocorrelation()
+    pow_signal = ang_signal.get_power_spectrum()
+

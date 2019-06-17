@@ -52,7 +52,6 @@ class PolarSignal(EMSignal):
         if isinstance(cut, float):
             cut = self.axes_manager.signal_axes[-3].value2index(cut)
         correlation = self.map(angular_correlation,
-                               mask=self.get_mask(),
                                binning=binning_factor,
                                cut_off=cut,
                                normalize=normalize,

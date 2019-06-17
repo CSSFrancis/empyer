@@ -19,10 +19,10 @@ def angular_correlation(r_theta_img, mask=None, binning=1, cut_off=0, normalize=
         Subtract <I(\theta)>^2 and divide by <I(\theta)>^2
     """
     image = r_theta_img
-    if mask is not None:
-        image[mask] = 0
+    if isinstance(image, np.ma.masked_array):
+        image[image.mask] = 0
         if cut_off is not 0:
-            mask = mask[cut_off:len(mask), :]
+            mask = image.mask[cut_off:len(image.mask), :]
 
     if cut_off is not 0:
         image = image[cut_off:len(image), :]
@@ -31,8 +31,6 @@ def angular_correlation(r_theta_img, mask=None, binning=1, cut_off=0, normalize=
         image = bin_2d(image, binning)
         if mask is not None:
             mask = bin_2d(mask, binning) != 0
-
-
 
     # fast method uses a FFT and is a process which is O(n) = n log(n)
     I_fft = np.fft.fft(image, axis=1)

@@ -267,11 +267,10 @@ class MaskPasser():
 
         Parameters
         ----------
-        shape: str
-            Acceptable shapes ['rectangle, 'circle']
-        data: list
-            Define shapes. eg 'rectangle' -> [x1,x2,y1,y2] 'circle' -> [radius, x,y]
-            data allows indexing with floats and the axes described for the signal
+        center: tuple
+            The (x,y) center of the circle
+        radius: float or int
+            The radius of the circle
         unmask: bool
             Unmask any pixels in the defined shape
         """

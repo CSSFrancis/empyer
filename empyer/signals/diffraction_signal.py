@@ -67,7 +67,7 @@ class DiffractionSignal(EMSignal):
             the angle of the major axes
         """
 
-        center, lengths, angle = self.sum().map(solve_ellipse,
+        center, lengths, angle = solve_ellipse(np.transpose(self.sum().data),
                                                num_points=num_points,
                                                interactive=interactive,
                                                plot=plot)

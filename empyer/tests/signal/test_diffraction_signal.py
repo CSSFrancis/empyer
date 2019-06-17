@@ -15,8 +15,8 @@ class TestDiffractionSignal(TestCase):
         rand_angle = np.random.rand(2000) * 2 * np.pi
 
         rand_points = [[(np.cos(ang) * self.lengths[0]), np.sin(ang) * self.lengths[1]] for ang in rand_angle]
-        rand_points = np.array([[int(point[1] * np.cos(self.angle) + point[0] * np.sin(self.angle) + self.center[1]),
-                                 int(point[0] * np.cos(self.angle) - point[1] * np.sin(self.angle) + self.center[0])]
+        rand_points = np.array([[int(point[0] * np.cos(self.angle) - point[1] * np.sin(self.angle) + self.center[0]),
+                                 int(point[1] * np.cos(self.angle) + point[0] * np.sin(self.angle) + self.center[1])]
                                 for point in rand_points])
         d[:, rand_points[:, 0], rand_points[:, 1]] = 1000
         #d = np.random.poisson(d)
@@ -40,7 +40,7 @@ class TestDiffractionSignal(TestCase):
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.lengths[0], max(self.lengths), places=-1)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.lengths[1], min(self.lengths), places=-1)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.angle, self.angle, places=1)
-        self.assertLess((converted.sum(axis=(0, 1)).data > 5000).sum(), 7)
+        self.assertLess((converted.sum(axis=(0, 1)).data > 5000).sum(), 10)
 
     def test_parallel_conversion(self):
         self.ds.calculate_polar_spectrum(phase_width=720,
@@ -50,14 +50,7 @@ class TestDiffractionSignal(TestCase):
 
     def test_conversion_and_mask(self):
         self.ds.masig[240:260, 0:256] = True
-        print(self.ds.data.mask)
-        self.ds.inav[1].plot()
-        plt.show()
         converted = self.ds.calculate_polar_spectrum(phase_width=720,
                                                      radius=None,
                                                      parallel=False,
                                                      inplace=False)
-        print(converted.data)
-        converted.plot()
-        plt.show()
-        plt.show()
