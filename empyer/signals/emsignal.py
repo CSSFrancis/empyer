@@ -43,7 +43,7 @@ class EMSignal(Signal2D):
         self.masig = MaskSlicer(self, isNavigation=False)
         self.mask_passer= None
 
-    def add_hdaaf_intensities(self, intensity_array, slope, intercept):
+    def add_haadf_intensities(self, intensity_array, slope, intercept):
         """Add High Angle Annular Dark Field intensities for each point.
 
         Parameters
