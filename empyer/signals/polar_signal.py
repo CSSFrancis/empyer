@@ -3,6 +3,7 @@ from empyer.signals.emsignal import EMSignal
 from empyer.signals.correlation_signal import CorrelationSignal
 from empyer.misc.angular_correlation import angular_correlation
 from empyer.misc.image import square
+from hyperspy.utils import stack
 
 
 class PolarSignal(EMSignal):
@@ -100,28 +101,35 @@ class PolarSignal(EMSignal):
                 int_vs_k = (var - center) / center
                 print(int_vs_k.axes_manager)
         else:
-            filter, thickness = self.thickness_filter()
-            with self.unfolded(unfold_navigation=True, unfold_signal=False):
-                if version is 'rings':
-                    int_vs_k = []
-                    for i, th in enumerate(thickness):
-                        var = self.inav[filter == i].nanmean(axis=-1)
-                        var.map(square)
-                        var = var.nanmean()
-                        center = self.nanmean(axis=-1).nanmean()
-                        center.map(square)
-                        int_vs_k = int_vs_k.append((var - center) / center)
-                elif version is 'omega':
-                    int_vs_k = []
-                    for i, th in enumerate(thickness):
-                        index = np.where(filter.flatten(0)==i+1)[0]
-                        print(tuple(index))
-                        var = self.inav[tuple(index)].map(square,
-                                                         show_progressbar=False,
-                                                         inplace=False).nanmean().nanmean(axis=1)
-                        center = self.nanmean(axis=-1)
-                        center.map(square)
-                        center = center.nanmean()
-                        int_vs_k.append((var - center) / center)
+            filt, thickness = self.thickness_filter()
+            if version is 'rings':
+                int_vs_k = []
+                for i, th in enumerate(thickness):
+                    index = np.where(filt.transpose() == i+1)
+                    index = tuple(zip(index[0], index[1]))
+                    var = stack([self.inav[ind] for ind in index])
+                    v = var.nanmean(axis=-1)
+                    v.map(square)
+                    v = v.nanmean()
+                    center = var.nanmean(axis=-1).nanmean()
+                    center.map(square)
+                    int_vs_k.append((v - center) / center)
+            if version is 'omega':
+                int_vs_k = []
+                for i, th in enumerate(thickness):
+                    index = np.where(filt.transpose() == i+1)
+                    index = tuple(zip(index[0], index[1]))
+                    var = stack([self.inav[ind] for ind in index])
+                    v = var.map(square, inplace=False).nanmean().nanmean(axis=-2)
+                    print(v)
+                    center = var.nanmean(axis=-2)
+                    print(center)
+                    center.map(square)
+                    center = center.nanmean()
+                    int_vs_k.append((v - center) / center)
+            int_vs_k = stack(int_vs_k)
+            int_vs_k.axes_manager.navigation_axes[0].offset = thickness[0]
+            int_vs_k.axes_manager.navigation_axes[0].scale = thickness[1] - thickness[0]
+
         return int_vs_k
 

@@ -32,5 +32,7 @@ class TestPolarSignal(TestCase):
 
     def test_fem_with_filter(self):
         self.ps.add_hdaaf_intensities(np.random.normal(size=(10, 10)), 1.5, .1)
-        self.ps.fem(version="omega")
+        vari = self.ps.fem(version="omega")
+        self.ps.plot()
+        plt.show()
         self.ps.fem(version="rings")
