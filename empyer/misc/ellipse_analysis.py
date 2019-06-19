@@ -143,6 +143,7 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
 
     def ellipse_angle_of_rotation(a):
         b, c, d, f, g, a = a[1] / 2, a[2], a[3] / 2, a[4] / 2, a[5], a[0]
+        #a,c = np.abs(a), np.abs(c)
         if b == 0:
             if a > c:
                 return 0
@@ -150,17 +151,24 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
                 return np.pi / 2
         else:
             ang = - np.arctan(2 * b / (a - c))/2
+            print("A:", a)
+            print("c:", c)
             if a > c:
                 print('a>c')
                 if ang > 0:
-                    print("Case1")
-                    return ang
+                    if (a<0) & (c<0):
+                        return ang+ np.pi/2
+                    else:
+                        return ang
                 else:
                     print("Case2")
                     return ang + np.pi
             else:
                 print("case3")
-                return np.pi/2 + ang
+                if (a < 0) & (c < 0):
+                    return ang
+                else:
+                    return np.pi/2 + ang
 
     coords = [[], []]
     if interactive:
@@ -204,7 +212,7 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
         coords[1] = np.floor_divide(indexes[-num_points:], i_shape[1])  # y axis (row)
     a = fit_ellipse(np.array(coords[0]), np.array(coords[1]))
     center = ellipse_center(a)  # (x,y)
-    center = [center[1],center[0]] # array coordinates (y,x)
+    center = [center[1], center[0]]# array coordinates (y,x)
     lengths = sorted(ellipse_axis_length(a), reverse=True)
     angle = ellipse_angle_of_rotation(a)
     print("The center is:", center)

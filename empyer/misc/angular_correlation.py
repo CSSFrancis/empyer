@@ -40,9 +40,7 @@ def angular_correlation(r_theta_img, binning=1, cut_off=0, normalize=True):
     # this is to determine how many of the variables were non zero... This is really dumb.  but...
     # it works and I should stop trying to fix it (wreak it)
     if mask is not None:
-        print(mask)
         mask_boolean = ~mask  # inverting the boolean mask
-        print("MASK N+BOOL", mask_boolean)
         mask_fft = np.fft.fft(mask_boolean, axis=1)
         number_unmasked = np.fft.ifft(mask_fft*np.conjugate(mask_fft), axis=1).real
         number_unmasked[number_unmasked == 0] = 1  # get rid of divide by zero error for completely masked rows

@@ -10,8 +10,10 @@ class TestDiffractionSignal(TestCase):
     def setUp(self):
         d = np.random.rand(10, 512, 512)
         self.center = [276, 256]
-        self.lengths = sorted(np.random.rand(2) * 100 + 100, reverse=True)
+        self.lengths = sorted(np.random.rand(2) * 50 + 100, reverse=True)
+        #self.lengths = [162.03487147056157, 125.55048399338234]
         self.angle = np.random.rand() * np.pi
+        #self.angle =.8
         rand_angle = np.random.rand(2000) * 2 * np.pi
 
         rand_points = [[(np.cos(ang) * self.lengths[0]), np.sin(ang) * self.lengths[1]] for ang in rand_angle]
@@ -34,6 +36,11 @@ class TestDiffractionSignal(TestCase):
 
     def test_conversion(self):
         converted = self.ds.calculate_polar_spectrum(phase_width=720, radius=None, parallel=False, inplace=False)
+        self.ds.inav[1].plot()
+        #plt.show()
+        #plt.plot(converted.inav[1].sum(axis=(0)).data)
+        #converted.inav[1].plot()
+        #plt.show()
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.center[0], self.center[0], places=-1)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.center[1], self.center[1], places=-1)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.lengths[0], max(self.lengths), places=-1)
@@ -41,11 +48,12 @@ class TestDiffractionSignal(TestCase):
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.angle, self.angle, places=1)
         self.assertLess((converted.sum(axis=(0, 1)).data > 5000).sum(), 10)
 
+
     def test_parallel_conversion(self):
         converted = self.ds.calculate_polar_spectrum(phase_width=720,
-                                         radius=None,
-                                         parallel=True,
-                                         inplace=False)
+                                                     radius=None,
+                                                     parallel=True,
+                                                     inplace=False)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.center[0], self.center[0], places=-1)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.center[1], self.center[1], places=-1)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.lengths[0], max(self.lengths), places=-1)

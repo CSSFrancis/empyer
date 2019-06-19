@@ -5,31 +5,18 @@ from empyer.misc.cartesain_to_polar import convert
 
 class TestConvert(TestCase):
     def setUp(self):
-        self.test2 = np.random.rand(10,10, 512, 512)
+        self.d = np.random.rand(512, 512)
+        self.center = [276, 256]
+        self.lengths = sorted(np.random.rand(2) * 100 + 100, reverse=True)
+        self.angle = np.random.rand() *  np.pi
+        rand_angle = np.random.rand(2000) * 2 * np.pi
+        rand_points = [[(np.cos(ang) * self.lengths[0]), np.sin(ang) * self.lengths[1]] for ang in rand_angle]
+        rand_points = np.array([[int(point[0] * np.cos(self.angle) - point[1] * np.sin(self.angle) + self.center[0]),
+                                 int(point[1] * np.cos(self.angle) + point[0] * np.sin(self.angle) + self.center[1])]
+                                for point in rand_points])
+        self.d[rand_points[:, 0], rand_points[:, 1]] = 10
 
     def test_2d_convert(self):
-        test1 = np.zeros((512, 512))
-        test1[240:260, :] = 1
-        c= convert(test1,
-                       center=[265, 250],
-                       angle=0,
-                       foci=[100, 100],
-                       phase_width=720)
-        test1[:, 240:260] = 1
-        mask = np.zeros((512, 512), dtype=bool)
-        mask[:240, 240:260] = 1
-        mask[260:, 240:260] = 1
-        c = convert(test1,
-                            mask=mask,
-                            center=[265, 250],
-                            angle=0,
-                            foci=[100, 100],
-                            phase_width=720)
-
-    def test_nd_convert(self):
-        conversion = convert(self.test2)
-        self.assertAlmostEqual(np.mean(conversion), 0.5, places=2)
-
-    def test_elliptical(self):
-        conversion = convert(self.test2, center=[265, 250], angle=.4, foci=[100, 130], phase_width=720)
-        self.assertAlmostEqual(np.mean(conversion), 0.5, places=2)
+        conversion = convert(self.d, center=self.center, angle=self.angle, foci=self.lengths)
+        s = np.sum(conversion, axis=1)
+        self.assertLess((s > max(s)/2).sum(), 4)

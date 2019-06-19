@@ -1,36 +1,40 @@
 from unittest import TestCase
 import numpy as np
 import matplotlib.pyplot as plt
-import empyer as em
+from empyer import load
 
 
 class TestPowerSignal(TestCase):
     def setUp(self):
-        file = '/media/hdd/home/Zr65Cu27.5Al7.5FEM/HighTDatasets/Zr65Cu27.5Al7.5_1.19nmpsec(300W_3.8mT_170C_13sec)/19.38.03 Spectrum image_pos01.hdf5'
-        file2 = '/media/hdd/home/Zr65Cu27.5Al7.5FEM/HighTDatasets/Zr65Cu27.5Al7.5_1.19nmpsec(300W_3.8mT_170C_13sec)/19.50.51 Spectrum image_pos01.hdf5'
-
-        self.d = em.load(file)
+        file = '/home/carter/Documents/ZrCuAl(HH)4-16-2018_175W_3.8mT_175C_25s(0.83nmpsec)/hdf5_files/12.55.42 Spectrum image_pos01.hdf5'
+        #file = '/home/carter/Documents/ZrCuAl(HH)4-16-2018_175W_3.8mT_175C_25s(0.83nmpsec)/hdf5_files/13.08.24 Spectrum image_pos01-2.hdf5'
+        #file = '/home/carter/Documents/ZrCuAl(HH)4-16-2018_175W_3.8mT_175C_25s(0.83nmpsec)/hdf5_files/13.20.15 Spectrum image_pos02.hdf5'
+        self.d = load(file).inav[0:3, 0:3]
         self.d.mask_below(300)
-        self.d2 = em.load(file2)
-        self.d2.mask_below(300)
+
+    def test_plot(self):
+        self.d.inav[1,1].plot()
+        plt.imshow(self.d.inav[1, 1].data)
+        self.d.determine_ellipse(num_points=500)
+        plt.show()
 
     def test_ellipse(self):
         self.d.determine_ellipse(num_points=500)
 
     def test_polar_unwrapping(self):
+        self.d.determine_ellipse()
         p = self.d.calculate_polar_spectrum()
-        print(p)
-        p.plot()
+        p.inav[1, 1].plot()
+        plt.show()
+        s = p.autocorrelation().get_summed_power_spectrum().isig[2, 3.0:6.0]
+        s.plot()
         plt.show()
 
-    def test_polar_unwrapping(self):
+    def test_polar_unwrapping2(self):
         self.d.determine_ellipse()
         p = self.d.calculate_polar_spectrum()
         a = p.autocorrelation()
 
-        self.d2.determine_ellipse()
-        p2 = self.d2.calculate_polar_spectrum()
-        a2 = p2.autocorrelation()
 
         a.get_summed_power_spectrum().isig[2, 3.25:5.5].plot()
         a2.get_summed_power_spectrum().isig[2, 3.25:5.5].plot()
