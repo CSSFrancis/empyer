@@ -108,11 +108,10 @@ class PolarSignal(EMSignal):
                     index = np.where(filt.transpose() == i+1)
                     index = tuple(zip(index[0], index[1]))
                     var = stack([self.inav[ind] for ind in index])
-                    v = var.nanmean(axis=-1)
-                    v.map(square)
-                    v = v.nanmean()
-                    center = var.nanmean(axis=-1).nanmean()
+                    v = var.map(square, inplace=False).nanmean().nanmean(axis=-2)
+                    center = var.nanmean(axis=-2)
                     center.map(square)
+                    center = center.nanmean()
                     int_vs_k.append((v - center) / center)
             if version is 'omega':
                 int_vs_k = []
