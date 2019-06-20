@@ -120,13 +120,11 @@ class PolarSignal(EMSignal):
                     index = np.where(filt.transpose() == i+1)
                     index = tuple(zip(index[0], index[1]))
                     var = stack([self.inav[ind] for ind in index])
-                    v = var.map(square, inplace=False).nanmean().nanmean(axis=-2)
-                    print(v)
+                    v = var.map(square, inplace=False).nanmean(axis=-2)
                     center = var.nanmean(axis=-2)
-                    print(center)
                     center.map(square)
                     center = center.nanmean()
-                    int_vs_k.append((v - center) / center)
+                    int_vs_k.append(((v - center) / center).nanmean())
             int_vs_k = stack(int_vs_k)
             int_vs_k.axes_manager.navigation_axes[0].offset = thickness[0]
             int_vs_k.axes_manager.navigation_axes[0].scale = thickness[1] - thickness[0]

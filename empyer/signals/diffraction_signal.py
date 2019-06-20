@@ -71,7 +71,6 @@ class DiffractionSignal(EMSignal):
                                                num_points=num_points,
                                                interactive=interactive,
                                                plot=plot)
-        #angle=-angle
         self.metadata.set_item("Signal.Ellipticity.center", center)
         self.metadata.set_item("Signal.Ellipticity.angle", angle)
         self.metadata.set_item("Signal.Ellipticity.lengths", lengths)
