@@ -14,13 +14,11 @@ class TestIOSignal(TestCase):
     def test_to_diffraction_signal(self):
         ds = to_diffraction_signal(self.s)
         self.assertDictEqual(ds.axes_manager.as_dictionary(), self.s.axes_manager.as_dictionary())
-        ds.mask_slice(1,4,1,4)
+        ds.mask_below(value=.5)
         ds.save(filename='temp', overwrite=True, extension='hdf5')
         ds_2 = load('temp.hdf5')
         self.assertEqual(ds.metadata.Signal.signal_type, ds_2.metadata.Signal.signal_type)
-        print(ds.metadata.Mask)
-        print(ds_2.metadata.Mask)
-        self.assertEqual(ds.metadata.Mask[14, 15], ds_2.metadata.Mask[14, 15])
+        self.assertIsInstance(ds_2.data, np.ma.masked_array)
 
     def test_to_polar_signal(self):
         ps = to_polar_signal(self.s)
