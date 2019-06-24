@@ -21,6 +21,7 @@ def convert(img, center=None, angle=None, foci=None, radius=None, phase_width=72
     img_shape = np.shape(img)
     if center is None:
         center = np.true_divide(img_shape[-2:], 2)
+    center = [center[1], center[0]]
     if radius is None:
         radius = int(min(img_shape[-2:]) - max(np.abs(np.subtract(img_shape[-2:], center)))-5)
         if foci is not None:

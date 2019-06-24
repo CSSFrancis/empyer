@@ -150,25 +150,15 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
             else:
                 return np.pi / 2
         else:
-            ang = - np.arctan(2 * b / (a - c))/2
-            print("A:", a)
-            print("c:", c)
             if a > c:
                 print('a>c')
+                ang = - np.arctan(2 * b / (a - c)) / 2
                 if ang > 0:
-                    if (a<0) & (c<0):
-                        return ang+ np.pi/2
-                    else:
-                        return ang
-                else:
-                    print("Case2")
-                    return ang + np.pi
-            else:
-                print("case3")
-                if (a < 0) & (c < 0):
                     return ang
                 else:
-                    return np.pi/2 + ang
+                    return np.pi+ang
+            else:
+                return np.pi - np.arctan(2 * b / (a - c)) / 2
 
     coords = [[], []]
     if interactive:
@@ -212,7 +202,7 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
         coords[1] = np.floor_divide(indexes[-num_points:], i_shape[1])  # y axis (row)
     a = fit_ellipse(np.array(coords[0]), np.array(coords[1]))
     center = ellipse_center(a)  # (x,y)
-    center = [center[1], center[0]]# array coordinates (y,x)
+    #  center = [center[1],center[0]] # array coordinates (y,x)
     lengths = sorted(ellipse_axis_length(a), reverse=True)
     angle = ellipse_angle_of_rotation(a)
     print("The center is:", center)
@@ -225,6 +215,6 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
         axe.imshow(img)
         axe.add_patch(ellipse)
         plt.show()
-    center = list(center)
+    center = list(reversed(center))
     return center, lengths, angle
 
