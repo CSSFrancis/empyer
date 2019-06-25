@@ -9,7 +9,7 @@ class TestPowerSignal(TestCase):
         #file = '/home/carter/Documents/ZrCuAl(HH)4-16-2018_175W_3.8mT_175C_25s(0.83nmpsec)/hdf5_files/12.55.42 Spectrum image_pos01.hdf5'
         file = '/home/carter/Documents/ZrCuAl(HH)4-16-2018_175W_3.8mT_175C_25s(0.83nmpsec)/hdf5_files/13.08.24 Spectrum image_pos01-2.hdf5'
         #file = '/home/carter/Documents/ZrCuAl(HH)4-16-2018_175W_3.8mT_175C_25s(0.83nmpsec)/hdf5_files/13.20.15 Spectrum image_pos02.hdf5'
-        self.d = load(file).inav[0:3, 0:3]
+        self.d = load(file)
         self.d.mask_below(300)
 
     def test_plot(self):

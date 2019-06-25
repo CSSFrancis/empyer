@@ -8,7 +8,7 @@ class TestConvert(TestCase):
         self.d = np.random.rand(512, 512)
         self.center = [276, 256]
         self.lengths = sorted(np.random.rand(2) * 100 + 100, reverse=True)
-        self.angle = np.random.rand() *  np.pi
+        self.angle = np.random.rand() * np.pi
         rand_angle = np.random.rand(2000) * 2 * np.pi
         rand_points = [[(np.cos(ang) * self.lengths[0]), np.sin(ang) * self.lengths[1]] for ang in rand_angle]
         rand_points = np.array([[int(point[0] * np.cos(self.angle) - point[1] * np.sin(self.angle) + self.center[0]),

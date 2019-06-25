@@ -27,7 +27,9 @@ class TestDiffractionSignal(TestCase):
 
     def test_ellipse(self):
         self.ds.determine_ellipse()
-        print(self.ds.metadata.Signal.Ellipticity.center[0])
+        print("Centers: ", self.center, self.ds.metadata.Signal.Ellipticity.center)
+        print("Lengths: ", self.lengths, self.ds.metadata.Signal.Ellipticity.lengths)
+        print("Angle: ", self.angle, self.ds.metadata.Signal.Ellipticity.angle)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.center[0], self.center[0], places=-1)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.center[1], self.center[1], places=-1)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.lengths[0], max(self.lengths), places=-1)
@@ -67,6 +69,9 @@ class TestDiffractionSignal(TestCase):
                                                      radius=None,
                                                      parallel=False,
                                                      inplace=False)
+        print("Centers: ", self.center, self.ds.metadata.Signal.Ellipticity.center)
+        print("Lengths: ", self.lengths, self.ds.metadata.Signal.Ellipticity.lengths)
+        print("Angle: ", self.angle, self.ds.metadata.Signal.Ellipticity.angle)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.center[0], self.center[0], places=-1)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.center[1], self.center[1], places=-1)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.lengths[0], max(self.lengths), places=-1)

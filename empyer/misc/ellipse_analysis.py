@@ -118,9 +118,9 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
         D = np.hstack((x * x, x * y, y * y, x, y, np.ones_like(x)))   # Design matrix [x^2, xy, y^2, x,y,1]
         S = np.dot(D.T, D)  # Scatter Matrix
         C = np.zeros([6, 6])
-        C[0, 2] = C[2, 0] = 2;
+        C[0, 2] = C[2, 0] = 2
         C[1, 1] = -1
-        E, V = eig(np.dot(inv(S), C))  # eigen decomposition to solve constrained minimization probelm
+        E, V = eig(np.dot(inv(S), C))  # eigen decomposition to solve constrained minimization problem
         n = np.argmax(np.abs(E))   # maximum eigenvalue solution
         a = V[:, n]
         return a
@@ -143,22 +143,29 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
 
     def ellipse_angle_of_rotation(a):
         b, c, d, f, g, a = a[1] / 2, a[2], a[3] / 2, a[4] / 2, a[5], a[0]
-        #a,c = np.abs(a), np.abs(c)
+        print(a,c)
+        #a =abs(a)
+        #c =abs(c)
         if b == 0:
             if a > c:
-                return 0
+                ang = 0
             else:
-                return np.pi / 2
+                ang = np.pi / 2
+            return ang
         else:
             if a > c:
-                print('a>c')
-                ang = - np.arctan(2 * b / (a - c)) / 2
-                if ang > 0:
-                    return ang
-                else:
-                    return np.pi+ang
+                print("a>c")
+                ang = np.pi / 2 + np.arctan(2 * b / (a - c)) / 2
+                if a < 0 and c < 0:
+                    ang = ang + np.pi/2
             else:
-                return np.pi - np.arctan(2 * b / (a - c)) / 2
+                print("a<c")
+                ang = np.arctan(2 * b / (a - c)) / 2
+                if a < 0 and c < 0:
+                    ang = ang + np.pi/2
+            if ang < 0:
+                return ang +np.pi
+            return ang
 
     coords = [[], []]
     if interactive:
@@ -198,11 +205,11 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
         if isinstance(flattened_array, np.ma.masked_array):
             indexes = indexes[flattened_array.mask[indexes] == False]
         # take top 5000 points make sure exclude zero beam
-        coords[0] = np.remainder(indexes[-num_points:], i_shape[0])  # x axis (column)
-        coords[1] = np.floor_divide(indexes[-num_points:], i_shape[1])  # y axis (row)
+        coords[0] = np.floor_divide(indexes[-num_points:], i_shape[1])  # x axis (row)
+        coords[1] = np.remainder(indexes[-num_points:], i_shape[1]) # y axis (col)
+    print("Point2!:", coords[0][-1], coords[1][-1])
     a = fit_ellipse(np.array(coords[0]), np.array(coords[1]))
     center = ellipse_center(a)  # (x,y)
-    #  center = [center[1],center[0]] # array coordinates (y,x)
     lengths = sorted(ellipse_axis_length(a), reverse=True)
     angle = ellipse_angle_of_rotation(a)
     print("The center is:", center)
@@ -215,6 +222,6 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
         axe.imshow(img)
         axe.add_patch(ellipse)
         plt.show()
-    center = list(reversed(center))
     return center, lengths, angle
+
 
