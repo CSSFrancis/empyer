@@ -132,6 +132,7 @@ class EMSignal(Signal2D):
             Unmask any pixel with a value below value
         """
         self.add_mask()
+        print(value)
         self.data.mask[self.data < value] = not unmask
 
     def mask_above(self, value, unmask=False):

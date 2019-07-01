@@ -4,7 +4,7 @@ from empyer.misc.ellipse_analysis import solve_ellipse
 from empyer.misc.cartesain_to_polar import convert
 from empyer.signals.emsignal import EMSignal
 from empyer.signals.polar_signal import PolarSignal
-
+import matplotlib.pyplot as plt
 
 class DiffractionSignal(EMSignal):
     """
@@ -81,7 +81,13 @@ class DiffractionSignal(EMSignal):
         self.metadata.set_item("Signal.Ellipticity.calibrated", True)
         return center, lengths, angle
 
-    def calculate_polar_spectrum(self, phase_width=720, radius=None, parallel=False, inplace=False, segment=None):
+    def calculate_polar_spectrum(self,
+                                 phase_width=720,
+                                 radius=None,
+                                 parallel=False,
+                                 inplace=False,
+                                 segments=None,
+                                 num_points=500):
         """Take the Diffraction Pattern and unwrap the diffraction pattern.
 
         Parameters
@@ -104,7 +110,7 @@ class DiffractionSignal(EMSignal):
 
         if not self.metadata.Signal.Ellipticity.calibrated:
             self.determine_ellipse()
-        if segment is None:
+        if segments is None:
             polar_signal = self.map(convert,
                                     center=self.metadata.Signal.Ellipticity.center,
                                     angle=self.metadata.Signal.Ellipticity.angle,
@@ -115,18 +121,29 @@ class DiffractionSignal(EMSignal):
                                     inplace=inplace,
                                     show_progressbar=False)
         else:
-            
-            self.inav[i]
-            n_calib, n_extra = self.axes_manager.navigation_shape// segment, self.axes_manager.navigation_shapes% segment
+            len_of_segments = np.array(self.axes_manager.navigation_shape) // segments
+            extra_len = np.array(self.axes_manager.navigation_shape) % segments
+            centers = np.zeros(shape=(*self.axes_manager.navigation_shape, 2))
+            lengths = np.zeros(shape=(*self.axes_manager.navigation_shape, 2))
+            angle = np.zeros(shape=(*self.axes_manager.navigation_shape, 2))
+            for i in range(segments):
+                for j in range(segments):
+                    extra = [extra_len[0] * (i == segments-1), extra_len[1] * (j == segments-1)]
+                    s1 = int(i*len_of_segments[0])
+                    sp1 = int((i+1)*len_of_segments[0]+extra[0])
+                    s2 = int(j*len_of_segments[1])
+                    sp2 = int((j+1)*len_of_segments[1]+extra[1])
+                    centers[s1:sp1, s2:sp2, :], lengths[s1:sp1, s2:sp2, :], angle[s1:sp1, s2:sp2, :] = solve_ellipse(self.inav[s1:sp1, s2:sp2].sum().data,num_points=num_points)
 
-                center, lengths, angle = solve_ellipse(self.sum().data,
-                                                   num_points=num_points,
-                                                   interactive=interactive,
-                                                   plot=plot)
-            polar_signal = self._map_iterate(convert, iterating_kwargs= ellip,
-                                    parallel=parallel,
-                                    inplace=inplace,
-                                    show_progressbar=False)
+            ellip = (('center', np.reshape(centers, (-1, 2))),
+                     ('foci', np.reshape(lengths, (-1, 2))),
+                     ('angle', np.reshape(angle, -1)))
+            polar_signal = self._map_iterate(convert,
+                                             iterating_kwargs=ellip,
+                                             parallel=parallel,
+                                             inplace=inplace,
+                                             show_progressbar=False)
+            print("done")
 
 
         passed_meta_data = self.metadata.as_dictionary()
