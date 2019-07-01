@@ -81,7 +81,7 @@ class DiffractionSignal(EMSignal):
         self.metadata.set_item("Signal.Ellipticity.calibrated", True)
         return center, lengths, angle
 
-    def calculate_polar_spectrum(self, phase_width=720, radius=None, parallel=False, inplace=False):
+    def calculate_polar_spectrum(self, phase_width=720, radius=None, parallel=False, inplace=False, segment=None):
         """Take the Diffraction Pattern and unwrap the diffraction pattern.
 
         Parameters
@@ -104,15 +104,30 @@ class DiffractionSignal(EMSignal):
 
         if not self.metadata.Signal.Ellipticity.calibrated:
             self.determine_ellipse()
-        polar_signal = self.map(convert,
-                                center=self.metadata.Signal.Ellipticity.center,
-                                angle=self.metadata.Signal.Ellipticity.angle,
-                                foci=self.metadata.Signal.Ellipticity.lengths,
-                                phase_width=phase_width,
-                                radius=radius,
-                                parallel=parallel,
-                                inplace=inplace,
-                                show_progressbar=False)
+        if segment is None:
+            polar_signal = self.map(convert,
+                                    center=self.metadata.Signal.Ellipticity.center,
+                                    angle=self.metadata.Signal.Ellipticity.angle,
+                                    foci=self.metadata.Signal.Ellipticity.lengths,
+                                    phase_width=phase_width,
+                                    radius=radius,
+                                    parallel=parallel,
+                                    inplace=inplace,
+                                    show_progressbar=False)
+        else:
+            
+            self.inav[i]
+            n_calib, n_extra = self.axes_manager.navigation_shape// segment, self.axes_manager.navigation_shapes% segment
+
+                center, lengths, angle = solve_ellipse(self.sum().data,
+                                                   num_points=num_points,
+                                                   interactive=interactive,
+                                                   plot=plot)
+            polar_signal = self._map_iterate(convert, iterating_kwargs= ellip,
+                                    parallel=parallel,
+                                    inplace=inplace,
+                                    show_progressbar=False)
+
 
         passed_meta_data = self.metadata.as_dictionary()
         if self.metadata.Signal.has_item('Ellipticity'):

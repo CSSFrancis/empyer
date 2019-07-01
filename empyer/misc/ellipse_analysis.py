@@ -143,9 +143,7 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
 
     def ellipse_angle_of_rotation(a):
         b, c, d, f, g, a = a[1] / 2, a[2], a[3] / 2, a[4] / 2, a[5], a[0]
-        print(a,c)
-        #a =abs(a)
-        #c =abs(c)
+        print("a and c are:", a,c)
         if b == 0:
             if a > c:
                 ang = 0
@@ -157,6 +155,7 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
                 print("a>c")
                 ang = np.pi / 2 + np.arctan(2 * b / (a - c)) / 2
                 if a < 0 and c < 0:
+                    print("Both less than zero")
                     ang = ang + np.pi/2
             else:
                 print("a<c")
@@ -164,7 +163,10 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
                 if a < 0 and c < 0:
                     ang = ang + np.pi/2
             if ang < 0:
-                return ang +np.pi
+                print("ang less than zero")
+                return ang + np.pi
+            if ang > np.pi:
+                return ang - np.pi
             return ang
 
     coords = [[], []]
@@ -207,7 +209,6 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
         # take top 5000 points make sure exclude zero beam
         coords[0] = np.floor_divide(indexes[-num_points:], i_shape[1])  # x axis (row)
         coords[1] = np.remainder(indexes[-num_points:], i_shape[1]) # y axis (col)
-    print("Point2!:", coords[0][-1], coords[1][-1])
     a = fit_ellipse(np.array(coords[0]), np.array(coords[1]))
     center = ellipse_center(a)  # (x,y)
     lengths = sorted(ellipse_axis_length(a), reverse=True)

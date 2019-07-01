@@ -37,6 +37,7 @@ class PolarSignal(EMSignal):
         # TODO: Add the ability to cutoff like slicing (maybe use np.s)
         """Create a Correlation Signal from a numpy array.
 
+
         Parameters
         ----------
         binning_factor : int
