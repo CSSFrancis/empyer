@@ -12,8 +12,17 @@ class TestPowerSignal(TestCase):
         self.d = load(file)
         self.d.mask_below(300)
 
+    def test_segmented_convert(self):
+        ps = self.d.calculate_polar_spectrum(radius=200, segments=5, phase_width=360)
+        ps.sum(axis=(0,1)).plot()
+        plt.show()
+        ac = ps.autocorrelation()
+        ac.get_summed_power_spectrum().isig[0:12, 3.0:7.0].plot()
+        plt.show()
+
     def test_plot(self):
-        self.d.inav[1,1].plot()
+
+        self.d.inav[1, 1].plot()
         plt.imshow(self.d.inav[1, 1].data)
         self.d.determine_ellipse(num_points=1000)
         plt.show()

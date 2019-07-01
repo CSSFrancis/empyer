@@ -125,7 +125,7 @@ class DiffractionSignal(EMSignal):
             extra_len = np.array(self.axes_manager.navigation_shape) % segments
             centers = np.zeros(shape=(*self.axes_manager.navigation_shape, 2))
             lengths = np.zeros(shape=(*self.axes_manager.navigation_shape, 2))
-            angle = np.zeros(shape=(*self.axes_manager.navigation_shape, 2))
+            angle = np.zeros(shape=self.axes_manager.navigation_shape)
             for i in range(segments):
                 for j in range(segments):
                     extra = [extra_len[0] * (i == segments-1), extra_len[1] * (j == segments-1)]
@@ -133,7 +133,7 @@ class DiffractionSignal(EMSignal):
                     sp1 = int((i+1)*len_of_segments[0]+extra[0])
                     s2 = int(j*len_of_segments[1])
                     sp2 = int((j+1)*len_of_segments[1]+extra[1])
-                    centers[s1:sp1, s2:sp2, :], lengths[s1:sp1, s2:sp2, :], angle[s1:sp1, s2:sp2, :] = solve_ellipse(self.inav[s1:sp1, s2:sp2].sum().data,num_points=num_points)
+                    centers[s1:sp1, s2:sp2, :], lengths[s1:sp1, s2:sp2, :], angle[s1:sp1, s2:sp2] = solve_ellipse(self.inav[s1:sp1, s2:sp2].sum().data,num_points=num_points)
 
             ellip = (('center', np.reshape(centers, (-1, 2))),
                      ('foci', np.reshape(lengths, (-1, 2))),
@@ -142,7 +142,12 @@ class DiffractionSignal(EMSignal):
                                              iterating_kwargs=ellip,
                                              parallel=parallel,
                                              inplace=inplace,
-                                             show_progressbar=False)
+                                             show_progressbar=False,
+                                             ragged=False,
+                                             radius=radius,
+                                             phase_width=phase_width)
+            print(polar_signal.inav[1,1])
+
             print("done")
 
 
@@ -151,7 +156,7 @@ class DiffractionSignal(EMSignal):
             del(passed_meta_data['Signal']['Ellipticity'])
 
         polar = PolarSignal(polar_signal, metadata=passed_meta_data)
-        polar.mask_below(value=.001)
+        polar.mask_below(value=.00001)
 
         polar.axes_manager.navigation_axes = self.axes_manager.navigation_axes
         polar.set_axes(-2,

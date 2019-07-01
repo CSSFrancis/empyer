@@ -88,6 +88,7 @@ class TestDiffractionSignal(TestCase):
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.angle, self.angle, places=1)
         self.assertLess((converted.sum(axis=(0, 1)).data > 5000).sum(), 10)
 
+
 class TestSegmentedDiffractionSignal(TestCase):
     def setUp(self):
         self.ellipse = np.random.rand(25, 200, 200)
@@ -113,8 +114,9 @@ class TestSegmentedDiffractionSignal(TestCase):
         self.ds = DiffractionSignal(self.s)
 
     def test_seg(self):
-        self.ds.plot()
-        plt.show()
-        ps = self.ds.calculate_polar_spectrum(segments=5, num_points=120)
-        ps.plot()
+        ps = self.ds.calculate_polar_spectrum(segments=5, num_points=120, radius=80)
+        #ps.inav[0, 0].plot()
+        ps.inav[0, 1].plot()
+        ps.inav[1, 1].plot()
+        #ps.inav[1, 0].plot()
         plt.show()

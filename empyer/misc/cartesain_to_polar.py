@@ -7,6 +7,7 @@ from empyer.misc.image import ellipsoid_list_to_cartesian, polar_list_to_cartesi
 
 def convert(img, center=None, angle=None, foci=None, radius=None, phase_width=720):
     #  This function someday will be faster hopefully...
+
     """
     :param img: a n by 2-d array for the image to convert to polar coordinates
     :param mask: 2-d boolean array which excludes certain points
