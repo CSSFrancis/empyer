@@ -42,7 +42,8 @@ class TestDiffractionSignal(TestCase):
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.lengths[0], max(self.lengths), places=-1)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.lengths[1], min(self.lengths), places=-1)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.angle, self.angle, places=1)
-        self.assertLess((converted.sum(axis=(0, 1)).data > 5000).sum(), 10)
+        print("the max is:", np.max(converted.sum(axis=(0, 1, 2)).data) / 2)
+        self.assertLess((converted.sum(axis=(0, 1, 2)).data > max(converted.sum(axis=(0, 1, 2)).data)/2).sum(), 5)
 
     def test_parallel_conversion(self):
         converted = self.ds.calculate_polar_spectrum(phase_width=720,

@@ -123,51 +123,42 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
         E, V = eig(np.dot(inv(S), C))  # eigen decomposition to solve constrained minimization problem
         n = np.argmax(np.abs(E))   # maximum eigenvalue solution
         a = V[:, n]
+        print("a is:", np.abs(a))
         return a
 
-    def ellipse_center(a):
-        b, c, d, f, g, a = a[1] / 2, a[2], a[3] / 2, a[4] / 2, a[5], a[0]
-        num = b * b - a * c
-        x0 = (c * d - b * f) / num
-        y0 = (a * f - b * d) / num
+    def ellipse_center(ellipse_parameters):
+        a, b, c, d, e, f = ellipse_parameters
+        denom = b**2 - (4 * a * c)
+        x0 = (2 * c * d - b * e) / denom
+        y0 = (2 * a * e - b * d) / denom
         return np.array([x0, y0])
 
-    def ellipse_axis_length(a):
-        b, c, d, f, g, a = a[1] / 2, a[2], a[3] / 2, a[4] / 2, a[5], a[0]
-        up = 2 * (a * f * f + c * d * d + g * b * b - 2 * b * d * f - a * c * g)
-        down1 = (b * b - a * c) * ((c - a) * np.sqrt(1 + 4 * b * b / ((a - c) * (a - c))) - (c + a))
-        down2 = (b * b - a * c) * ((a - c) * np.sqrt(1 + 4 * b * b / ((a - c) * (a - c))) - (c + a))
-        res1 = np.sqrt(up / down1)
-        res2 = np.sqrt(up / down2)
-        return np.array([res1, res2])
+    def ellipse_axis_length(ellipse_parameters):
+        a, b, c, d, e, f = ellipse_parameters
+        denom = b**2 - (4 * a * c)
+        num1 = np.sqrt(2 * (a * e ** 2 + c * d ** 2 - b * d * e + (b ** 2 - 4 * a * c) * f) *
+                       ((a+c) - np.sqrt((a - c) ** 2 + b ** 2)))
+        num2 = np.sqrt(2 * (a * e ** 2 + c * d ** 2 - b * d * e + (b ** 2 - 4 * a * c) * f) *
+                       ((a+c) + np.sqrt((a - c) ** 2 + b ** 2)))
+        axis1 = abs(num1/denom)
+        axis2 = abs(num2/denom)
 
-    def ellipse_angle_of_rotation(a):
-        b, c, d, f, g, a = a[1] / 2, a[2], a[3] / 2, a[4] / 2, a[5], a[0]
+        return np.sort([axis1, axis2])
+
+    def ellipse_angle_of_rotation(ellipse_parameters):
+        a, b, c, d, e, f = ellipse_parameters
         print("a and c are:", a,c)
         if b == 0:
-            if a > c:
+            if a < c:
                 ang = 0
             else:
                 ang = np.pi / 2
             return ang
         else:
-            if a > c:
-                print("a>c")
-                ang = np.pi / 2 + np.arctan(2 * b / (a - c)) / 2
-                if a < 0 and c < 0:
-                    print("Both less than zero")
-                    ang = ang + np.pi/2
-            else:
-                print("a<c")
-                ang = np.arctan(2 * b / (a - c)) / 2
-                if a < 0 and c < 0:
-                    ang = ang + np.pi/2
-            if ang < 0:
-                print("ang less than zero")
-                return ang + np.pi
-            if ang > np.pi:
-                return ang - np.pi
+            num = c - a - np.sqrt((a-c)**2+b**2)
+            ang = np.arctan(num/b)
             return ang
+
 
     coords = [[], []]
     if interactive:
@@ -211,7 +202,7 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
         coords[1] = np.remainder(indexes[-num_points:], i_shape[1]) # y axis (col)
     a = fit_ellipse(np.array(coords[0]), np.array(coords[1]))
     center = ellipse_center(a)  # (x,y)
-    lengths = sorted(ellipse_axis_length(a), reverse=True)
+    lengths = ellipse_axis_length(a)
     angle = ellipse_angle_of_rotation(a)
     print("The center is:", center)
     print("The major and minor axis lengths are:", lengths)
