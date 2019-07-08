@@ -192,3 +192,12 @@ def ellipsoid_list_to_cartesian(r_list, theta_list, center, major, minor, angle,
             x_list.append(x)
             y_list.append(y)
     return x_list, y_list
+
+
+def random_ellipse(num_points, center, foci, angle):
+    rand_angle = np.random.rand(num_points) * 2 * np.pi
+    points = [[(np.cos(ang) * foci[0]), np.sin(ang) * foci[1]] for ang in rand_angle]
+    points = np.array([[int(point[0] * np.cos(angle) - point[1] * np.sin(angle) + center[0]),
+                        int(point[1] * np.cos(angle) + point[0] * np.sin(angle) + center[1])]
+                       for point in points])
+    return points

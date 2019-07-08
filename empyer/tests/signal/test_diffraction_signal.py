@@ -4,6 +4,7 @@ import numpy as np
 from hyperspy.signals import Signal2D, BaseSignal
 from empyer.signals.diffraction_signal import DiffractionSignal
 import matplotlib.pyplot as plt
+from empyer.misc.image import random_ellipse
 
 
 class TestDiffractionSignal(TestCase):
@@ -12,11 +13,7 @@ class TestDiffractionSignal(TestCase):
         self.center = [276, 256]
         self.lengths = sorted(np.random.rand(2) * 50 + 100, reverse=True)
         self.angle = np.random.rand() * np.pi
-        rand_angle = np.random.rand(2000) * 2 * np.pi
-        rand_points = [[(np.cos(ang) * self.lengths[0]), np.sin(ang) * self.lengths[1]] for ang in rand_angle]
-        rand_points = np.array([[int(point[0] * np.cos(self.angle) - point[1] * np.sin(self.angle) + self.center[0]),
-                                 int(point[1] * np.cos(self.angle) + point[0] * np.sin(self.angle) + self.center[1])]
-                                for point in rand_points])
+        rand_points = random_ellipse(num_points=1000, center=self.center,foci=self.lengths,angle=self.angle)
         d[:,:, rand_points[:, 0], rand_points[:, 1]] = 10
         self.bs = BaseSignal(data=d, lazy=False)
         self.s = Signal2D(self.bs)
@@ -33,32 +30,19 @@ class TestDiffractionSignal(TestCase):
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.lengths[1], min(self.lengths), places=-1)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.angle, self.angle, places=1)
 
-    def test_segmented_ellipse(self):
-
-        self.ds.calculate_polar_spectrum(segments=3)
-        print("Centers: ", self.center, self.ds.metadata.Signal.Ellipticity.center)
-        print("Lengths: ", self.lengths, self.ds.metadata.Signal.Ellipticity.lengths)
-        print("Angle: ", self.angle, self.ds.metadata.Signal.Ellipticity.angle)
-        self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.center[0], self.center[0], places=-1)
-        self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.center[1], self.center[1], places=-1)
-        self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.lengths[0], max(self.lengths), places=-1)
-        self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.lengths[1], min(self.lengths), places=-1)
-        self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.angle, self.angle, places=1)
-
     def test_conversion(self):
         converted = self.ds.calculate_polar_spectrum(phase_width=720, radius=None, parallel=False, inplace=False)
-        self.ds.inav[1].plot()
+        #self.ds.inav[1].plot()
         #plt.show()
         #plt.plot(converted.inav[1].sum(axis=(0)).data)
-        #converted.inav[1].plot()
-        #plt.show()
+        converted.sum(axis=(0, 1, 2)).plot()
+        plt.show()
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.center[0], self.center[0], places=-1)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.center[1], self.center[1], places=-1)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.lengths[0], max(self.lengths), places=-1)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.lengths[1], min(self.lengths), places=-1)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.angle, self.angle, places=1)
         self.assertLess((converted.sum(axis=(0, 1)).data > 5000).sum(), 10)
-
 
     def test_parallel_conversion(self):
         converted = self.ds.calculate_polar_spectrum(phase_width=720,

@@ -113,7 +113,7 @@ class DiffractionSignal(EMSignal):
         if segments is None:
             polar_signal = self.map(convert,
                                     center=self.metadata.Signal.Ellipticity.center,
-                                    angle=self.metadata.Signal.Ellipticity.angle,
+                                    angle=(np.pi/2)-self.metadata.Signal.Ellipticity.angle,
                                     foci=self.metadata.Signal.Ellipticity.lengths,
                                     phase_width=phase_width,
                                     radius=radius,
