@@ -22,7 +22,6 @@ def convert(img, center=None, angle=None, foci=None, radius=None, phase_width=72
     img_shape = np.shape(img)
     if center is None:
         center = np.true_divide(img_shape[-2:], 2)
-    #center = [center[1], center[0]]
     if radius is None:
         radius = int(min(img_shape[-2:]) - max(np.abs(np.subtract(img_shape[-2:], center)))-5)
         if foci is not None:
@@ -38,7 +37,7 @@ def convert(img, center=None, angle=None, foci=None, radius=None, phase_width=72
         final_x, final_y = polar_list_to_cartesian(final_r, final_theta, center)
     # for elliptical conversions
     else:
-        final_the = np.linspace(-1*np.pi, np.pi, num=phase_width)
+        final_the = np.linspace(0, 2*np.pi, num=phase_width)
         final_rad = np.arange(r_inital, r_final, 1)
         final_x, final_y = ellipsoid_list_to_cartesian(final_rad,
                                                        final_the,

@@ -123,7 +123,7 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
         E, V = eig(np.dot(inv(S), C))  # eigen decomposition to solve constrained minimization problem
         n = np.argmax(np.abs(E))   # maximum eigenvalue solution
         a = V[:, n]
-        print("a is:", np.abs(a))
+        print("a is:", a)
         return a
 
     def ellipse_center(ellipse_parameters):
@@ -143,21 +143,27 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
         axis1 = abs(num1/denom)
         axis2 = abs(num2/denom)
 
-        return np.sort([axis1, axis2])
+        return np.sort([axis1, axis2])[::-1]
 
     def ellipse_angle_of_rotation(ellipse_parameters):
         a, b, c, d, e, f = ellipse_parameters
-        print("a and c are:", a,c)
+        b, d, e = b/2, d/2, e/3
         if b == 0:
-            if a < c:
-                ang = 0
+            if a > c:
+                return 0
             else:
-                ang = np.pi / 2
-            return ang
+                return np.pi / 2
         else:
-            num = c - a - np.sqrt((a-c)**2+b**2)
-            ang = np.arctan(num/b)
-            return ang
+            if a < c:
+                ang = .5 * invcot((a-c)/(2*b))
+                if (a<0) == (b<0): # same sign
+                    ang = ang+np.pi/2
+                return ang
+            else:
+                ang =np.pi/2 + .5 * invcot((a-c)/(2*b))
+                if (a < 0) != (b < 0):
+                    ang=ang-np.pi/2
+                return ang
 
 
     coords = [[], []]
@@ -188,7 +194,6 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
             figure1.canvas.draw()
         cid = figure1.canvas.mpl_connect('button_press_event', add_point)
         plt.show()
-        print(coords[0])
     #  non-interactive, works better if there is an intense ring
     # TODO: Make method more robust with respect to obviously wrong points
     else:
@@ -200,6 +205,7 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
         # take top 5000 points make sure exclude zero beam
         coords[0] = np.floor_divide(indexes[-num_points:], i_shape[1])  # x axis (row)
         coords[1] = np.remainder(indexes[-num_points:], i_shape[1]) # y axis (col)
+        plt.scatter(coords[0], coords[1])
     a = fit_ellipse(np.array(coords[0]), np.array(coords[1]))
     center = ellipse_center(a)  # (x,y)
     lengths = ellipse_axis_length(a)
@@ -217,3 +223,5 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
     return center, lengths, angle
 
 
+def invcot(val):
+    return (np.pi/2) - np.arctan(val)

@@ -165,8 +165,8 @@ def ellipsoid_list_to_cartesian(r_list, theta_list, center, major, minor, angle,
     x_list = []
     y_list = []
     focii_ratio = minor / major
-    h_o = (1 / ((focii_ratio ** 2) + 1) ** 0.5)  # minor
-    k_o = (1 / ((focii_ratio ** -2) + 1) ** 0.5)  # major
+    h_o = (1 / ((focii_ratio ** 2) + 1) ** 0.5)  # major
+    k_o = (1 / ((focii_ratio ** -2) + 1) ** 0.5)  # minor  THIS IS A PROBLEM AND NOT THE SAME AS DONE OTHER PLACES>>>
     cos_angle = np.cos(angle)
     sin_angle = np.sin(angle)
     if even_spaced:
@@ -174,25 +174,13 @@ def ellipsoid_list_to_cartesian(r_list, theta_list, center, major, minor, angle,
         t_cos = [np.cos(t)for t in theta_list]
         x_unrotated = [[tc*r for tc in t_cos]for r in r_list]
         y_unrotated = [[ts*r for ts in t_sin] for r in r_list]  # creating a circle
-        x_unrotated = np.multiply(x_unrotated, k_o)
-        y_unrotated = np.multiply(y_unrotated, h_o)  # Circle to unrotated ellipse, major axis on x
-        x_list = np.add(np.multiply(x_unrotated, cos_angle), np.multiply(y_unrotated, sin_angle))
+        x_list = np.multiply(x_unrotated, h_o)
+        y_list = np.multiply(y_unrotated, k_o)  # Circle to un-rotated ellipse, major axis on x
+        x_list = np.subtract(np.multiply(x_list, cos_angle), np.multiply(y_list, sin_angle))
         x_list = np.add(x_list, center[0])
-        print(angle)
-        y_list = np.subtract(np.multiply(y_unrotated, cos_angle), np.multiply(x_unrotated, sin_angle))
+        y_list = np.add(np.multiply(y_list, cos_angle), np.multiply(x_list, sin_angle))
         y_list = np.add(y_list, center[1])  # rotated ellipse
-        plt.scatter(x_list,y_list)
-        '''
-        t_sin = [np.sin(t) for t in theta_list]
-        t_cos = [np.cos(t) for t in theta_list]
-        h_list = np.multiply(r_list, h_o)
-        k_list = np.multiply(r_list, k_o)
-        x_unrotated = [[h * tc - h * ts for ts, tc in zip(t_sin, t_cos)] for h in h_list]
-        y_unrotated = [[k * tc + k * ts for ts, tc in zip(t_sin, t_cos)] for k in k_list]
-        x_list = np.subtract(np.multiply(x_unrotated, cos_angle), np.multiply(y_unrotated, sin_angle))
-        x_list = np.add(x_list, center[0])
-        y_list = np.add(np.multiply(y_unrotated, cos_angle), np.multiply(x_unrotated, sin_angle))
-        y_list = np.add(y_list, center[1])'''
+
     else:
         for r, t in zip(r_list,theta_list):
             h = h_o *r
@@ -208,9 +196,11 @@ def ellipsoid_list_to_cartesian(r_list, theta_list, center, major, minor, angle,
 
 
 def random_ellipse(num_points, center, foci, angle):
-    rand_angle = np.random.rand(num_points) * 2 * np.pi
-    points = [[(np.cos(ang) * foci[0]), np.sin(ang) * foci[1]] for ang in rand_angle]
-    points = np.array([[int(point[0] * np.cos(angle) - point[1] * np.sin(angle) + center[0]),
-                        int(point[1] * np.cos(angle) + point[0] * np.sin(angle) + center[1])]
-                       for point in points])
+    rand_angle = np.random.rand(num_points) * 2 * np.pi  # random points on a circle
+    points = [[(np.cos(ang) * foci[0]), np.sin(ang) * foci[1]] for ang in rand_angle]  # circle to ellipse
+    points = np.array([[round(x * np.cos(angle) - y * np.sin(angle) + center[0]),
+                       round(y * np.cos(angle) + x * np.sin(angle) + center[1])]  # rotating the ellipse
+                       for x, y in points])
+
     return points
+
