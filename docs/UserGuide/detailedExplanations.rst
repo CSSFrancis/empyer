@@ -18,9 +18,10 @@ incredibly useful they are a good start for how to efficiently package microscop
 Most of the work he is setting up your axes correctly, which while not the hardest thing to do, will save many headaches
 down the road.
 
-.. image:: individualAngularCorrelation.png
-
 **Advanced Image Registration**
 
+In most cases the image resolution of the diffraction patterns is both a blessing and a curse. On one hand higher
+resolution gives a more accurate image and position, but on the other hand, higher resolutions means that for every
+distortion in a diffraction pattern there is a loss of intensity.
 
-.. _scripts: https://github.com/hyperspy
+.. _scripts: https://github.com/CSSFrancis/convertImages
