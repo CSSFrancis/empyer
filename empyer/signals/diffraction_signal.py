@@ -2,7 +2,7 @@ import numpy as np
 
 from empyer.misc.ellipse_analysis import solve_ellipse
 from empyer.misc.cartesain_to_polar import convert
-from empyer.signals.emsignal import EMSignal
+from empyer.signals.em_signal import EMSignal
 from empyer.signals.polar_signal import PolarSignal
 import matplotlib.pyplot as plt
 

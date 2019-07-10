@@ -1,5 +1,5 @@
 import numpy as np
-from empyer.signals.emsignal import EMSignal
+from empyer.signals.em_signal import EMSignal
 from empyer.signals.correlation_signal import CorrelationSignal
 from empyer.misc.angular_correlation import angular_correlation
 from empyer.misc.image import square

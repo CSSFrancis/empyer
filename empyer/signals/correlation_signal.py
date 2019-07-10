@@ -1,4 +1,4 @@
-from empyer.signals.emsignal import EMSignal
+from empyer.signals.em_signal import EMSignal
 from empyer.signals.power_signal import PowerSignal
 from empyer.misc.angular_correlation import power_spectrum
 
