@@ -16,7 +16,6 @@ class TestBinning(TestCase):
         self.assertTupleEqual(np.shape(bin2), (256,256))
 
 
-
 class TestConversions(TestCase):
     def setUp(self):
         self.thetas = np.linspace(-1*np.pi, np.pi, num=180)
