@@ -9,12 +9,12 @@ class TestDiffractionSignal(TestCase):
     def setUp(self):
         #file = '/home/carter/Documents/ZrCuAl(HH)4-16-2018_175W_3.8mT_175C_25s(0.83nmpsec)/hdf5_files/12.55.42 Spectrum image_pos01.hdf5'
         file = '/home/carter/Documents/ZrCuAl(HH)4-16-2018_175W_3.8mT_175C_25s(0.83nmpsec)/hdf5_files/13.08.24 Spectrum image_pos01-2.hdf5'
-        file = '/Users/shaw/Shaw/data/FEM_Data/ZrCuAl(HH)3-28-2017_50W_3.8mT_170C_78s(0.24nmpsec)/hdf5_files/pos1-2.hdf5'
+        #file = '/Users/shaw/Shaw/data/FEM_Data/ZrCuAl(HH)3-28-2017_50W_3.8mT_170C_78s(0.24nmpsec)/hdf5_files/pos1-2.hdf5'
         self.d = load(file)
         self.d.mask_below(300)
 
     def test_elliptical_identification(self):
-        self.d.determine_ellipse(num_points=1000)
+        self.d.determine_ellipse(num_points=2000)
         ellipse = self.d.metadata.Signal.Ellipticity
         points = random_ellipse(num_points=100, center=ellipse.center, angle=ellipse.angle, foci=ellipse.lengths)
         #self.d.data[:, :, points[:, 0], points[:, 1]] = 100000

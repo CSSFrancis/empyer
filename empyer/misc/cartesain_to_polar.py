@@ -16,7 +16,6 @@ def convert(img, center=None, angle=None, foci=None, radius=None, phase_width=72
     :param foci: The lengths of the foci of the ellipse
     :param phase_width: the number of "pixels" in the polar image along the x direction
     :param radius: the number of "pixels" in the polar image along the y direction
-    :param plot: Plot the image after converting it...
     :return: polar_img r vs. theta
     """
     img_shape = np.shape(img)

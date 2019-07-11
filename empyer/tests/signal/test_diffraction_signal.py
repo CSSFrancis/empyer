@@ -13,8 +13,8 @@ class TestDiffractionSignal(TestCase):
         self.center = [276, 256]
         self.lengths = sorted(np.random.rand(2) * 50 + 100, reverse=True)
         self.angle = np.random.rand() * np.pi
-        rand_points = random_ellipse(num_points=1000, center=self.center,foci=self.lengths,angle=self.angle)
-        d[:,:, rand_points[:, 0], rand_points[:, 1]] = 10
+        rand_points = random_ellipse(num_points=1000, center=self.center, foci=self.lengths, angle=self.angle)
+        d[:, :, rand_points[:, 0], rand_points[:, 1]] = 10
         self.bs = BaseSignal(data=d, lazy=False)
         self.s = Signal2D(self.bs)
         self.ds = DiffractionSignal(self.s)
@@ -32,9 +32,9 @@ class TestDiffractionSignal(TestCase):
 
     def test_conversion(self):
         converted = self.ds.calculate_polar_spectrum(phase_width=720, radius=None, parallel=False, inplace=False)
-        #self.ds.inav[1].plot()
-        #plt.show()
-        #plt.plot(converted.inav[1].sum(axis=(0)).data)
+        self.ds.inav[1].plot()
+        plt.show()
+        plt.plot(converted.inav[1].sum(axis=(0)).data)
         converted.sum(axis=(0, 1, 2)).plot()
         plt.show()
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.center[0], self.center[0], places=-1)

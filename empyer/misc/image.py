@@ -164,32 +164,29 @@ def ellipsoid_list_to_cartesian(r_list, theta_list, center, major, minor, angle,
     """
     x_list = []
     y_list = []
-    focii_ratio = minor / major
-    h_o = (1 / ((focii_ratio ** 2) + 1) ** 0.5)  # major
-    k_o = (1 / ((focii_ratio ** -2) + 1) ** 0.5)  # minor  THIS IS A PROBLEM AND NOT THE SAME AS DONE OTHER PLACES>>>
+    foci_avg = (major+minor)/2
+    h_o = major/foci_avg # major
+    k_o = minor/foci_avg
     cos_angle = np.cos(angle)
     sin_angle = np.sin(angle)
     if even_spaced:
         t_sin = [np.sin(t)for t in theta_list]
         t_cos = [np.cos(t)for t in theta_list]
-        x_unrotated = [[tc*r for tc in t_cos]for r in r_list]
-        y_unrotated = [[ts*r for ts in t_sin] for r in r_list]  # creating a circle
-        x_list = np.multiply(x_unrotated, h_o)
-        y_list = np.multiply(y_unrotated, k_o)  # Circle to un-rotated ellipse, major axis on x
-        x_list = np.subtract(np.multiply(x_list, cos_angle), np.multiply(y_list, sin_angle))
+        x_circle = [[tc*h_o*r for tc in t_cos]for r in r_list]
+        y_circle = [[ts*k_o*r for ts in t_sin] for r in r_list]  # creating a circle
+        x_list = np.subtract(np.multiply(x_circle, cos_angle), np.multiply(y_circle, sin_angle))
         x_list = np.add(x_list, center[0])
-        y_list = np.add(np.multiply(y_list, cos_angle), np.multiply(x_list, sin_angle))
+        y_list = np.add(np.multiply(y_circle, cos_angle), np.multiply(x_circle, sin_angle))
         y_list = np.add(y_list, center[1])  # rotated ellipse
 
     else:
         for r, t in zip(r_list,theta_list):
             h = h_o *r
             k = k_o *r
-            x_unrotated = h*(np.cos(t)) - h*np.sin(t)
-            y_unrotated = k*(np.sin(t)) + k*np.cos(t)
-            #  need to rotate by the angle
+            x_unrotated = h*(np.cos(t))
+            y_unrotated = k*(np.sin(t))  # creating ellipse
             x = center[0] + x_unrotated * cos_angle - y_unrotated * sin_angle
-            y = center[1]+y_unrotated*cos_angle + x_unrotated*sin_angle
+            y = center[1]+y_unrotated*cos_angle + x_unrotated*sin_angle  # rotating ellipse
             x_list.append(x)
             y_list.append(y)
     return x_list, y_list
@@ -200,7 +197,7 @@ def random_ellipse(num_points, center, foci, angle):
     points = [[(np.cos(ang) * foci[0]), np.sin(ang) * foci[1]] for ang in rand_angle]  # circle to ellipse
     points = np.array([[round(x * np.cos(angle) - y * np.sin(angle) + center[0]),
                        round(y * np.cos(angle) + x * np.sin(angle) + center[1])]  # rotating the ellipse
-                       for x, y in points])
+                       for x, y in points], dtype=int)
 
     return points
 

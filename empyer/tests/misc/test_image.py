@@ -30,7 +30,7 @@ class TestConversions(TestCase):
                                           angle=np.pi/4,
                                           even_spaced=True)
         plt.scatter(x, y)
-        p = random_ellipse(num_points=10, center=[0,0], foci=[20,10], angle=np.pi/4)
+        p = random_ellipse(num_points=100, center=[0,0], foci=[20,10], angle=np.pi/4)
         plt.scatter(p[:, 0], p[:, 1])
         plt.show()
 

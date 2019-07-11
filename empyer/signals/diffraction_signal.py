@@ -4,7 +4,7 @@ from empyer.misc.ellipse_analysis import solve_ellipse
 from empyer.misc.cartesain_to_polar import convert
 from empyer.signals.em_signal import EMSignal
 from empyer.signals.polar_signal import PolarSignal
-import matplotlib.pyplot as plt
+
 
 class DiffractionSignal(EMSignal):
     """
@@ -71,10 +71,6 @@ class DiffractionSignal(EMSignal):
                                                num_points=num_points,
                                                interactive=interactive,
                                                plot=plot)
-        # Accounting for some weird change of axis....
-        #angle = np.pi/2-angle
-        #if angle < 0:
-        #    angle = np.pi+angle
         self.metadata.set_item("Signal.Ellipticity.center", center)
         self.metadata.set_item("Signal.Ellipticity.angle", angle)
         self.metadata.set_item("Signal.Ellipticity.lengths", lengths)
@@ -113,7 +109,7 @@ class DiffractionSignal(EMSignal):
         if segments is None:
             polar_signal = self.map(convert,
                                     center=self.metadata.Signal.Ellipticity.center,
-                                    angle=(np.pi/2)-self.metadata.Signal.Ellipticity.angle,
+                                    angle=self.metadata.Signal.Ellipticity.angle,
                                     foci=self.metadata.Signal.Ellipticity.lengths,
                                     phase_width=phase_width,
                                     radius=radius,

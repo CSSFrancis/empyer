@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from numpy.linalg import eig, inv
 from collections import namedtuple
 from matplotlib.patches import Ellipse
+from empyer.misc.cartesain_to_polar import convert
 
 
 def find_center(img):
@@ -221,6 +222,11 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
         axe.add_patch(ellipse)
         plt.show()
     return center, lengths, angle
+
+def advanced_solve_ellipse(img, num_points=500):
+    center, lengths, angle = solve_ellipse(img, num_points=num_points)
+    convert(img, angle=None,lengths=None, center=center)
+
 
 
 def invcot(val):
