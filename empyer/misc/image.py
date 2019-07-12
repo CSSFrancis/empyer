@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
+
 
 def flatten_axis(array, axis):
     array_shape = np.shape(array)
@@ -135,7 +135,7 @@ def create_grid(dimension1, dimension2):
     return a, b
 
 
-def ellipsoid_list_to_cartesian(r_list, theta_list, center, major, minor, angle, even_spaced=False):
+def ellipsoid_list_to_cartesian(r_list, theta_list, center, axes_lengths=None, angle=None):
     """Takes a list of ellipsoid points and then use then find their cartesian equivalent
 
     Parameters
@@ -146,14 +146,12 @@ def ellipsoid_list_to_cartesian(r_list, theta_list, center, major, minor, angle,
         list of all of the radius.  Can either be all values or even_spaced
     center: array_like
         center of the ellipsoid
-    major: float
+    lengths: float
         length of the major axis
     minor: float
         length of the minor axis
     angle: float
         angle of the major axis in radians
-    even_spaced: bool
-        if the values are even spaced.
 
     Returns
     ----------
@@ -162,34 +160,37 @@ def ellipsoid_list_to_cartesian(r_list, theta_list, center, major, minor, angle,
     y_list: array_like
         list of y points
     """
-    x_list = []
-    y_list = []
-    foci_avg = (major+minor)/2
-    h_o = major/foci_avg # major
-    k_o = minor/foci_avg
-    cos_angle = np.cos(angle)
-    sin_angle = np.sin(angle)
-    if even_spaced:
-        t_sin = [np.sin(t)for t in theta_list]
-        t_cos = [np.cos(t)for t in theta_list]
-        x_circle = [[tc*h_o*r for tc in t_cos]for r in r_list]
-        y_circle = [[ts*k_o*r for ts in t_sin] for r in r_list]  # creating a circle
-        x_list = np.subtract(np.multiply(x_circle, cos_angle), np.multiply(y_circle, sin_angle))
-        x_list = np.add(x_list, center[0])
-        y_list = np.add(np.multiply(y_circle, cos_angle), np.multiply(x_circle, sin_angle))
-        y_list = np.add(y_list, center[1])  # rotated ellipse
 
+    # Averaging the major and minor axes
+    if axes_lengths is not None:
+        axes_avg = sum(axes_lengths)/2
+        h_o = max(axes_lengths)/axes_avg  # major
+        k_o = min(axes_lengths)/axes_avg
     else:
-        for r, t in zip(r_list,theta_list):
-            h = h_o *r
-            k = k_o *r
-            x_unrotated = h*(np.cos(t))
-            y_unrotated = k*(np.sin(t))  # creating ellipse
-            x = center[0] + x_unrotated * cos_angle - y_unrotated * sin_angle
-            y = center[1]+y_unrotated*cos_angle + x_unrotated*sin_angle  # rotating ellipse
-            x_list.append(x)
-            y_list.append(y)
-    return x_list, y_list
+        h_o = 1
+        k_o = 1
+    r_mat = np.mat(r_list)
+
+    # calculating points equally spaced annularly on a unit circle
+    t_sin = np.mat([np.sin(t)for t in theta_list])
+    t_cos = np.mat([np.cos(t)for t in theta_list])
+    # unit circle to ellipses at r spacing
+    x_circle = r_mat.transpose()*t_sin*h_o
+    y_circle = r_mat.transpose()*t_cos * k_o
+
+    if angle is not None:
+        # angle of rotation
+        cos_angle = np.cos(angle)
+        sin_angle = np.sin(angle)
+        x_list = x_circle*cos_angle - y_circle*sin_angle
+        x_list = np.add(x_list, center[0])
+        y_list = y_circle*cos_angle + x_circle*sin_angle
+        y_list = np.add(y_list, center[1])
+        return np.array(x_list), np.array(y_list)
+    else:
+        x_list = np.add(x_circle, center[0])
+        y_list = np.add(y_circle, center[1])
+        return np.array(x_list), np.array(y_list)
 
 
 def random_ellipse(num_points, center, foci, angle):

@@ -68,8 +68,8 @@ def random_rotation():
     p = random.uniform(0, 1)
     alpha = 2 * np.pi * u
     beta = np.arccos(2 * v -1)
-    rotation_vector = (np.cos(alpha)*np.sin(beta),np.sin(beta), np.sin(alpha)*np.cos(beta))
-    theta =  2 * np.pi * p
+    rotation_vector = (np.cos(alpha)*np.sin(beta), np.sin(beta), np.sin(alpha)*np.cos(beta))
+    theta = 2 * np.pi * p
     return rotation_vector, theta
 
 
@@ -129,7 +129,7 @@ def mult_quaternions(Q1,Q2):
             x1*y0 - y1*x0 + z1*w0 +w1*z0])
 
 
-def simulate_symmetry(symmetry=4, I=1, k=4, r=1, iterations= 1000):
+def simulate_symmetry(symmetry=4, I=1, k=4, r=1, iterations=1000):
     angle = (2*np.pi)/symmetry
     k = [[np.cos(angle*i)*k, np.sin(angle*i)*k, 0] for i in range(symmetry)]
     observed_int = np. zeros(shape=(iterations, symmetry*4))
@@ -141,3 +141,21 @@ def simulate_symmetry(symmetry=4, I=1, k=4, r=1, iterations= 1000):
             observed_int[i, j * 4 +1] = I * shape_function(r=r, s=s)
 
     return observed_int
+
+
+def random_pattern(symmetry, k):
+    angle = (2*np.pi)/symmetry
+    k = k+np.random.randn()/6  # normal distribution about k
+    k = [[np.cos(angle*i)*k, np.sin(angle*i)*k, 0] for i in range(symmetry)]
+    rotation_vector, theta = random_rotation()
+    s = [sg(acc_voltage=200, rotation_vector=rotation_vector, theta=theta, k0=speckle) for speckle in k]
+    observed_intensity = [1 * shape_function(r=1, s=dev) for dev in s]
+    return k, observed_intensity
+
+
+def simulate_pattern(symetry, k, num_clusterns, center, angle, lengths):
+    image = np.zeros(shape=(512,512))
+    for i in range(num_clusterns):
+        k_val, observed_int = random_pattern(symmetry=symetry, k=k)
+        k_index = [[int(k[0]*25), int(k[1]*25)] for k in k_val]
+        print(k_index)

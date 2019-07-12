@@ -4,7 +4,7 @@ from empyer.misc.ellipse_analysis import solve_ellipse
 from empyer.misc.cartesain_to_polar import convert
 from empyer.signals.em_signal import EMSignal
 from empyer.signals.polar_signal import PolarSignal
-
+from timeit import timeit
 
 class DiffractionSignal(EMSignal):
     """
@@ -79,7 +79,7 @@ class DiffractionSignal(EMSignal):
 
     def calculate_polar_spectrum(self,
                                  phase_width=720,
-                                 radius=None,
+                                 radius=[0, -1],
                                  parallel=False,
                                  inplace=False,
                                  segments=None,
@@ -110,7 +110,7 @@ class DiffractionSignal(EMSignal):
             polar_signal = self.map(convert,
                                     center=self.metadata.Signal.Ellipticity.center,
                                     angle=self.metadata.Signal.Ellipticity.angle,
-                                    foci=self.metadata.Signal.Ellipticity.lengths,
+                                    lengths=self.metadata.Signal.Ellipticity.lengths,
                                     phase_width=phase_width,
                                     radius=radius,
                                     parallel=parallel,
@@ -142,7 +142,7 @@ class DiffractionSignal(EMSignal):
                                              ragged=False,
                                              radius=radius,
                                              phase_width=phase_width)
-            print(polar_signal.inav[1,1])
+            print(polar_signal.inav[1, 1])
 
             print("done")
 

@@ -13,6 +13,10 @@ class TestDiffractionSignal(TestCase):
         self.d = load(file)
         self.d.mask_below(300)
 
+    def test_ellipse1(self):
+        self.d.determine_ellipse(num_points=2000, plot=True)
+        plt.show()
+
     def test_elliptical_identification(self):
         self.d.determine_ellipse(num_points=2000)
         ellipse = self.d.metadata.Signal.Ellipticity
@@ -22,7 +26,7 @@ class TestDiffractionSignal(TestCase):
         ac = ps.autocorrelation()
         ac.sum(axis=(0, 1)).isig[:, 2.5:7.0].plot()
         plt.show()
-        ac.get_summed_power_spectrum().isig[0:12, 2.5:7.0].plot()
+        ac.get_summed_power_spectrum().isig[0:12, 2.5:7.0].plot(cmap='hot')
         plt.show()
         ps.sum(axis=(0, 1, 2)).plot()
         plt.show()

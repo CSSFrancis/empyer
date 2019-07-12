@@ -3,6 +3,7 @@ import numpy as np
 from empyer.misc.cartesain_to_polar import convert
 from empyer.misc.image import random_ellipse
 import matplotlib.pyplot as plt
+from timeit import timeit
 
 
 class TestConvert(TestCase):
@@ -16,7 +17,10 @@ class TestConvert(TestCase):
         self.d[rand_points[:, 0], rand_points[:, 1]] = 10
 
     def test_2d_convert(self):
-        conversion = convert(self.d, center=self.center, angle=self.angle, foci=self.lengths, phase_width=1440)
+        start= timeit()
+        conversion = convert(self.d, center=self.center, angle=self.angle, foci=self.lengths, phase_width=720)
+        stop = timeit()
+        print((stop-start))
         s = np.sum(conversion, axis=1)
         even = np.sum(conversion, axis=0)
         self.assertLess((s > max(s)/2).sum(), 4)

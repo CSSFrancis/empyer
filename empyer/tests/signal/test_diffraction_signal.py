@@ -5,6 +5,7 @@ from hyperspy.signals import Signal2D, BaseSignal
 from empyer.signals.diffraction_signal import DiffractionSignal
 import matplotlib.pyplot as plt
 from empyer.misc.image import random_ellipse
+import time
 
 
 class TestDiffractionSignal(TestCase):
@@ -31,12 +32,10 @@ class TestDiffractionSignal(TestCase):
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.angle, self.angle, places=1)
 
     def test_conversion(self):
-        converted = self.ds.calculate_polar_spectrum(phase_width=720, radius=None, parallel=False, inplace=False)
-        self.ds.inav[1].plot()
-        plt.show()
-        plt.plot(converted.inav[1].sum(axis=(0)).data)
-        converted.sum(axis=(0, 1, 2)).plot()
-        plt.show()
+        start = time.time()
+        converted = self.ds.calculate_polar_spectrum(phase_width=720, parallel=False, inplace=False)
+        stop = time.time()
+        print("the Time is:", stop-start)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.center[0], self.center[0], places=-1)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.center[1], self.center[1], places=-1)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.lengths[0], max(self.lengths), places=-1)
@@ -47,7 +46,6 @@ class TestDiffractionSignal(TestCase):
 
     def test_parallel_conversion(self):
         converted = self.ds.calculate_polar_spectrum(phase_width=720,
-                                                     radius=None,
                                                      parallel=True,
                                                      inplace=False)
         self.assertAlmostEqual(self.ds.metadata.Signal.Ellipticity.center[0], self.center[0], places=-1)
