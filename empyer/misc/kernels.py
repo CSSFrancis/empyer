@@ -149,13 +149,14 @@ def random_pattern(symmetry, k):
     k = [[np.cos(angle*i)*k, np.sin(angle*i)*k, 0] for i in range(symmetry)]
     rotation_vector, theta = random_rotation()
     s = [sg(acc_voltage=200, rotation_vector=rotation_vector, theta=theta, k0=speckle) for speckle in k]
-    observed_intensity = [1 * shape_function(r=1, s=dev) for dev in s]
+    observed_intensity = [100 * shape_function(r=1, s=dev) for dev in s]
     return k, observed_intensity
 
 
-def simulate_pattern(symetry, k, num_clusterns, center, angle, lengths):
+def simulate_pattern(symetry, k, num_clusterns, probe_size, center, angle, lengths):
     image = np.zeros(shape=(512,512))
     for i in range(num_clusterns):
         k_val, observed_int = random_pattern(symmetry=symetry, k=k)
-        k_index = [[int(k[0]*25), int(k[1]*25)] for k in k_val]
-        print(k_index)
+        k_index = np.array([[int(k[0]*25)+center[0], int(k[1]*25+center[1])] for k in k_val])
+        image[k_index[:, 0], k_index[:, 1]] = observed_int
+    return image
