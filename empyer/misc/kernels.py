@@ -1,8 +1,9 @@
 import hyperspy.api as hs
 import numpy as np
 import random
-from empyer.misc.angular_correlation import angular_correlation
 
+from empyer.misc.angular_correlation import angular_correlation
+from scipy.interpolate import RectBivariateSpline
 import matplotlib.pyplot as plt
 
 
@@ -129,45 +130,10 @@ def mult_quaternions(Q1,Q2):
             x1*y0 - y1*x0 + z1*w0 +w1*z0])
 
 
-def simulate_symmetry(symmetry=4, I=1, k=4, r=1, iterations=1000):
-    angle = (2*np.pi)/symmetry
-    k = [[np.cos(angle*i)*k, np.sin(angle*i)*k, 0] for i in range(symmetry)]
-    observed_int = np. zeros(shape=(iterations, symmetry*4))
-    for i in range(iterations):
-        rotation_vector, theta = random_rotation()
-        for j, speckle in enumerate(k):
-            s = sg(acc_voltage=200, rotation_vector=rotation_vector, theta=theta, k0=speckle)
-            observed_int[i, j*4] = I*shape_function(r=r, s=s)
-            observed_int[i, j * 4 +1] = I * shape_function(r=r, s=s)
-
-    return observed_int
 
 
-def random_pattern(symmetry, k):
-    angle = (2*np.pi)/symmetry
-    k = k # +np.random.randn()/10 # normal distribution about k
-    k = [[np.cos(angle*i)*k, np.sin(angle*i)*k] for i in range(symmetry)]
-    rotation_vector, theta = random_rotation()
-    rand_angle = np.random.rand()*np.pi*2
-    k = [list(rotate(x, y, rand_angle))+[0] for x, y in k]
-    print(k)
-    s = [sg(acc_voltage=200, rotation_vector=rotation_vector, theta=theta, k0=speckle) for speckle in k]
-    observed_intensity = [100 * shape_function(r=1, s=dev) for dev in s]
-    return k, observed_intensity
 
 
-def simulate_pattern(symetry, k, num_clusterns, probe_size, center, angle, lengths):
-    image = np.zeros(shape=(512, 512))
-    xInd, yInd = np.mgrid[:512, :512]
-    for i in range(num_clusterns):
-        k_val, observed_int = random_pattern(symmetry=symetry, k=k)
-        for pos, inten in zip(k_val, observed_int):
-            print(pos)
-            circle = (xInd - pos[0] - center[0]) ** 2 + (yInd - pos[1]-center[1]) ** 2
-            image[circle < probe_size] += inten
-            print(inten)
 
-    return image
 
-def rotate(x,y,angle):
-    return x*np.cos(angle)-y*np.sin(angle),y*np.cos(angle)+x*np.sin(angle)
+

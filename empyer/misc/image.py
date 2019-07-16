@@ -202,3 +202,7 @@ def random_ellipse(num_points, center, foci, angle):
 
     return points
 
+
+def rotate(x,y,angle):
+    return x*np.cos(angle)-y*np.sin(angle),y*np.cos(angle)+x*np.sin(angle)
+
