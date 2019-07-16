@@ -48,6 +48,6 @@ class TestConvert(TestCase):
         random_pattern(4,4)
 
     def test_simulate_image(self):
-        i = simulate_pattern(4, 4, 100, center=[256,256], angle=0,  lengths=[10, 10])
+        i = simulate_pattern(4, k=100, num_clusterns=500, probe_size=20, center=[256, 256], angle=0,  lengths=[10, 10])
         plt.imshow(i)
         plt.show()

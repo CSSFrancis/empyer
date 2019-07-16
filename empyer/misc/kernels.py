@@ -145,18 +145,29 @@ def simulate_symmetry(symmetry=4, I=1, k=4, r=1, iterations=1000):
 
 def random_pattern(symmetry, k):
     angle = (2*np.pi)/symmetry
-    k = k+np.random.randn()/6  # normal distribution about k
-    k = [[np.cos(angle*i)*k, np.sin(angle*i)*k, 0] for i in range(symmetry)]
+    k = k # +np.random.randn()/10 # normal distribution about k
+    k = [[np.cos(angle*i)*k, np.sin(angle*i)*k] for i in range(symmetry)]
     rotation_vector, theta = random_rotation()
+    rand_angle = np.random.rand()*np.pi*2
+    k = [list(rotate(x, y, rand_angle))+[0] for x, y in k]
+    print(k)
     s = [sg(acc_voltage=200, rotation_vector=rotation_vector, theta=theta, k0=speckle) for speckle in k]
     observed_intensity = [100 * shape_function(r=1, s=dev) for dev in s]
     return k, observed_intensity
 
 
 def simulate_pattern(symetry, k, num_clusterns, probe_size, center, angle, lengths):
-    image = np.zeros(shape=(512,512))
+    image = np.zeros(shape=(512, 512))
+    xInd, yInd = np.mgrid[:512, :512]
     for i in range(num_clusterns):
         k_val, observed_int = random_pattern(symmetry=symetry, k=k)
-        k_index = np.array([[int(k[0]*25)+center[0], int(k[1]*25+center[1])] for k in k_val])
-        image[k_index[:, 0], k_index[:, 1]] = observed_int
+        for pos, inten in zip(k_val, observed_int):
+            print(pos)
+            circle = (xInd - pos[0] - center[0]) ** 2 + (yInd - pos[1]-center[1]) ** 2
+            image[circle < probe_size] += inten
+            print(inten)
+
     return image
+
+def rotate(x,y,angle):
+    return x*np.cos(angle)-y*np.sin(angle),y*np.cos(angle)+x*np.sin(angle)
