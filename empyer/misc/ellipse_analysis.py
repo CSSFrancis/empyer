@@ -124,7 +124,6 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
         # take top 5000 points make sure exclude zero beam
         coords[0] = np.floor_divide(indexes[-num_points:], i_shape[1])  # x axis (row)
         coords[1] = np.remainder(indexes[-num_points:], i_shape[1]) # y axis (col)
-        plt.scatter(coords[0], coords[1])
     a = fit_ellipse(np.array(coords[0]), np.array(coords[1]))
     center = ellipse_center(a)  # (x,y)
     lengths = ellipse_axis_length(a)

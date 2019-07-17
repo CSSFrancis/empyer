@@ -44,6 +44,7 @@ def angular_correlation(r_theta_img, mask=None, binning=1, cut_off=0, normalize=
         a = np.multiply(np.divide(a, number_unmasked), 720)
 
     if normalize:
+        print("normalizing")
         a_prime = np.zeros(np.shape(a))
         for i, row in enumerate(a):
             row_mean = np.mean(row)
@@ -51,7 +52,7 @@ def angular_correlation(r_theta_img, mask=None, binning=1, cut_off=0, normalize=
                 normalized_row = np.divide(np.subtract(row, row_mean), 1)
             else:
                 normalized_row = np.divide(np.subtract(row, row_mean), row_mean)
-                a_prime[i, :] = normalized_row
+            a_prime[i, :] = normalized_row
             a = a_prime
     return a
 

@@ -10,9 +10,9 @@ def cartesian_to_ellipse(center, angle, lengths):
     minor = min(lengths)/np.mean(lengths)
     xInd, yInd = xInd - center[0], yInd - center[1]
     xInd, yInd = rotate(xInd, yInd, angle=-angle)
-    xInd, yInd = xInd*major, yInd*minor
+    xInd, yInd = xInd*minor, yInd*major
     xInd, yInd = rotate(xInd, yInd, angle=angle)
-    return xInd,yInd
+    return xInd, yInd
 
 
 def distort(image, center, angle, lengths):
@@ -22,17 +22,6 @@ def distort(image, center, angle, lengths):
     xInd, yInd = cartesian_to_ellipse(center=center, angle=angle, lengths=lengths)
     distorted = np.array(spline.ev(yInd, xInd))
     return distorted
-
-
-def cartesian_to_ellipse(center, angle, lengths):
-    xInd, yInd = np.mgrid[:512, :512]
-    major = max(lengths)/np.mean(lengths)
-    minor = min(lengths)/np.mean(lengths)
-    xInd, yInd = xInd - center[0], yInd - center[1]
-    xInd, yInd = rotate(xInd, yInd, angle=angle)
-    xInd, yInd = xInd*major, yInd*minor
-    xInd, yInd = rotate(xInd, yInd, angle=-angle)
-    return xInd, yInd
 
 
 def simulate_symmetry(symmetry=4, I=1, k=4, r=1, iterations=1000):
@@ -62,13 +51,15 @@ def random_pattern(symmetry, k):
 
 
 def simulate_pattern(symmetry, k, num_clusters, probe_size, center, angle, lengths):
-    image = np.zeros(shape=(512, 512))
+    image = np.ones(shape=(512, 512))
     xInd, yInd = np.mgrid[:512, :512]
     for i in range(num_clusters):
         k_val, observed_int = random_pattern(symmetry=symmetry, k=k)
         for pos, inten in zip(k_val, observed_int):
             circle = (xInd - pos[0] - center[0]) ** 2 + (yInd - pos[1] - center[1]) ** 2
             image[circle < probe_size] += inten
+            #image[circle < probe_size] += 10
+
     image = distort(image, center, angle, lengths)
     return image
 
