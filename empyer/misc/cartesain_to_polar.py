@@ -34,7 +34,7 @@ def convert(img, center=None, angle=None, lengths=None, radius=None, phase_width
     if center is None:
         center = np.true_divide(img_shape[-2:], 2)
     if radius[1] == -1:
-        radius[1] = min(np.subtract(img_shape, center))-1
+        radius[1] = int(min(np.subtract(img_shape, center)))
     final_the = np.linspace(0, 2*np.pi, num=phase_width)
     final_rad = np.arange(radius[0], radius[1], 1)
     final_x, final_y = ellipsoid_list_to_cartesian(final_rad,

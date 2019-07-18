@@ -22,7 +22,7 @@ class TestDiffractionSignal(TestCase):
         ellipse = self.d.metadata.Signal.Ellipticity
         points = random_ellipse(num_points=100, center=ellipse.center, angle=ellipse.angle, foci=ellipse.lengths)
         #self.d.data[:, :, points[:, 0], points[:, 1]] = 100000
-        ps = self.d.calculate_polar_spectrum(phase_width=720, radius=[0, 200])
+        ps = self.d.calculate_polar_spectrum(phase_width=720, radius=[0,200])
         ps.inav[1,1].plot()
         plt.show()
         ac = ps.autocorrelation(cut=50)
