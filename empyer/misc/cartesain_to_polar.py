@@ -34,7 +34,7 @@ def convert(img, center=None, angle=None, lengths=None, radius=[0, -1], phase_wi
     if center is None:
         center = np.true_divide(img_shape[-2:], 2)
     if radius[1] == -1:
-        radius[1] = min(np.subtract(img_shape, center))
+        radius[1] = min(np.subtract(img_shape, center))-1
     final_the = np.linspace(0, 2*np.pi, num=phase_width)
     final_rad = np.arange(radius[0], radius[1], 1)
     final_x, final_y = ellipsoid_list_to_cartesian(final_rad,
@@ -51,7 +51,7 @@ def convert(img, center=None, angle=None, lengths=None, radius=[0, -1], phase_wi
         pass
     spline = RectBivariateSpline(initial_x, initial_y, intensity, kx=1, ky=1)  # bi-linear spline (Takes 90% of time)
     polar_img = np.array(spline.ev(final_x, final_y))
-    polar_img = np.reshape(polar_img, (int(radius[1]-radius[0]+1), phase_width))
+    polar_img = np.reshape(polar_img, (int(radius[1]-radius[0]), phase_width))
 
     # outputting new mask
     polar_img[polar_img < 0] =0

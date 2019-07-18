@@ -1,5 +1,6 @@
 import numpy as np
 from empyer.misc.image import bin_2d
+import matplotlib.pyplot as plt
 
 
 def angular_correlation(r_theta_img, mask=None, binning=1, cut_off=0, normalize=True):
@@ -18,29 +19,30 @@ def angular_correlation(r_theta_img, mask=None, binning=1, cut_off=0, normalize=
         Subtract <I(\theta)>^2 and divide by <I(\theta)>^2
     """
     image = r_theta_img
-    if mask is not None:
-        image[mask] = 0
+    m = mask
+    if m is not None:
+        mask_boolean = ~m  # inverting the boolean mask
+        mask_fft = np.fft.fft(mask_boolean, axis=1)
+        number_unmasked = np.fft.ifft(mask_fft*np.conjugate(mask_fft), axis=1).real
+        number_unmasked[number_unmasked < 1] = 1  # get rid of divide by zero error for completely masked rows
+        image[m] = 0
         if cut_off is not 0:
-            mask = mask[cut_off:len(mask), :]
+            number_unmasked = number_unmasked[cut_off:len(number_unmasked), :]
 
     if cut_off is not 0:
         image = image[cut_off:len(image), :]
 
     if binning is not 1:
         image = bin_2d(image, binning)
-        if mask is not None:
-            mask = bin_2d(mask, binning) != 0
+        if m is not None:
+            m = bin_2d(m, binning) != 0
 
     # fast method uses a FFT and is a process which is O(n) = n log(n)
     I_fft = np.fft.fft(image, axis=1)
     a = np.fft.ifft(I_fft * np.conjugate(I_fft), axis=1).real
     # this is to determine how many of the variables were non zero... This is really dumb.  but...
     # it works and I should stop trying to fix it (wreak it)
-    if mask is not None:
-        mask_boolean = ~mask  # inverting the boolean mask
-        mask_fft = np.fft.fft(mask_boolean, axis=1)
-        number_unmasked = np.fft.ifft(mask_fft*np.conjugate(mask_fft), axis=1).real
-        number_unmasked[number_unmasked == 0] = 1  # get rid of divide by zero error for completely masked rows
+    if m is not None:
         a = np.multiply(np.divide(a, number_unmasked), 720)
 
     if normalize:

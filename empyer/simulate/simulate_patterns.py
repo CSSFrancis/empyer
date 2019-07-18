@@ -34,7 +34,6 @@ def simulate_symmetry(symmetry=4, I=1, k=4, r=1, iterations=1000):
             s = sg(acc_voltage=200, rotation_vector=rotation_vector, theta=theta, k0=speckle)
             observed_int[i, j*4] = I*shape_function(r=r, s=s)
             observed_int[i, j * 4 + 1] = I * shape_function(r=r, s=s)
-
     return observed_int
 
 

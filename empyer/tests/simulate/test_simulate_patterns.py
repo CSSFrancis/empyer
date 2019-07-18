@@ -24,7 +24,6 @@ class TestSimulations(TestCase):
         i = simulate_pattern(4, k=100, num_clusters=3, probe_size=20, center=[256, 256], angle=0, lengths=[20, 10])
         c, a, lengths = solve_ellipse(i)
 
-
     def test_cartesian_to_ellipse(self):
         x, y = cartesian_to_ellipse(center=[256, 256], angle=np.pi /4, lengths=[1.5, 1])
         plt.scatter(x, y)
