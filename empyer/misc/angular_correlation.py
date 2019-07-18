@@ -46,7 +46,6 @@ def angular_correlation(r_theta_img, mask=None, binning=1, cut_off=0, normalize=
         a = np.multiply(np.divide(a, number_unmasked), 720)
 
     if normalize:
-        print("normalizing")
         a_prime = np.zeros(np.shape(a))
         for i, row in enumerate(a):
             row_mean = np.mean(row)
@@ -67,7 +66,6 @@ def power_spectrum(correlation, method="FFT"):
     """
 
     if method is "FFT":
-        print(np.shape(correlation))
         pow_spectrum = np.fft.fft(correlation, axis=1).real
         pow_spectrum = np.power(pow_spectrum, 2)
     return pow_spectrum

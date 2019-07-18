@@ -4,7 +4,7 @@ from empyer.misc.ellipse_analysis import solve_ellipse
 from empyer.misc.cartesain_to_polar import convert
 from empyer.signals.em_signal import EMSignal
 from empyer.signals.polar_signal import PolarSignal
-from timeit import timeit
+
 
 class DiffractionSignal(EMSignal):
     """

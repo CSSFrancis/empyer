@@ -5,6 +5,23 @@ from empyer.misc.kernels import shape_function,sg,random_rotation
 
 
 def cartesian_to_ellipse(center, angle, lengths):
+    """ Converts a grid of points to equivalent elliptical points for a spline interpolation
+
+    Parameters
+    ---------------
+    center: list
+        The center of the ellipse
+    angle: float
+        The angle of the major axis in radians
+    lengths: The lengths of the major and minor axis of the ellipse
+
+    Returns
+    ------------
+    xInd: array-like
+        The x indices for the interpolation
+    yInd: array-like
+        The y indices for the interpolation
+    """
     xInd, yInd = np.mgrid[:512, :512]
     major = max(lengths)/np.mean(lengths)
     minor = min(lengths)/np.mean(lengths)

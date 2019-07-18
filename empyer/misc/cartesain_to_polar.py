@@ -1,11 +1,10 @@
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
 
-from empyer.misc.image import ellipsoid_list_to_cartesian, polar_list_to_cartesian, create_grid
-import time
+from empyer.misc.image import ellipsoid_list_to_cartesian
 
 
-def convert(img, center=None, angle=None, lengths=None, radius=[0, -1], phase_width=720):
+def convert(img, center=None, angle=None, lengths=None, radius=None, phase_width=720):
     """ Function for converting an image in cartesian coordinates to polar coordinates.
 
     Parameters
@@ -28,7 +27,8 @@ def convert(img, center=None, angle=None, lengths=None, radius=[0, -1], phase_wi
     polar_img: array-like
         A numpy array of the input img  in polar coordiates. Dim (radius[1]-radius[0]) x phase_width
     """
-    st = time.time()
+    if radius is None:
+        radius = [0, -1]
     img_shape = np.shape(img)
     initial_y, initial_x = range(0, img_shape[-2]), range(0, img_shape[-1])
     if center is None:

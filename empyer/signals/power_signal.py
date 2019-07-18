@@ -1,5 +1,3 @@
-import numpy as np
-
 from empyer.signals.em_signal import EMSignal
 
 
