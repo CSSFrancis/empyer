@@ -7,7 +7,7 @@ def readme():
 
 
 setup(name='empyer',
-      version='0.201',
+      version='0.202',
       description='Electron Microscopy tools for analyzing 4 and 5 dimensional STEM datasets',
       long_description=readme(),
       keywords='STEM Electron Microscopy Glass',
