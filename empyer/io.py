@@ -1,5 +1,5 @@
 from hyperspy.api import load as hsload
-from .signals.emsignal import EMSignal
+from .signals.em_signal import EMSignal
 from .signals.diffraction_signal import DiffractionSignal
 from .signals.polar_signal import PolarSignal
 from .signals.correlation_signal import CorrelationSignal
@@ -57,6 +57,15 @@ def load(filenames=None,
 
 def to_em_signal(signal=None):
     """Hyperspy signal to em_signal
+
+    Parameters
+    ---------------------
+    signal: Signal2D
+
+    Returns
+    ---------------------
+    ds: em_signal
+        A signal of type signal_type
     """
     ax = signal.axes_manager.as_dictionary()
     ax = [ax[key]for key in ax]
@@ -66,6 +75,15 @@ def to_em_signal(signal=None):
 
 def to_diffraction_signal(signal=None):
     """Hyperspy signal to diffraction_signal
+
+    Parameters
+    ---------------------
+    signal: Signal2D
+
+    Returns
+    ---------------------
+    ds: em_signal
+        A signal of type signal_type
     """
     ax = signal.axes_manager.as_dictionary()
     ax = [ax[key]for key in ax]
@@ -75,7 +93,16 @@ def to_diffraction_signal(signal=None):
 
 def to_polar_signal(signal=None):
     """Hyperspy signal to polar_signal
-     """
+
+    Parameters
+    ---------------------
+    signal: Signal2D
+
+    Returns
+    ---------------------
+    ds: em_signal
+        A signal of type signal_type
+    """
     ax = signal.axes_manager.as_dictionary()
     ax = [ax[key]for key in ax]
     ps = PolarSignal(signal,
@@ -86,7 +113,17 @@ def to_polar_signal(signal=None):
 
 def to_correlation_signal(signal=None):
     """Hyperspy signal to correlation_signal
-     """
+
+    Parameters
+    ---------------------
+    signal: Signal2D
+
+    Returns
+    ---------------------
+    ds: em_signal
+        A signal of type signal_type
+    """
+
     ax = signal.axes_manager.as_dictionary()
     ax = [ax[key]for key in ax]
     cs = CorrelationSignal(signal,
@@ -97,7 +134,16 @@ def to_correlation_signal(signal=None):
 
 def to_power_signal(signal=None):
     """Hyperspy signal to power_signal
-     """
+
+    Parameters
+    ---------------------
+    signal: Signal2D
+
+    Returns
+    ---------------------
+    ds: em_signal
+        A signal of type signal_type
+    """
     ax = signal.axes_manager.as_dictionary()
     ax = [ax[key]for key in ax]
     ps = PowerSignal(signal,

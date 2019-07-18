@@ -1,90 +1,8 @@
 import numpy as np
-import math
-import random
 import matplotlib.pyplot as plt
 from numpy.linalg import eig, inv
-from collections import namedtuple
 from matplotlib.patches import Ellipse
-
-
-def find_center(img):
-    """
-    Function which finds the center of a diffraction pattern
-
-    Using an algorithm described in T.C. Patterson et al. Ultramicroscopy 103, 275 (2005). The algorithm assumes the
-    sample is circularly symmetric.Takes a random sampling of positions in a cropped region and compares to other points
-
-    Parameters
-    ---------
-    img: array-like
-        An input image with an imposed circle of higher intensity
-    """
-    def mean_squared_displacement(iterations, mask_x, mask_y, center, img, no_mask=True):
-        count = 0
-        msd = 0
-        points = len(mask_x)
-        for i in range(iterations):
-            random_position = random.randint(0, points - 1)
-            initial_x, initial_y = mask_x[random_position], mask_y[random_position]
-            radius = calculate_magnitude(mask_x[random_position], mask_y[random_position])
-            theta = random.uniform(0, 2 * np.pi)
-            x_rotated, y_rotated = polar_to_cartesian(theta, radius, center)
-            initial_x = int(initial_x + center[0])
-            initial_y = int(initial_y + center[1])
-            final, initial = img[x_rotated][y_rotated], img[initial_x][initial_y]
-
-            if no_mask or final.mask is True or initial.mask is True:
-                msd = msd + (final - initial) ** 2
-                count = count + 1
-
-        if count:
-            msd = msd / count
-        else:
-            msd = 0
-        return msd
-
-    def create_circular_grid(inner_radius, outer_radius):
-        x, y = np.meshgrid(range(-outer_radius, outer_radius + 1), range(-outer_radius, outer_radius + 1))
-        r = np.sqrt(x ** 2 + y ** 2)
-        inside = r < outer_radius
-        x, y = x[inside], y[inside]
-        return x, y
-
-    def calculate_magnitude(x, y):
-        magnitude = np.sqrt((x) ** 2 + (y) ** 2)
-        return magnitude
-
-    def polar_to_cartesian(theta, r, center):
-        # could do linear interpolation but way more computationally difficult
-        x = int(math.floor(r * np.cos(theta)) + center[0])
-        y = int(math.floor(r * np.sin(theta)) + center[1])
-        return x, y
-
-    search_radius = 7
-    all_msd = []
-    shape = np.shape(img)
-    image_center = np.divide(shape, 2)
-    left_bound, right_bound = int(image_center[0]-(search_radius*4)), int(image_center[1]+(search_radius*4))
-    MSD = namedtuple('MSD', 'mean_displacement position')
-    for x in range(left_bound, right_bound, 4):
-        for y in range(left_bound, right_bound, 4):
-            center = [x, y]
-            mask_x, mask_y = create_circular_grid(50,150)
-            msd = mean_squared_displacement(500, mask_y, mask_y, center, img)
-            msd =MSD(mean_displacement=msd, position=[x, y])
-            all_msd.append(msd)
-    center = min(all_msd, key=lambda k: k.mean_displacement).position
-    msd2 = []
-    left_bound, right_bound = int(center[0]-10), int(center[1]+10)
-    for x in range(left_bound, right_bound, 2):
-        for y in range(left_bound, right_bound, 2):
-            center = [x, y]
-            mask_x, mask_y = create_circular_grid(500, 150)
-            msd = mean_squared_displacement(500, mask_y, mask_y, center, img)
-            msd =MSD(mean_displacement=msd, position=[x, y])
-            msd2.append(msd)
-    center = min(msd2, key=lambda k: k.mean_displacement).position
-    return center
+from empyer.misc.cartesain_to_polar import convert
 
 
 def solve_ellipse(img, interactive=False, num_points=500, plot=False):
@@ -123,49 +41,48 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
         E, V = eig(np.dot(inv(S), C))  # eigen decomposition to solve constrained minimization problem
         n = np.argmax(np.abs(E))   # maximum eigenvalue solution
         a = V[:, n]
+        print("a is:", a)
         return a
 
-    def ellipse_center(a):
-        b, c, d, f, g, a = a[1] / 2, a[2], a[3] / 2, a[4] / 2, a[5], a[0]
-        num = b * b - a * c
-        x0 = (c * d - b * f) / num
-        y0 = (a * f - b * d) / num
+    def ellipse_center(ellipse_parameters):
+        a, b, c, d, e, f = ellipse_parameters
+        denom = b**2 - (4 * a * c)
+        x0 = (2 * c * d - b * e) / denom
+        y0 = (2 * a * e - b * d) / denom
         return np.array([x0, y0])
 
-    def ellipse_axis_length(a):
-        b, c, d, f, g, a = a[1] / 2, a[2], a[3] / 2, a[4] / 2, a[5], a[0]
-        up = 2 * (a * f * f + c * d * d + g * b * b - 2 * b * d * f - a * c * g)
-        down1 = (b * b - a * c) * ((c - a) * np.sqrt(1 + 4 * b * b / ((a - c) * (a - c))) - (c + a))
-        down2 = (b * b - a * c) * ((a - c) * np.sqrt(1 + 4 * b * b / ((a - c) * (a - c))) - (c + a))
-        res1 = np.sqrt(up / down1)
-        res2 = np.sqrt(up / down2)
-        return np.array([res1, res2])
+    def ellipse_axis_length(ellipse_parameters):
+        a, b, c, d, e, f = ellipse_parameters
+        denom = b**2 - (4 * a * c)
+        num1 = np.sqrt(2 * (a * e ** 2 + c * d ** 2 - b * d * e + (b ** 2 - 4 * a * c) * f) *
+                       ((a+c) - np.sqrt((a - c) ** 2 + b ** 2)))
+        num2 = np.sqrt(2 * (a * e ** 2 + c * d ** 2 - b * d * e + (b ** 2 - 4 * a * c) * f) *
+                       ((a+c) + np.sqrt((a - c) ** 2 + b ** 2)))
+        axis1 = abs(num1/denom)
+        axis2 = abs(num2/denom)
 
-    def ellipse_angle_of_rotation(a):
-        b, c, d, f, g, a = a[1] / 2, a[2], a[3] / 2, a[4] / 2, a[5], a[0]
-        print(a,c)
-        #a =abs(a)
-        #c =abs(c)
+        return np.sort([axis1, axis2])[::-1]
+
+    def ellipse_angle_of_rotation(ellipse_parameters):
+        a, b, c, d, e, f = ellipse_parameters
+        b, d, e = b/2, d/2, e/3
         if b == 0:
             if a > c:
-                ang = 0
+                return 0
             else:
-                ang = np.pi / 2
-            return ang
+                return np.pi / 2
         else:
-            if a > c:
-                print("a>c")
-                ang = np.pi / 2 + np.arctan(2 * b / (a - c)) / 2
-                if a < 0 and c < 0:
-                    ang = ang + np.pi/2
+            if a < c:
+                ang = .5 * invcot((a-c)/(2*b))
+                if (a<0) == (b<0): # same sign
+                    ang = ang+np.pi/2
+                return ang
             else:
-                print("a<c")
-                ang = np.arctan(2 * b / (a - c)) / 2
-                if a < 0 and c < 0:
-                    ang = ang + np.pi/2
-            if ang < 0:
-                return ang +np.pi
-            return ang
+                ang =np.pi/2 + .5 * invcot((a-c)/(2*b))
+                if (a < 0) != (b < 0):
+                    ang=ang-np.pi/2
+                return ang
+
 
     coords = [[], []]
     if interactive:
@@ -195,7 +112,7 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
             figure1.canvas.draw()
         cid = figure1.canvas.mpl_connect('button_press_event', add_point)
         plt.show()
-        print(coords[0])
+
     #  non-interactive, works better if there is an intense ring
     # TODO: Make method more robust with respect to obviously wrong points
     else:
@@ -207,16 +124,16 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
         # take top 5000 points make sure exclude zero beam
         coords[0] = np.floor_divide(indexes[-num_points:], i_shape[1])  # x axis (row)
         coords[1] = np.remainder(indexes[-num_points:], i_shape[1]) # y axis (col)
-    print("Point2!:", coords[0][-1], coords[1][-1])
     a = fit_ellipse(np.array(coords[0]), np.array(coords[1]))
     center = ellipse_center(a)  # (x,y)
-    lengths = sorted(ellipse_axis_length(a), reverse=True)
+    lengths = ellipse_axis_length(a)
     angle = ellipse_angle_of_rotation(a)
     print("The center is:", center)
     print("The major and minor axis lengths are:", lengths)
     print("The angle of rotation is:", angle)
     if plot:
-        ellipse = Ellipse((center[0], center[1]), lengths[0] * 2, lengths[1] * 2, angle=angle, fill=False)
+        print("plotting")
+        ellipse = Ellipse((center[1], center[0]), lengths[0] * 2, lengths[1] * 2, angle=angle, fill=False)
         fig = plt.figure()
         axe = fig.add_subplot(111)
         axe.imshow(img)
@@ -225,3 +142,41 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
     return center, lengths, angle
 
 
+def advanced_solve_ellipse(img, center, lengths, angle, phase_width, radius, num_points=500):
+    """ This is a method in development. Better at optimizing angular correlations
+
+    This method is in development. Due to the fact that an ellipse will have maximum 2-fold symmetry when the center
+    is correctly determined and maximum 2*n-fold symmetry when the major/ minor axes as well as the angle of rotation
+    is correct. This algorithm optimizes for these quantities.
+
+    Parameters:
+    -----------
+    img: Array-like
+        2-d Array of some image
+    range: list
+        The lower and upper limits to look at. Usually should just look at the first ring.
+    num_points: int
+        The number of points to look at to determine the characteristic ellipse.
+
+    Return:
+    -------------
+    center: list
+        The x and y coordinates of the center
+    lengths: list
+        The major and minor axes
+    angle: float
+        The angle of rotation for the ellipse
+    """
+
+    # Brute force testing method...
+
+    x = np.linspace(-5,5,20)
+    y = np.linspace(-5, 5, 20)
+
+    pol =[[convert(img, angle=None, lengths=None, center=np.add(center[x1,y1]), phase_width=phase_width, radius=radius)
+           for x1 in x]for y1 in y]
+    
+
+
+def invcot(val):
+    return (np.pi/2) - np.arctan(val)

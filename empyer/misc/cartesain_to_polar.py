@@ -1,72 +1,57 @@
-
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
 
 from empyer.misc.image import ellipsoid_list_to_cartesian, polar_list_to_cartesian, create_grid
+import time
 
 
-def convert(img, center=None, angle=None, foci=None, radius=None, phase_width=720):
-    #  This function someday will be faster hopefully...
+def convert(img, center=None, angle=None, lengths=None, radius=[0, -1], phase_width=720):
+    """ Function for converting an image in cartesian coordinates to polar coordinates.
+
+    Parameters
+    ------------------
+    img:array-like
+        A n by 2-d array for the image to convert to polar coordinates
+    center: list
+        [X,Y] coordinates for the center of the image
+    angle: float
+        Angle of rotation if the sample is elliptical
+    lengths: list
+        The major and minor lengths of the ellipse
+    radius: list
+        The inner and outer indexes to define the radius by.
+    phase_width: int
+        The number of "pixels" in the polar image along the x direction
+
+    Returns
+    -----------
+    polar_img: array-like
+        A numpy array of the input img  in polar coordiates. Dim (radius[1]-radius[0]) x phase_width
     """
-    :param img: a n by 2-d array for the image to convert to polar coordinates
-    :param mask: 2-d boolean array which excludes certain points
-    :param center: x,y coordinates for the center of the image
-    :param angle: angle of rotation if the sample is elliptical
-    :param foci: The lengths of the foci of the ellipse
-    :param phase_width: the number of "pixels" in the polar image along the x direction
-    :param radius: the number of "pixels" in the polar image along the y direction
-    :param plot: Plot the image after converting it...
-    :return: polar_img r vs. theta
-    """
+    st = time.time()
     img_shape = np.shape(img)
+    initial_y, initial_x = range(0, img_shape[-2]), range(0, img_shape[-1])
     if center is None:
         center = np.true_divide(img_shape[-2:], 2)
-    #center = [center[1], center[0]]
-    if radius is None:
-        radius = int(min(img_shape[-2:]) - max(np.abs(np.subtract(img_shape[-2:], center)))-5)
-        if foci is not None:
-            radius = int(radius/(max(foci)/min(foci)))
-    # setting up grids for faster interpolation
-    r_inital = 1
-    r_final = int(radius + r_inital)
-
-    initial_y, initial_x = range(1, img_shape[-2]+1), range(1, img_shape[-1]+1)
-    # for perfectly circular conversions
-    if angle is None and foci is None:
-        final_theta, final_r = create_grid(np.linspace(-1 * np.pi, np.pi, phase_width), np.arange(r_inital, r_final, 1))
-        final_x, final_y = polar_list_to_cartesian(final_r, final_theta, center)
-    # for elliptical conversions
-    else:
-        final_the = np.linspace(-1*np.pi, np.pi, num=phase_width)
-        final_rad = np.arange(r_inital, r_final, 1)
-        final_x, final_y = ellipsoid_list_to_cartesian(final_rad,
-                                                       final_the,
-                                                       center,
-                                                       major=foci[0],
-                                                       minor=foci[1],
-                                                       angle=angle,
-                                                       even_spaced=True)
-    inten = img.data
+    if radius[1] == -1:
+        radius[1] = min(np.subtract(img_shape, center))
+    final_the = np.linspace(0, 2*np.pi, num=phase_width)
+    final_rad = np.arange(radius[0], radius[1], 1)
+    final_x, final_y = ellipsoid_list_to_cartesian(final_rad,
+                                                   final_the,
+                                                   center,
+                                                   axes_lengths=lengths,
+                                                   angle=angle)
+    intensity = img.data
 
     # setting masked values to negative values. Anything interpolated from masked values becomes negative
     try:
-        inten[img.mask] = -999999
+        intensity[img.mask] = -999999
     except AttributeError:
         pass
-    # For higher than 2 dimensional arrays.  Speeds up computations a little but requires more memory
-    if len(img_shape) > 2:
-        inten = np.reshape(inten, (-1, *img_shape[-2:]))
-        polar_img = np.zeros((inten.shape[0],)+(r_final - r_inital, phase_width))
-        for i, img in enumerate(inten):
-            spline = RectBivariateSpline(initial_x, initial_y, img, kx=1, ky=1)  # bi-linear spline
-            polar = np.array(spline.ev(final_x, final_y))
-            polar_img[i] = np.reshape(polar, [r_final - r_inital, phase_width])
-        polar_img = np.reshape(polar_img, (*img_shape[:-2], radius, phase_width))
-
-    else:
-        spline = RectBivariateSpline(initial_x, initial_y, inten, kx=1, ky=1)  # bi-linear spline
-        polar_img = np.array(spline.ev(final_x, final_y))
-        polar_img = np.reshape(polar_img, (radius, phase_width))
+    spline = RectBivariateSpline(initial_x, initial_y, intensity, kx=1, ky=1)  # bi-linear spline (Takes 90% of time)
+    polar_img = np.array(spline.ev(final_x, final_y))
+    polar_img = np.reshape(polar_img, (int(radius[1]-radius[0]+1), phase_width))
 
     # outputting new mask
     polar_img[polar_img < 0] =0

@@ -1,8 +1,9 @@
 import hyperspy.api as hs
 import numpy as np
 import random
-from empyer.misc.angular_correlation import angular_correlation
 
+from empyer.misc.angular_correlation import angular_correlation
+from scipy.interpolate import RectBivariateSpline
 import matplotlib.pyplot as plt
 
 
@@ -68,8 +69,8 @@ def random_rotation():
     p = random.uniform(0, 1)
     alpha = 2 * np.pi * u
     beta = np.arccos(2 * v -1)
-    rotation_vector = (np.cos(alpha)*np.sin(beta),np.sin(beta), np.sin(alpha)*np.cos(beta))
-    theta =  2 * np.pi * p
+    rotation_vector = (np.cos(alpha)*np.sin(beta), np.sin(beta), np.sin(alpha)*np.cos(beta))
+    theta = 2 * np.pi * p
     return rotation_vector, theta
 
 
@@ -129,15 +130,10 @@ def mult_quaternions(Q1,Q2):
             x1*y0 - y1*x0 + z1*w0 +w1*z0])
 
 
-def simulate_symmetry(symmetry=4, I=1, k=4, r=1, iterations= 1000):
-    angle = (2*np.pi)/symmetry
-    k = [[np.cos(angle*i)*k, np.sin(angle*i)*k, 0] for i in range(symmetry)]
-    observed_int = np. zeros(shape=(iterations, symmetry*4))
-    for i in range(iterations):
-        rotation_vector, theta = random_rotation()
-        for j, speckle in enumerate(k):
-            s = sg(acc_voltage=200, rotation_vector=rotation_vector, theta=theta, k0=speckle)
-            observed_int[i, j*4] = I*shape_function(r=r, s=s)
-            observed_int[i, j * 4 +1] = I * shape_function(r=r, s=s)
 
-    return observed_int
+
+
+
+
+
+

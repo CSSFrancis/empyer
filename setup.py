@@ -22,6 +22,7 @@ setup(name='empyer',
                 'empyer.tests'],
       install_requires=['hyperspy >=1.3',
                         'numpy',
-                        'matplotlib'],
+                        'matplotlib',
+                        'scipy'],
       include_package_data=True,
       zip_safe=False)

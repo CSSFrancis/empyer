@@ -25,9 +25,9 @@ copyright = '2019, Carter Francis'
 author = 'Carter Francis'
 
 # The short X.Y version
-version = ''
+version = '0.170'
 # The full version, including alpha/beta/rc tags
-release = '.151'
+release = '.170'
 
 
 # -- General configuration ---------------------------------------------------

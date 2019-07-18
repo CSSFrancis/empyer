@@ -2,9 +2,8 @@ import numpy as np
 from empyer.misc.image import bin_2d
 
 
-def angular_correlation(r_theta_img, binning=1, cut_off=0, normalize=True):
+def angular_correlation(r_theta_img, mask=None, binning=1, cut_off=0, normalize=True):
     """A program that takes a 2d image and then preforms an angular correlation on the image.
-
     Parameters
     ----------
     r_theta_img: array_like
@@ -18,13 +17,12 @@ def angular_correlation(r_theta_img, binning=1, cut_off=0, normalize=True):
     normalize: bool
         Subtract <I(\theta)>^2 and divide by <I(\theta)>^2
     """
-    mask = None
     image = r_theta_img
-    if isinstance(image, np.ma.core.masked_array):
-        mask = np.ma.copy(np.ma.getmaskarray(image))
-        image[image.mask] = 0
+    if mask is not None:
+        image[mask] = 0
         if cut_off is not 0:
-            mask = mask[cut_off:len(image.mask), :]
+            mask = mask[cut_off:len(mask), :]
+
     if cut_off is not 0:
         image = image[cut_off:len(image), :]
 
@@ -34,7 +32,6 @@ def angular_correlation(r_theta_img, binning=1, cut_off=0, normalize=True):
             mask = bin_2d(mask, binning) != 0
 
     # fast method uses a FFT and is a process which is O(n) = n log(n)
-    # fft ignores masks..
     I_fft = np.fft.fft(image, axis=1)
     a = np.fft.ifft(I_fft * np.conjugate(I_fft), axis=1).real
     # this is to determine how many of the variables were non zero... This is really dumb.  but...
@@ -44,8 +41,10 @@ def angular_correlation(r_theta_img, binning=1, cut_off=0, normalize=True):
         mask_fft = np.fft.fft(mask_boolean, axis=1)
         number_unmasked = np.fft.ifft(mask_fft*np.conjugate(mask_fft), axis=1).real
         number_unmasked[number_unmasked == 0] = 1  # get rid of divide by zero error for completely masked rows
+        a = np.multiply(np.divide(a, number_unmasked), 720)
 
     if normalize:
+        print("normalizing")
         a_prime = np.zeros(np.shape(a))
         for i, row in enumerate(a):
             row_mean = np.mean(row)
@@ -55,8 +54,6 @@ def angular_correlation(r_theta_img, binning=1, cut_off=0, normalize=True):
                 normalized_row = np.divide(np.subtract(row, row_mean), row_mean)
             a_prime[i, :] = normalized_row
             a = a_prime
-    if mask is not None:
-        a[number_unmasked < 10] = 0
     return a
 
 

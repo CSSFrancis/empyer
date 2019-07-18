@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from empyer.misc.kernels import s_g_kernel, s_g_kern_toAng,get_wavelength, sg, shape_function,simulate_symmetry
+from empyer.misc.kernels import random_pattern, simulate_pattern, cartesian_to_ellipse
 
 
 class TestConvert(TestCase):
@@ -35,8 +36,3 @@ class TestConvert(TestCase):
         plt.plot([shape_function(1, (i/100)+.00001)for i in range(100)])
         plt.show()
 
-    def test_simulate_symmetry(self):
-        sim = simulate_symmetry(symmetry=6, iterations=10000)
-        power_sim = np.mean([np.fft.fft(s).real**2 for s in sim], axis=0)
-        plt.plot(power_sim)
-        plt.show()

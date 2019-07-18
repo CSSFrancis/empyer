@@ -1,5 +1,5 @@
 import numpy as np
-from empyer.signals.emsignal import EMSignal
+from empyer.signals.em_signal import EMSignal
 from empyer.signals.correlation_signal import CorrelationSignal
 from empyer.misc.angular_correlation import angular_correlation
 from empyer.misc.image import square
@@ -37,6 +37,7 @@ class PolarSignal(EMSignal):
         # TODO: Add the ability to cutoff like slicing (maybe use np.s)
         """Create a Correlation Signal from a numpy array.
 
+
         Parameters
         ----------
         binning_factor : int
@@ -52,12 +53,17 @@ class PolarSignal(EMSignal):
         """
         if isinstance(cut, float):
             cut = self.axes_manager.signal_axes[-3].value2index(cut)
-        correlation = self.map(angular_correlation,
-                               binning=binning_factor,
-                               cut_off=cut,
-                               normalize=normalize,
-                               inplace=False)
-        correlation.mask_where(condition=(correlation.data ==0))
+        if isinstance(self.data, np.ma.masked_array):
+            mask = np.reshape(self.data.mask, newshape=(-1, *reversed(self.axes_manager.signal_shape)))
+        else:
+            mask = None
+        correlation = self._map_iterate(angular_correlation,
+                                        iterating_kwargs=(('mask', mask),),
+                                        binning=binning_factor,
+                                        cut_off=cut,
+                                        normalize=normalize,
+                                        inplace=False)
+        correlation.mask_where(condition=(correlation.data == 0))
         passed_meta_data = self.metadata.as_dictionary()
         angular = CorrelationSignal(correlation, metadata=passed_meta_data)
         shift = cut // binning_factor

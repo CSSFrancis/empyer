@@ -5,7 +5,7 @@ import time
 import matplotlib.pyplot as plt
 
 from hyperspy.signals import Signal2D, BaseSignal
-from empyer.signals.emsignal import EMSignal
+from empyer.signals.em_signal import EMSignal
 import empyer as em
 
 

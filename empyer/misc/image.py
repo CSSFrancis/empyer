@@ -135,7 +135,7 @@ def create_grid(dimension1, dimension2):
     return a, b
 
 
-def ellipsoid_list_to_cartesian(r_list, theta_list, center, major, minor, angle, even_spaced=False):
+def ellipsoid_list_to_cartesian(r_list, theta_list, center, axes_lengths=None, angle=None):
     """Takes a list of ellipsoid points and then use then find their cartesian equivalent
 
     Parameters
@@ -146,14 +146,12 @@ def ellipsoid_list_to_cartesian(r_list, theta_list, center, major, minor, angle,
         list of all of the radius.  Can either be all values or even_spaced
     center: array_like
         center of the ellipsoid
-    major: float
+    lengths: float
         length of the major axis
     minor: float
         length of the minor axis
     angle: float
         angle of the major axis in radians
-    even_spaced: bool
-        if the values are even spaced.
 
     Returns
     ----------
@@ -162,33 +160,49 @@ def ellipsoid_list_to_cartesian(r_list, theta_list, center, major, minor, angle,
     y_list: array_like
         list of y points
     """
-    x_list = []
-    y_list = []
-    focii_ratio = minor / major
-    h_o = (1 / ((focii_ratio ** 2) + 1) ** 0.5)  # finding the major and minor axis lengths
-    k_o = (1 / ((focii_ratio ** -2) + 1) ** 0.5)
-    cos_angle = np.cos(angle)
-    sin_angle = np.sin(angle)
-    if even_spaced:
-        t_sin = [np.sin(t)for t in theta_list]
-        t_cos = [np.cos(t)for t in theta_list]
-        h_list = np.multiply(r_list, h_o)
-        k_list = np.multiply(r_list, k_o)
-        x_unrotated = [[h*tc - h*ts for ts, tc in zip(t_sin, t_cos)]for h in h_list]
-        y_unrotated = [[k*tc + k*ts for ts, tc in zip(t_sin, t_cos)] for k in k_list]
-        x_list = np.subtract(np.multiply(x_unrotated, cos_angle), np.multiply(y_unrotated, sin_angle))
-        x_list = np.add(x_list, center[0])
-        y_list = np.add(np.multiply(y_unrotated, cos_angle), np.multiply(x_unrotated, sin_angle))
-        y_list = np.add(y_list, center[1])
+
+    # Averaging the major and minor axes
+    if axes_lengths is not None:
+        axes_avg = sum(axes_lengths)/2
+        h_o = max(axes_lengths)/axes_avg  # major
+        k_o = min(axes_lengths)/axes_avg
     else:
-        for r, t in zip(r_list,theta_list):
-            h = h_o *r
-            k = k_o *r
-            x_unrotated = h*(np.cos(t)) - h*np.sin(t)
-            y_unrotated = k*(np.sin(t)) + k*np.cos(t)
-            #  need to rotate by the angle
-            x = center[0] + x_unrotated * cos_angle - y_unrotated * sin_angle
-            y = center[1]+y_unrotated*cos_angle + x_unrotated*sin_angle
-            x_list.append(x)
-            y_list.append(y)
-    return x_list, y_list
+        h_o = 1
+        k_o = 1
+    r_mat = np.mat(r_list)
+
+    # calculating points equally spaced annularly on a unit circle
+    t_sin = np.mat([np.sin(t)for t in theta_list])
+    t_cos = np.mat([np.cos(t)for t in theta_list])
+    # unit circle to ellipses at r spacing
+    x_circle = r_mat.transpose()*t_sin*h_o
+    y_circle = r_mat.transpose()*t_cos * k_o
+
+    if angle is not None:
+        # angle of rotation
+        cos_angle = np.cos(angle)
+        sin_angle = np.sin(angle)
+        x_list = x_circle*cos_angle - y_circle*sin_angle
+        x_list = np.add(x_list, center[0])
+        y_list = y_circle*cos_angle + x_circle*sin_angle
+        y_list = np.add(y_list, center[1])
+        return np.array(x_list), np.array(y_list)
+    else:
+        x_list = np.add(x_circle, center[0])
+        y_list = np.add(y_circle, center[1])
+        return np.array(x_list), np.array(y_list)
+
+
+def random_ellipse(num_points, center, foci, angle):
+    rand_angle = np.random.rand(num_points) * 2 * np.pi  # random points on a circle
+    points = [[(np.cos(ang) * foci[0]), np.sin(ang) * foci[1]] for ang in rand_angle]  # circle to ellipse
+    points = np.array([[round(x * np.cos(angle) - y * np.sin(angle) + center[0]),
+                       round(y * np.cos(angle) + x * np.sin(angle) + center[1])]  # rotating the ellipse
+                       for x, y in points], dtype=int)
+
+    return points
+
+
+def rotate(x, y, angle):
+    return x*np.cos(angle)-y*np.sin(angle), y*np.cos(angle)+x*np.sin(angle)
+

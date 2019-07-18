@@ -1,6 +1,6 @@
 import numpy as np
 
-from empyer.signals.emsignal import EMSignal
+from empyer.signals.em_signal import EMSignal
 
 
 class PowerSignal(EMSignal):

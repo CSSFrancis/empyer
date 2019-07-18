@@ -5,6 +5,11 @@
 
 Welcome to EMpyer's Documentation!
 ==================================
+WARNING! This project is still in beta, feel free to use the project as you wish,
+however, there are continuing changes being done to the codebase which may result in
+changes to programs which depend on the project.  Additionally there may be spots in the documentation
+where things are missing, and we are working to fill.
+
 Quick Start
 =======================
 .. toctree::
