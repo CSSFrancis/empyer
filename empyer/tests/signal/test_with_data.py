@@ -28,16 +28,16 @@ class TestDiffractionSignal(TestCase):
         ac = ps.autocorrelation(cut=50)
         ac.sum(axis=(0, 1)).isig[:, :7.0].plot()
         plt.show()
-        ac.get_summed_power_spectrum().isig[0:12, :7.0].plot(cmap='hot')
+        ac.get_summed_power_spectrum().isig[0:20, :7.0].plot(cmap='hot')
         plt.show()
         ps.sum(axis=(0, 1, 2)).plot()
         plt.show()
 
     def test_segmented_convert(self):
-        ps = self.d.calculate_polar_spectrum(radius=200, segments=5, phase_width=360)
+        ps = self.d.calculate_polar_spectrum(radius=[0,200], segments=2, phase_width=360)
         plt.show()
         ac = ps.autocorrelation()
-        ac.get_summed_power_spectrum().isig[0:12, 3.0:7.0].plot()
+        ac.get_summed_power_spectrum().isig[0:20, 3.0:7.0].plot()
         plt.show()
 
     def test_plot(self):

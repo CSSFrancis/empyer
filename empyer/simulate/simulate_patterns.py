@@ -33,6 +33,23 @@ def cartesian_to_ellipse(center, angle, lengths):
 
 
 def distort(image, center, angle, lengths):
+    """ Takes an image and distorts the image based on an elliptical distortion
+
+    Parameters
+    ---------------
+    image: array-like
+        The image to apply the elliptical distortion to
+    center: list
+        The center of the ellipse
+    angle: float
+        The angle of the major axis in radians
+    lengths: The lengths of the major and minor axis of the ellipse
+
+    Returns
+    ------------
+    distorted:array-like
+        The elliptically distorted image
+    """
     img_shape = np.shape(image)
     initial_y, initial_x = range(-center[1], img_shape[-2]-center[1]), range(-center[0], img_shape[-1]-center[0])
     spline = RectBivariateSpline(initial_x, initial_y, image, kx=1, ky=1)
@@ -42,6 +59,27 @@ def distort(image, center, angle, lengths):
 
 
 def simulate_symmetry(symmetry=4, I=1, k=4, r=1, iterations=1000):
+    """Simulates the intensities of some symmetry for a random rotation.
+
+    Assumes a spherical cluster of randius r and spots appearing at k and an Intensity of I (if the deviation parameter
+    "s" is zero)
+
+    Parameters
+    ---------------
+    symmetry: int
+        The symmetry of the clusters
+    I: float
+        Intensity with deviation parameter of zero
+    k: float
+        The inverse spacing of the clusters nm^-1
+    r: float
+        The radius of the cluster.
+
+    Returns
+    ------------
+    observed_int:list
+        The intensities of the speckles described.
+    """
     angle = (2*np.pi)/symmetry
     k = [[np.cos(angle*i)*k, np.sin(angle*i)*k, 0] for i in range(symmetry)]
     observed_int = np. zeros(shape=(iterations, symmetry*4))
@@ -55,6 +93,20 @@ def simulate_symmetry(symmetry=4, I=1, k=4, r=1, iterations=1000):
 
 
 def random_pattern(symmetry, k):
+    """Creates a random pattern of some symmetry at some k
+
+    Parameters
+    ---------------
+    symmetry: int
+        The symmetry of the cluster
+    k: float
+        The inverse spacing of the cluster nm^-1
+
+    Returns
+    ------------
+    k:array-like
+        The
+    """
     angle = (2*np.pi)/symmetry
     k = k # +np.random.randn()/10 # normal distribution about k
     k = [[np.cos(angle*i)*k, np.sin(angle*i)*k] for i in range(symmetry)]
