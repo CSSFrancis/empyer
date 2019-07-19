@@ -5,7 +5,7 @@ from empyer.misc.kernels import shape_function,sg,random_rotation
 
 
 def cartesian_to_ellipse(center, angle, lengths):
-    """ Converts a grid of points to equivalent elliptical points for a spline interpolation
+    """Converts a grid of points to equivalent elliptical points for a spline interpolation
 
     Parameters
     ---------------
@@ -33,7 +33,7 @@ def cartesian_to_ellipse(center, angle, lengths):
 
 
 def distort(image, center, angle, lengths):
-    """ Takes an image and distorts the image based on an elliptical distortion
+    """Takes an image and distorts the image based on an elliptical distortion
 
     Parameters
     ---------------

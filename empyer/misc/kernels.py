@@ -42,7 +42,6 @@ def s_g_kernel(kernel_size, d_hkl, cluster_size, voltage):
     dict0 = {'size': kernel_size, 'name': 's_x', 'units': 'nm^-1', 'scale': scaling, 'offset': 0}
     dict1 = {'size': kernel_size, 'name': 's_y', 'units': 'nm^-1', 'scale': scaling, 'offset': 0}
     k = hs.signals.Signal2D(data=kernel, axes=[dict0, dict1])
-
     return k
 
 
@@ -78,18 +77,14 @@ def sg(acc_voltage, rotation_vector, theta, k0=(4,0,0)):
     """
     Parameters
     ----------------
-    accelerating_voltage: int
+    acc_voltage: int
         In kV the voltage of the instrument for calculating Ewald's sphere
+    rotation_vector: list
+        The vector that the system is rotaed around
     theta: float
-        The
-    phi: float
-        The size of the cluster being calculated.
-    omega: float
-        The size of the cluster being calculated.
-    k: float
-        The k spacing for the speckle
-    r: float
-        The radius of the particle
+        The angle of rotation
+    k: tuple
+        The (x,y,z) of the original s value from the optic axis.
     """
     es_radius = 1/get_wavelength(acc_voltage)
 
