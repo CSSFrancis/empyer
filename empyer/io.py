@@ -127,8 +127,8 @@ def to_correlation_signal(signal=None):
     ax = signal.axes_manager.as_dictionary()
     ax = [ax[key]for key in ax]
     cs = CorrelationSignal(signal,
-                     metadata=signal.metadata.as_dictionary(),
-                     axes=ax)
+                           metadata=signal.metadata.as_dictionary(),
+                           axes=ax)
     return cs
 
 

@@ -4,7 +4,7 @@ from empyer.misc.ellipse_analysis import solve_ellipse
 from empyer.misc.cartesain_to_polar import convert
 from empyer.signals.em_signal import EMSignal
 from empyer.signals.polar_signal import PolarSignal
-from timeit import timeit
+
 
 class DiffractionSignal(EMSignal):
     """
@@ -132,7 +132,7 @@ class DiffractionSignal(EMSignal):
                     centers[s1:sp1, s2:sp2, :], lengths[s1:sp1, s2:sp2, :], angle[s1:sp1, s2:sp2] = solve_ellipse(self.inav[s1:sp1, s2:sp2].sum().data,num_points=num_points)
 
             ellip = (('center', np.reshape(centers, (-1, 2))),
-                     ('foci', np.reshape(lengths, (-1, 2))),
+                     ('lengths', np.reshape(lengths, (-1, 2))),
                      ('angle', np.reshape(angle, -1)))
             polar_signal = self._map_iterate(convert,
                                              iterating_kwargs=ellip,

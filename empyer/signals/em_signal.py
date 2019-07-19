@@ -1,6 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import os
 
 from hyperspy.signals import Signal2D
 from hyperspy.misc.slicing import SpecialSlicers

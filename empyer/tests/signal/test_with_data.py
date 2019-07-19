@@ -7,8 +7,8 @@ from empyer.misc.image import random_ellipse
 
 class TestDiffractionSignal(TestCase):
     def setUp(self):
-        #file = '/home/carter/Documents/ZrCuAl(HH)4-16-2018_175W_3.8mT_175C_25s(0.83nmpsec)/hdf5_files/12.55.42 Spectrum image_pos01.hdf5'
-        file = '/home/carter/Documents/ZrCuAl(HH)4-16-2018_175W_3.8mT_175C_25s(0.83nmpsec)/hdf5_files/13.08.24 Spectrum image_pos01-2.hdf5'
+        file = '/home/carter/Documents/ZrCuAl(HH)4-16-2018_175W_3.8mT_175C_25s(0.83nmpsec)/hdf5_files/12.55.42 Spectrum image_pos01.hdf5'
+        #file = '/home/carter/Documents/ZrCuAl(HH)4-16-2018_175W_3.8mT_175C_25s(0.83nmpsec)/hdf5_files/13.08.24 Spectrum image_pos01-2.hdf5'
         #file = '/Users/shaw/Shaw/data/FEM_Data/ZrCuAl(HH)3-28-2017_50W_3.8mT_170C_78s(0.24nmpsec)/hdf5_files/pos1-2.hdf5'
         self.d = load(file)
         self.d.mask_below(300)
@@ -22,20 +22,22 @@ class TestDiffractionSignal(TestCase):
         ellipse = self.d.metadata.Signal.Ellipticity
         points = random_ellipse(num_points=100, center=ellipse.center, angle=ellipse.angle, foci=ellipse.lengths)
         #self.d.data[:, :, points[:, 0], points[:, 1]] = 100000
-        ps = self.d.calculate_polar_spectrum(phase_width=720, radius=200)
-        ac = ps.autocorrelation()
-        ac.sum(axis=(0, 1)).isig[:, 2.5:7.0].plot()
+        ps = self.d.calculate_polar_spectrum(phase_width=720, radius=[0,200])
+        ps.inav[1,1].plot()
         plt.show()
-        ac.get_summed_power_spectrum().isig[0:12, 2.5:7.0].plot(cmap='hot')
+        ac = ps.autocorrelation(cut=50)
+        ac.sum(axis=(0, 1)).isig[:, :7.0].plot()
+        plt.show()
+        ac.get_summed_power_spectrum().isig[0:20, :7.0].plot(cmap='hot')
         plt.show()
         ps.sum(axis=(0, 1, 2)).plot()
         plt.show()
 
     def test_segmented_convert(self):
-        ps = self.d.calculate_polar_spectrum(radius=200, segments=5, phase_width=360)
+        ps = self.d.calculate_polar_spectrum(radius=[0,200], segments=2, phase_width=360)
         plt.show()
         ac = ps.autocorrelation()
-        ac.get_summed_power_spectrum().isig[0:12, 3.0:7.0].plot()
+        ac.get_summed_power_spectrum().isig[0:20, 3.0:7.0].plot()
         plt.show()
 
     def test_plot(self):
