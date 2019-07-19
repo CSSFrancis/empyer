@@ -46,6 +46,9 @@ def load(filenames=None,
         signal = to_em_signal(signal)
     if signal.metadata.Signal.signal_type == 'polar_signal':
         signal = to_polar_signal(signal)
+
+
+        
     if signal.metadata.Signal.signal_type == 'correlation_signal':
         signal = to_correlation_signal(signal)
     if signal.metadata.Signal.signal_type == 'power_signal':
