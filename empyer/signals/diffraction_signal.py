@@ -4,6 +4,7 @@ from empyer.misc.ellipse_analysis import solve_ellipse
 from empyer.misc.cartesain_to_polar import convert
 from empyer.signals.em_signal import EMSignal
 from empyer.signals.polar_signal import PolarSignal
+from hyperspy._signals.lazy import LazySignal
 
 
 class DiffractionSignal(EMSignal):
@@ -164,3 +165,11 @@ class DiffractionSignal(EMSignal):
                        scale=self.axes_manager[-1].scale,
                        units=self.axes_manager[-1].units)
         return polar
+
+
+class LazyDiffractionSignal(LazySignal, DiffractionSignal):
+
+    _lazy = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

@@ -4,6 +4,7 @@ from empyer.signals.correlation_signal import CorrelationSignal
 from empyer.misc.angular_correlation import angular_correlation
 from empyer.misc.image import square
 from hyperspy.utils import stack
+from hyperspy._signals.lazy import LazySignal
 
 
 class PolarSignal(EMSignal):
@@ -136,3 +137,10 @@ class PolarSignal(EMSignal):
 
         return int_vs_k
 
+
+class LazyEMSignal(LazySignal,PolarSignal):
+
+    _lazy = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

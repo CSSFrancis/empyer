@@ -63,8 +63,6 @@ class TestDiffractionSignal(TestCase):
         self.d.determine_ellipse()
         p = self.d.calculate_polar_spectrum()
         a = p.autocorrelation()
-
-
         a.get_summed_power_spectrum().isig[2, 3.25:5.5].plot()
         a2.get_summed_power_spectrum().isig[2, 3.25:5.5].plot()
         plt.show()

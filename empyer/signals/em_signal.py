@@ -2,6 +2,7 @@ import numpy as np
 
 from hyperspy.signals import Signal2D
 from hyperspy.misc.slicing import SpecialSlicers
+from hyperspy._signals.lazy import LazySignal
 
 
 class EMSignal(Signal2D):
@@ -319,3 +320,10 @@ class MaskPasser():
         self.signal.data.mask[self.slice][..., x_ind, y_ind] = not unmask
         return
 
+
+class LazyEMSignal(LazySignal,EMSignal):
+
+    _lazy = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

@@ -1,4 +1,5 @@
 from empyer.signals.em_signal import EMSignal
+from hyperspy._signals.lazy import LazySignal
 
 
 class PowerSignal(EMSignal):
@@ -68,3 +69,11 @@ class PowerSignal(EMSignal):
         else:
             sym_map = self.isig[k_region[0]:k_region[1], symmetry].sum(axis=[-1]).transpose()
         return sym_map
+
+
+class LazyEMSignal(LazySignal,PowerSignal):
+
+    _lazy = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
