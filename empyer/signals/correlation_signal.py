@@ -1,7 +1,7 @@
 from empyer.signals.em_signal import EMSignal
 from empyer.signals.power_signal import PowerSignal
 from empyer.misc.angular_correlation import power_spectrum
-
+from hyperspy._signals.lazy import LazySignal
 
 class CorrelationSignal(EMSignal):
     """Create a  Correlation Signal from a numpy array.
@@ -30,6 +30,12 @@ class CorrelationSignal(EMSignal):
     def __init__(self, *args, **kwargs):
         EMSignal.__init__(self, *args, **kwargs)
         self.metadata.set_item("Signal.type", "correlation_signal")
+
+    def as_lazy(self, *args, **kwargs):
+        res = super().as_lazy(*args, **kwargs)
+        res.__class__ = LazyCorrelationSignal
+        res.__init__(**res._to_dictionary())
+        return res
 
     def get_power_spectrum(self, method="FFT"):
         """
@@ -66,3 +72,11 @@ class CorrelationSignal(EMSignal):
         # TODO: Add in the ability to get the summed power spectrum over an axis.
         summed_pow = self.sum(axis=(0, 1))
         return summed_pow.get_power_spectrum()
+
+
+class LazyCorrelationSignal(LazySignal,CorrelationSignal):
+
+    _lazy = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

@@ -30,6 +30,12 @@ class PowerSignal(EMSignal):
         EMSignal.__init__(self, *args, **kwargs)
         self.metadata.set_item("Signal.type", "power_signal")
 
+    def as_lazy(self, *args, **kwargs):
+        res = super().as_lazy(*args, **kwargs)
+        res.__class__ = LazyPowerSignal
+        res.__init__(**res._to_dictionary())
+        return res
+
     def get_i_vs_k(self, symmetry=None):
         """ Get the intensity versus k for the summed diffraction patterns
 
@@ -71,7 +77,7 @@ class PowerSignal(EMSignal):
         return sym_map
 
 
-class LazyEMSignal(LazySignal,PowerSignal):
+class LazyPowerSignal(LazySignal,PowerSignal):
 
     _lazy = True
 

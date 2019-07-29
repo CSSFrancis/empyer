@@ -43,6 +43,12 @@ class EMSignal(Signal2D):
         self.masig = MaskSlicer(self, isNavigation=False)
         self.mask_passer= None
 
+    def as_lazy(self, *args, **kwargs):
+        res = super().as_lazy(*args, **kwargs)
+        res.__class__ = LazyEMSignal
+        res.__init__(**res._to_dictionary())
+        return res
+
     def add_haadf_intensities(self, intensity_array, slope, intercept):
         """Add High Angle Annular Dark Field intensities for each point.
 

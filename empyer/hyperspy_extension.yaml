@@ -4,58 +4,58 @@ signals:
     signal_dimension: 2
     dtype: real
     lazy: False
-    import: empyer.signals.em_signal
+    module: empyer.signals.em_signal
   LazyEMSignal:
     signal_type: "lazy_em_signal"
     signal_dimension: 2
     dtype: real
     lazy: True
-    import: empyer.signals.em_signal
+    module: empyer.signals.em_signal
   DiffractionSignal:
     signal_type: "diffraction_signal"
     signal_dimension: 2
     dtype: real
     lazy: False
-    import: empyer.signals.diffraction_signal
+    module: empyer.signals.diffraction_signal
   LazyDiffractionSignal:
     signal_type: "lazy_diffraction_signal"
     signal_dimension: 2
     dtype: real
     lazy: True
-    import: empyer.signals.diffraction_signal
+    module: empyer.signals.diffraction_signal
   PolarSignal:
     signal_type: "polar_signal"
     signal_dimension: 2
     dtype: real
     lazy: False
-    import: empyer.signals.polar_signal
+    module: empyer.signals.polar_signal
   LazyPolarSignal:
     signal_type: "lazy_polar_signal"
     signal_dimension: 2
     dtype: real
     lazy: True
-    import: empyer.signals.polar_signal
+    module: empyer.signals.polar_signal
   CorrelationSignal:
     signal_type: "correlation_signal"
     signal_dimension: 2
     dtype: real
     lazy: False
-    import: empyer.signals.correlation_signal
+    module: empyer.signals.correlation_signal
   LazyCorrelationSignal:
     signal_type: "lazy_correlation_signal"
     signal_dimension: 2
     dtype: real
     lazy: True
-    import: empyer.signals.correlation_signal
+    module: empyer.signals.correlation_signal
   PowerSignal:
     signal_type: "power_signal"
     signal_dimension: 2
     dtype: real
     lazy: False
-    import: empyer.signals.power_signal
+    module: empyer.signals.power_signal
   LazyPowerSignal:
     signal_type: "lazy_power_signal"
     signal_dimension: 2
     dtype: real
     lazy: True
-    import: empyer.signals.power_signal
+    module: empyer.signals.power_signal

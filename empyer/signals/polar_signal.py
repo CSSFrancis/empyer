@@ -34,6 +34,12 @@ class PolarSignal(EMSignal):
         EMSignal.__init__(self, *args, **kwargs)
         self.metadata.set_item("Signal.type", "polar_signal")
 
+    def as_lazy(self, *args, **kwargs):
+        res = super().as_lazy(*args, **kwargs)
+        res.__class__ = LazyPolarSignal
+        res.__init__(**res._to_dictionary())
+        return res
+
     def autocorrelation(self, binning_factor=1, cut=0, normalize=True):
         # TODO: Add the ability to cutoff like slicing (maybe use np.s)
         """Create a Correlation Signal from a numpy array.
@@ -138,7 +144,7 @@ class PolarSignal(EMSignal):
         return int_vs_k
 
 
-class LazyEMSignal(LazySignal,PolarSignal):
+class LazyPolarSignal(LazySignal,PolarSignal):
 
     _lazy = True
 

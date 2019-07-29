@@ -42,6 +42,12 @@ class DiffractionSignal(EMSignal):
         if not hasattr(self.metadata.Signal, 'type'):
             self.metadata.set_item("Signal.type", "diffraction_signal")
 
+    def as_lazy(self, *args, **kwargs):
+        res = super().as_lazy(*args, **kwargs)
+        res.__class__ = LazyDiffractionSignal
+        res.__init__(**res._to_dictionary())
+        return res
+
     def determine_ellipse(self, num_points=500, interactive=False, plot=False):
         # TODO: Identify if there needs to be a drift correction applied.
         # TODO: Exclude the zero beam if it isn't masked.
