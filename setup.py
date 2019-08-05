@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 from os import path
 from io import open
 
@@ -11,7 +11,7 @@ def readme():
 
 
 setup(name='empyer',
-      version='0.202hsReg',
+      version='0.203',
       description='Electron Microscopy tools for analyzing 4 and 5 dimensional STEM datasets',
       long_description=readme(),
       keywords='STEM Electron Microscopy Glass',
@@ -29,8 +29,9 @@ setup(name='empyer',
                         'matplotlib',
                         'scipy'],
       include_package_data=True,
-      package_data={  # Optional
-          'hspy_ext': ['hyperspy_extension.yaml'],
+      package_data={
+          'empyer': ["hyperspy_extension.yaml"],
       },
-      entry_points={'hyperspy.extensions': 'hspy_ext = hspy_ext'},
+      #  entry point is hyperspy.extensions, registering empyer as a
+      entry_points={'hyperspy.extensions': ['empyer = empyer']},
       zip_safe=False)

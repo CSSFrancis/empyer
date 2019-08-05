@@ -11,7 +11,7 @@ class DiffractionSignal(EMSignal):
     """
     The Diffraction Signal class extends the Hyperspy 2d signal class
     """
-    _signal_type = "diffraction_signal"
+    _signal_type = "DiffractionSignal"
 
     def __init__(self, *args, **kwargs):
         """Create a Diffraction Signal from a numpy array.
