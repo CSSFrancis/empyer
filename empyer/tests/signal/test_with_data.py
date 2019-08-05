@@ -10,7 +10,7 @@ class TestDiffractionSignal(TestCase):
         file = '/home/carter/Documents/ZrCuAl(HH)4-16-2018_175W_3.8mT_175C_25s(0.83nmpsec)/hdf5_files/12.55.42 Spectrum image_pos01.hdf5'
         #file = '/home/carter/Documents/ZrCuAl(HH)4-16-2018_175W_3.8mT_175C_25s(0.83nmpsec)/hdf5_files/13.08.24 Spectrum image_pos01-2.hdf5'
         #file = '/Users/shaw/Shaw/data/FEM_Data/ZrCuAl(HH)3-28-2017_50W_3.8mT_170C_78s(0.24nmpsec)/hdf5_files/pos1-2.hdf5'
-        self.d = load(file)
+        self.d = load(file, lazy=False)
         self.d.mask_below(300)
 
     def test_ellipse1(self):
@@ -21,7 +21,6 @@ class TestDiffractionSignal(TestCase):
         self.d.determine_ellipse(num_points=2000)
         ellipse = self.d.metadata.Signal.Ellipticity
         points = random_ellipse(num_points=100, center=ellipse.center, angle=ellipse.angle, foci=ellipse.lengths)
-        #self.d.data[:, :, points[:, 0], points[:, 1]] = 100000
         ps = self.d.calculate_polar_spectrum(phase_width=720, radius=[0,200])
         ps.inav[1,1].plot()
         plt.show()
@@ -65,10 +64,6 @@ class TestDiffractionSignal(TestCase):
         a = p.autocorrelation()
         a.get_summed_power_spectrum().isig[2, 3.25:5.5].plot()
         a2.get_summed_power_spectrum().isig[2, 3.25:5.5].plot()
-        plt.show()
-
-    def test_angular_correlation(self):
-        self.ac.plot()
         plt.show()
 
     def test_power(self):

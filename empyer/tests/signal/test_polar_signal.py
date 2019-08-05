@@ -41,3 +41,6 @@ class TestPolarSignal(TestCase):
         self.ps.plot()
         plt.show()
         self.ps.fem(version="rings")
+
+    def test_lazy(self):
+        print(self.ps.as_lazy())

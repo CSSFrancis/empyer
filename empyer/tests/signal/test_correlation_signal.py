@@ -23,3 +23,6 @@ class TestPolarSignal(TestCase):
         plt.show()
         sum_power.isig[6, 3.0:8.0].plot()
         plt.show()
+
+    def test_lazy(self):
+        print(self.ps.as_lazy())

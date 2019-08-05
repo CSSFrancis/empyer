@@ -26,3 +26,6 @@ class TestPowerSignal(TestCase):
         mapped.plot()
         plt.show()
         self.ps.get_map(symmetry=10)
+
+    def test_lazy(self):
+        print(self.ps.as_lazy())

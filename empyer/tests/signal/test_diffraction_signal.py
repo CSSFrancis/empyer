@@ -2,7 +2,7 @@ from unittest import TestCase
 import numpy as np
 
 from hyperspy.signals import Signal2D, BaseSignal
-from empyer.signals.diffraction_signal import DiffractionSignal
+from empyer.signals.diffraction_signal import DiffractionSignal, LazyDiffractionSignal
 import matplotlib.pyplot as plt
 from empyer.misc.image import random_ellipse
 import time
@@ -101,3 +101,11 @@ class TestSegmentedDiffractionSignal(TestCase):
         ps.inav[0, 1].plot()
         ps.inav[1, 1].plot()
         plt.show()
+
+    def test_lazy(self):
+        lazy = self.ds.as_lazy()
+        self.assertIsInstance(lazy, LazyDiffractionSignal)
+        lazy.determine_ellipse()
+        lazy.mask_below(10)
+        lazy.manav[2:4,1].mask_below(10)
+        lazy.calculate_polar_spectrum()
