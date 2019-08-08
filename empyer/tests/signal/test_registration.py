@@ -15,4 +15,4 @@ class TestRegisterSignal(TestCase):
     def testCasting(self):
         self.s.set_signal_type("DiffractionSignal")
         self.s.determine_ellipse()
-
+        print(hs.print_known_signal_types())

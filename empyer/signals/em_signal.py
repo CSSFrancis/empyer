@@ -139,6 +139,8 @@ class EMSignal(Signal2D):
         self.add_mask()
         print(value)
         print(self)
+        print(np.less(self.data, value))
+        print(self.data.mask)
         self.data.mask[self.data < value] = not unmask
 
     def mask_above(self, value, unmask=False):

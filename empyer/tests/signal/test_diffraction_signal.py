@@ -58,7 +58,7 @@ class TestDiffractionSignal(TestCase):
     def test_conversion_and_mask(self):
         self.ds.masig[240:260, 0:256] = True
         converted = self.ds.calculate_polar_spectrum(phase_width=720,
-                                                     radius=None,
+                                                     radius=[0,200],
                                                      parallel=False,
                                                      inplace=False)
         print("Centers: ", self.center, self.ds.metadata.Signal.Ellipticity.center)

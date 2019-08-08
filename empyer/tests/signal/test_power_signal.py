@@ -5,7 +5,6 @@ from hyperspy.signals import Signal2D
 from empyer.signals.power_signal import PowerSignal
 
 
-
 class TestPowerSignal(TestCase):
     def setUp(self):
         d = np.random.rand(10, 10, 720, 180)

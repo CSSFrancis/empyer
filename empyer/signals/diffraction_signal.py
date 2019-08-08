@@ -122,8 +122,8 @@ class DiffractionSignal(EMSignal):
                                     radius=radius,
                                     parallel=parallel,
                                     inplace=inplace,
-                                    show_progressbar=False,
-                                    ragged=False)
+                                    show_progressbar=False)
+            print(np.shape(polar_signal))
         else:
             len_of_segments = np.array(self.axes_manager.navigation_shape) // segments
             extra_len = np.array(self.axes_manager.navigation_shape) % segments
@@ -160,7 +160,7 @@ class DiffractionSignal(EMSignal):
             del(passed_meta_data['Signal']['Ellipticity'])
 
         polar = PolarSignal(polar_signal, metadata=passed_meta_data)
-        polar.mask_below(value=.00001)
+        polar.mask_below(value=-9)
 
         polar.axes_manager.navigation_axes = self.axes_manager.navigation_axes
         polar.set_axes(-2,

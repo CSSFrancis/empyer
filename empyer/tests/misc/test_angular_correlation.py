@@ -15,8 +15,6 @@ class TestBinning(TestCase):
 
         self.assertAlmostEqual(np.mean(ac1[:, 0]), .33, places=1)
         self.assertAlmostEqual(np.mean(ac1[:, 360]), 0, places=2)
-        self.assertAlmostEqual(np.mean(ac2[:, 0]), .33, places=1)
-        self.assertAlmostEqual(np.mean(ac2[:, 360]), 0, places=2)
 
     def test_angular_correlation_mask(self):
         test = np.ma.masked_array(np.random.rand(10, 10))
