@@ -97,7 +97,7 @@ class TestSegmentedDiffractionSignal(TestCase):
         self.ds = DiffractionSignal(self.s)
 
     def test_seg(self):
-        ps = self.ds.calculate_polar_spectrum(segments=5, num_points=120, radius=80)
+        ps = self.ds.calculate_polar_spectrum(segments=5, num_points=120, radius=[0, 80])
         ps.inav[0, 1].plot()
         ps.inav[1, 1].plot()
         plt.show()

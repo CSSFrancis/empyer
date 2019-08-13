@@ -170,6 +170,13 @@ class EMSignal(Signal2D):
         self.data.mask[condition] = True
         return
 
+    def mask_border(self, pixels=1):
+        self.add_mask()
+        self.data.mask[..., -pixels :] = True
+        self.data.mask[..., : pixels] = True
+        self.data.mask[..., : pixels, :] = True
+        self.data.mask[..., -pixels :, :] = True
+
     def add_mask(self):
         if not isinstance(self.data, np.ma.masked_array):
             self.data = np.ma.asarray(self.data)
@@ -199,7 +206,7 @@ class EMSignal(Signal2D):
         r = np.sqrt(x_ind ** 2 + y_ind ** 2)
         inside = r < radius
         x_ind, y_ind = x_ind[inside]+int(center[0]), y_ind[inside]+int(center[1])
-        self.data.mask[x_ind, y_ind] = True
+        self.data.mask[..., x_ind, y_ind] = True
         return
 
     def get_signal_axes_values(self):

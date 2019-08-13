@@ -113,7 +113,11 @@ class DiffractionSignal(EMSignal):
 
         if not self.metadata.Signal.Ellipticity.calibrated:
             self.determine_ellipse()
+        rag = None
+        if self._lazy:
+            rag = False
         if segments is None:
+            print(rag)
             polar_signal = self.map(convert,
                                     center=self.metadata.Signal.Ellipticity.center,
                                     angle=self.metadata.Signal.Ellipticity.angle,
@@ -147,7 +151,6 @@ class DiffractionSignal(EMSignal):
                                              parallel=parallel,
                                              inplace=inplace,
                                              show_progressbar=False,
-                                             ragged=False,
                                              radius=radius,
                                              phase_width=phase_width)
             print(polar_signal.inav[1, 1])

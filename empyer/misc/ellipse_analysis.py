@@ -133,6 +133,7 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
     print("The angle of rotation is:", angle)
     if plot:
         print("plotting")
+        plt.scatter(coords[0], coords[1])
         ellipse = Ellipse((center[1], center[0]), lengths[0] * 2, lengths[1] * 2, angle=angle, fill=False)
         fig = plt.figure()
         axe = fig.add_subplot(111)
