@@ -116,6 +116,8 @@ class DiffractionSignal(EMSignal):
         rag = None
         if self._lazy:
             rag = False
+        if radius[1] == -1:
+            radius[1] = int(min(np.subtract(self.axes_manager.signal_shape, self.metadata.Signal.Ellipticity.center))-1)
         if segments is None:
             print(rag)
             polar_signal = self.map(convert,
