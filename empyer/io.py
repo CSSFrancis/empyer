@@ -5,6 +5,8 @@ from .signals.polar_signal import PolarSignal
 from .signals.correlation_signal import CorrelationSignal
 from .signals.power_signal import PowerSignal
 
+# Depreciated after version 0.210
+
 
 def load(filenames=None,
          signal_type=None,

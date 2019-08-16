@@ -1,9 +1,11 @@
 **EMpyer**
 
 Empyer is an extension of the hyperspy_ package.  It provides additional functionality related to analyzing 4 and 5
-dimensional data sets.  Especially STEM diffraction patterns from metallic glasses.
+dimensional data sets.  Especially STEM diffraction patterns from metallic glasses. Now Empyer can be loaded just
+through loading hyperspy_.  That means that once you install EMpyer it will automatically register the new methods
+and signals with the hyperspy_ package.
 
-Documenation can be found hosted here_.
+Documentation can be found hosted here_.
 
 *Quick Start Guide:*
 
@@ -14,10 +16,10 @@ Documenation can be found hosted here_.
 
 .. code:: python
 
-    import empyer
+    import hyperspy.api as hs
     import matplotlib.pyplot as plt
 
-    dif_signal = empyer.load(file, signal_type ='diffraction_signal')
+    dif_signal = hs.load(file, signal_type ='diffraction_signal')
     dif_signal.plot()
     plt.show()
 

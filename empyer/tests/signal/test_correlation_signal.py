@@ -1,9 +1,6 @@
 from unittest import TestCase
-import numpy as np
 import matplotlib.pyplot as plt
 
-from hyperspy.signals import Signal2D
-from empyer.signals.correlation_signal import CorrelationSignal
 from empyer.io import load
 
 
