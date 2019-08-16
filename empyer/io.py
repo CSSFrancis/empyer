@@ -5,6 +5,8 @@ from .signals.polar_signal import PolarSignal
 from .signals.correlation_signal import CorrelationSignal
 from .signals.power_signal import PowerSignal
 
+# Depreciated after version 0.210
+
 
 def load(filenames=None,
          signal_type=None,
@@ -23,6 +25,7 @@ def load(filenames=None,
         The type of signal to be loaded. Can be read from file or given
     stack: bool
         Stack creates a new axis and loads a list of files into one signal
+    stack_axis:
     new_axis_name: str
         The name of the new axis created with stack
     lazy: bool
@@ -46,6 +49,9 @@ def load(filenames=None,
         signal = to_em_signal(signal)
     if signal.metadata.Signal.signal_type == 'polar_signal':
         signal = to_polar_signal(signal)
+
+
+
     if signal.metadata.Signal.signal_type == 'correlation_signal':
         signal = to_correlation_signal(signal)
     if signal.metadata.Signal.signal_type == 'power_signal':

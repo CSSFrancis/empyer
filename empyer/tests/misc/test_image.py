@@ -25,10 +25,8 @@ class TestConversions(TestCase):
         x, y = ellipsoid_list_to_cartesian(self.radii,
                                           self.thetas,
                                           center=[0,0],
-                                          major=20,
-                                          minor=10,
-                                          angle=np.pi/4,
-                                          even_spaced=True)
+                                          axes_lengths=[10,20],
+                                          angle=np.pi/4)
         plt.scatter(x, y)
         p = random_ellipse(num_points=100, center=[0,0], foci=[20,10], angle=np.pi/4)
         plt.scatter(p[:, 0], p[:, 1])

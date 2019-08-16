@@ -77,6 +77,8 @@ class TestEMSignal(TestCase):
         self.ds.add_hdaaf_intensities(np.random.normal(size=(8, 9)), 1.5, .1)
         print(self.ds.thickness_filter())
 
-
+    def test_lazy_signal(self):
+        lazy = self.ds.as_lazy()
+        print(lazy)
 
 

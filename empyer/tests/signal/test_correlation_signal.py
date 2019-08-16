@@ -1,9 +1,6 @@
 from unittest import TestCase
-import numpy as np
 import matplotlib.pyplot as plt
 
-from hyperspy.signals import Signal2D
-from empyer.signals.correlation_signal import CorrelationSignal
 from empyer.io import load
 
 
@@ -23,3 +20,6 @@ class TestPolarSignal(TestCase):
         plt.show()
         sum_power.isig[6, 3.0:8.0].plot()
         plt.show()
+
+    def test_lazy(self):
+        print(self.ps.as_lazy())

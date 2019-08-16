@@ -1,0 +1,61 @@
+signals:
+  EmSignal:
+    signal_type: "EMSignal"
+    signal_dimension: 2
+    dtype: real
+    lazy: False
+    module: empyer.signals.em_signal
+  LazyEMSignal:
+    signal_type: "LazyEMSignal"
+    signal_dimension: 2
+    dtype: real
+    lazy: True
+    module: empyer.signals.em_signal
+  DiffractionSignal:
+    signal_type: "DiffractionSignal"
+    signal_dimension: 2
+    dtype: real
+    lazy: False
+    module: empyer.signals.diffraction_signal
+  LazyDiffractionSignal:
+    signal_type: "LazyDiffractionSignal"
+    signal_dimension: 2
+    dtype: real
+    lazy: True
+    module: empyer.signals.diffraction_signal
+  PolarSignal:
+    signal_type: "PolarSignal"
+    signal_dimension: 2
+    dtype: real
+    lazy: False
+    module: empyer.signals.polar_signal
+  LazyPolarSignal:
+    signal_type: "LazyPolarSignal"
+    signal_dimension: 2
+    dtype: real
+    lazy: True
+    module: empyer.signals.polar_signal
+  CorrelationSignal:
+    signal_type: "CorrelationSignal"
+    signal_dimension: 2
+    dtype: real
+    lazy: False
+    module: empyer.signals.correlation_signal
+  LazyCorrelationSignal:
+    signal_type: "LazyCorrelationSignal"
+    signal_dimension: 2
+    dtype: real
+    lazy: True
+    module: empyer.signals.correlation_signal
+  PowerSignal:
+    signal_type: "PowerSignal"
+    signal_dimension: 2
+    dtype: real
+    lazy: False
+    module: empyer.signals.power_signal
+  LazyPowerSignal:
+    signal_type: "LazyPowerSignal"
+    signal_dimension: 2
+    dtype: real
+    lazy: True
+    module: empyer.signals.power_signal

@@ -1,4 +1,5 @@
 from empyer.signals.em_signal import EMSignal
+from hyperspy._signals.lazy import LazySignal
 
 
 class PowerSignal(EMSignal):
@@ -28,6 +29,12 @@ class PowerSignal(EMSignal):
         """
         EMSignal.__init__(self, *args, **kwargs)
         self.metadata.set_item("Signal.type", "power_signal")
+
+    def as_lazy(self, *args, **kwargs):
+        res = super().as_lazy(*args, **kwargs)
+        res.__class__ = LazyPowerSignal
+        res.__init__(**res._to_dictionary())
+        return res
 
     def get_i_vs_k(self, symmetry=None):
         """ Get the intensity versus k for the summed diffraction patterns
@@ -68,3 +75,11 @@ class PowerSignal(EMSignal):
         else:
             sym_map = self.isig[k_region[0]:k_region[1], symmetry].sum(axis=[-1]).transpose()
         return sym_map
+
+
+class LazyPowerSignal(LazySignal,PowerSignal):
+
+    _lazy = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

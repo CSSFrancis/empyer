@@ -2,7 +2,7 @@ from unittest import TestCase
 import numpy as np
 
 from hyperspy.signals import Signal2D, BaseSignal
-from empyer.signals.diffraction_signal import DiffractionSignal
+from empyer.signals.diffraction_signal import DiffractionSignal, LazyDiffractionSignal
 import matplotlib.pyplot as plt
 from empyer.misc.image import random_ellipse
 import time
@@ -58,7 +58,7 @@ class TestDiffractionSignal(TestCase):
     def test_conversion_and_mask(self):
         self.ds.masig[240:260, 0:256] = True
         converted = self.ds.calculate_polar_spectrum(phase_width=720,
-                                                     radius=None,
+                                                     radius=[0,200],
                                                      parallel=False,
                                                      inplace=False)
         print("Centers: ", self.center, self.ds.metadata.Signal.Ellipticity.center)
@@ -97,7 +97,15 @@ class TestSegmentedDiffractionSignal(TestCase):
         self.ds = DiffractionSignal(self.s)
 
     def test_seg(self):
-        ps = self.ds.calculate_polar_spectrum(segments=5, num_points=120, radius=80)
+        ps = self.ds.calculate_polar_spectrum(segments=5, num_points=120, radius=[0, 80])
         ps.inav[0, 1].plot()
         ps.inav[1, 1].plot()
         plt.show()
+
+    def test_lazy(self):
+        lazy = self.ds.as_lazy()
+        self.assertIsInstance(lazy, LazyDiffractionSignal)
+        lazy.determine_ellipse()
+        lazy.mask_below(10)
+        lazy.manav[2:4,1].mask_below(10)
+        lazy.calculate_polar_spectrum()

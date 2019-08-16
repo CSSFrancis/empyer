@@ -4,13 +4,14 @@ from empyer.misc.ellipse_analysis import solve_ellipse
 from empyer.misc.cartesain_to_polar import convert
 from empyer.signals.em_signal import EMSignal
 from empyer.signals.polar_signal import PolarSignal
+from hyperspy._signals.lazy import LazySignal
 
 
 class DiffractionSignal(EMSignal):
     """
     The Diffraction Signal class extends the Hyperspy 2d signal class
     """
-    _signal_type = "diffraction_signal"
+    _signal_type = "DiffractionSignal"
 
     def __init__(self, *args, **kwargs):
         """Create a Diffraction Signal from a numpy array.
@@ -40,6 +41,12 @@ class DiffractionSignal(EMSignal):
 
         if not hasattr(self.metadata.Signal, 'type'):
             self.metadata.set_item("Signal.type", "diffraction_signal")
+
+    def as_lazy(self, *args, **kwargs):
+        res = super().as_lazy(*args, **kwargs)
+        res.__class__ = LazyDiffractionSignal
+        res.__init__(**res._to_dictionary())
+        return res
 
     def determine_ellipse(self, num_points=500, interactive=False, plot=False):
         # TODO: Identify if there needs to be a drift correction applied.
@@ -106,7 +113,13 @@ class DiffractionSignal(EMSignal):
 
         if not self.metadata.Signal.Ellipticity.calibrated:
             self.determine_ellipse()
+        rag = None
+        if self._lazy:
+            rag = False
+        if radius[1] == -1:
+            radius[1] = int(min(np.subtract(self.axes_manager.signal_shape, self.metadata.Signal.Ellipticity.center))-1)
         if segments is None:
+            print(rag)
             polar_signal = self.map(convert,
                                     center=self.metadata.Signal.Ellipticity.center,
                                     angle=self.metadata.Signal.Ellipticity.angle,
@@ -116,6 +129,7 @@ class DiffractionSignal(EMSignal):
                                     parallel=parallel,
                                     inplace=inplace,
                                     show_progressbar=False)
+            print(np.shape(polar_signal))
         else:
             len_of_segments = np.array(self.axes_manager.navigation_shape) // segments
             extra_len = np.array(self.axes_manager.navigation_shape) % segments
@@ -139,7 +153,6 @@ class DiffractionSignal(EMSignal):
                                              parallel=parallel,
                                              inplace=inplace,
                                              show_progressbar=False,
-                                             ragged=False,
                                              radius=radius,
                                              phase_width=phase_width)
             print(polar_signal.inav[1, 1])
@@ -152,7 +165,7 @@ class DiffractionSignal(EMSignal):
             del(passed_meta_data['Signal']['Ellipticity'])
 
         polar = PolarSignal(polar_signal, metadata=passed_meta_data)
-        polar.mask_below(value=.00001)
+        polar.mask_below(value=-9)
 
         polar.axes_manager.navigation_axes = self.axes_manager.navigation_axes
         polar.set_axes(-2,
@@ -164,3 +177,11 @@ class DiffractionSignal(EMSignal):
                        scale=self.axes_manager[-1].scale,
                        units=self.axes_manager[-1].units)
         return polar
+
+
+class LazyDiffractionSignal(LazySignal, DiffractionSignal):
+
+    _lazy = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

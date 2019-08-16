@@ -2,6 +2,7 @@ import numpy as np
 
 from hyperspy.signals import Signal2D
 from hyperspy.misc.slicing import SpecialSlicers
+from hyperspy._signals.lazy import LazySignal
 
 
 class EMSignal(Signal2D):
@@ -41,6 +42,12 @@ class EMSignal(Signal2D):
         self.manav = MaskSlicer(self, isNavigation=True)
         self.masig = MaskSlicer(self, isNavigation=False)
         self.mask_passer= None
+
+    def as_lazy(self, *args, **kwargs):
+        res = super().as_lazy(*args, **kwargs)
+        res.__class__ = LazyEMSignal
+        res.__init__(**res._to_dictionary())
+        return res
 
     def add_haadf_intensities(self, intensity_array, slope, intercept):
         """Add High Angle Annular Dark Field intensities for each point.
@@ -132,6 +139,8 @@ class EMSignal(Signal2D):
         self.add_mask()
         print(value)
         print(self)
+        print(np.less(self.data, value))
+        print(self.data.mask)
         self.data.mask[self.data < value] = not unmask
 
     def mask_above(self, value, unmask=False):
@@ -160,6 +169,15 @@ class EMSignal(Signal2D):
         self.add_mask()
         self.data.mask[condition] = True
         return
+
+    def mask_border(self, pixels=1):
+        self.add_mask()
+        if isinstance(pixels, int):
+            pixels = (self.axes_manager.signal_axes[0].value2index(pixels))
+        self.data.mask[..., -pixels:] = True
+        self.data.mask[..., : pixels] = True
+        self.data.mask[..., : pixels, :] = True
+        self.data.mask[..., -pixels:, :] = True
 
     def add_mask(self):
         if not isinstance(self.data, np.ma.masked_array):
@@ -190,7 +208,7 @@ class EMSignal(Signal2D):
         r = np.sqrt(x_ind ** 2 + y_ind ** 2)
         inside = r < radius
         x_ind, y_ind = x_ind[inside]+int(center[0]), y_ind[inside]+int(center[1])
-        self.data.mask[x_ind, y_ind] = True
+        self.data.mask[..., x_ind, y_ind] = True
         return
 
     def get_signal_axes_values(self):
@@ -319,3 +337,10 @@ class MaskPasser():
         self.signal.data.mask[self.slice][..., x_ind, y_ind] = not unmask
         return
 
+
+class LazyEMSignal(LazySignal,EMSignal):
+
+    _lazy = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

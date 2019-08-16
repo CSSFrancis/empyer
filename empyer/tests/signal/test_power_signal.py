@@ -5,7 +5,6 @@ from hyperspy.signals import Signal2D
 from empyer.signals.power_signal import PowerSignal
 
 
-
 class TestPowerSignal(TestCase):
     def setUp(self):
         d = np.random.rand(10, 10, 720, 180)
@@ -26,3 +25,6 @@ class TestPowerSignal(TestCase):
         mapped.plot()
         plt.show()
         self.ps.get_map(symmetry=10)
+
+    def test_lazy(self):
+        print(self.ps.as_lazy())

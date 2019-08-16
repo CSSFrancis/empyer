@@ -13,7 +13,7 @@ class TestConvert(TestCase):
         self.lengths = np.random.rand(100, 2)*30+50
         self.lengths = [sorted(l, reverse=True) for l in self.lengths]
         self.angles = np.random.rand(100)*np.pi
-        self.rand_points = np.array([random_ellipse(num_points=400, center=self.center, foci=l, angle=a) for
+        self.rand_points = np.array([random_ellipse(num_points=600, center=self.center, foci=l, angle=a) for
                        l, a in zip(self.lengths, self.angles)])
         for i, rand_point in enumerate(self.rand_points):
             self.ellipse[i, rand_point[:, 0], rand_point[:, 1]] = 100
@@ -38,7 +38,7 @@ class TestConvert(TestCase):
             self.assertAlmostEqual(self.center[1], cen[1], places=-1)
             self.assertAlmostEqual(le[0], max(l), places=-1)
             self.assertAlmostEqual(le[1], min(l), places=-1)
-            self.assertAlmostEqual(a, an, places=1)
+            self.assertAlmostEqual(a, an, places=0)
 
     def test_solve_ellipse_mask(self):
         e = np.ma.masked_array(self.ellipse)
@@ -48,7 +48,7 @@ class TestConvert(TestCase):
         c, l, a = solve_ellipse(e, num_points=150)
         print("Centers: ", self.center, c)
         print("Lengths: ", self.lengths, l)
-        print("Angle: ", self.angle, a)
+        print("Angle: ", self.angles, a)
         self.assertAlmostEqual(c[0], self.center[0], places=-1)
         self.assertAlmostEqual(c[1], self.center[1], places=-1)
         self.assertAlmostEqual(l[0], max(self.lengths), places=-1)
