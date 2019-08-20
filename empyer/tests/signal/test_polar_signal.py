@@ -8,7 +8,7 @@ from empyer.signals.diffraction_signal import PolarSignal
 class TestPolarSignal(TestCase):
     def setUp(self):
         d = np.random.rand(10, 10, 200, 720)
-        d[:,:,50, 185] = 100
+        d[:, :, 50, 185] = 100
         d[:, :, 50, 365] = 100
         d[:, :, 50, 545] = 100
         d[:, :, 50, 5] = 100
@@ -27,6 +27,14 @@ class TestPolarSignal(TestCase):
         self.ps.masig[:, 0:20] = True
         self.ps.mask_above(value=40)
         ac = self.ps.autocorrelation()
+        ac.plot()
+        plt.show()
+        self.assertLess(ac.data[1, 1, 50, 180], 45)
+
+    def test_autocorrelation_mask(self):
+        self.ps.masig[:, 0:20] = True
+        self.ps.mask_above(value=40)
+        ac = self.ps.autocorrelation(cut=40.0)
         ac.plot()
         plt.show()
         self.assertLess(ac.data[1, 1, 50, 180], 45)

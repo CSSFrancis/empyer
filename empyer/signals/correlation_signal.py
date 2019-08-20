@@ -3,6 +3,7 @@ from empyer.signals.power_signal import PowerSignal
 from empyer.misc.angular_correlation import power_spectrum
 from hyperspy._signals.lazy import LazySignal
 
+
 class CorrelationSignal(EMSignal):
     """Create a  Correlation Signal from a numpy array.
 

@@ -48,7 +48,7 @@ class DiffractionSignal(EMSignal):
         res.__init__(**res._to_dictionary())
         return res
 
-    def determine_ellipse(self, num_points=500, interactive=False, plot=False):
+    def determine_ellipse(self, num_points=500, suspected_radius=None, interactive=False, plot=False):
         # TODO: Identify if there needs to be a drift correction applied.
         # TODO: Exclude the zero beam if it isn't masked.
         """Determine the elliptical nature of the diffraction pattern.
@@ -73,7 +73,8 @@ class DiffractionSignal(EMSignal):
         angle : float
             the angle of the major axes
         """
-
+        if isinstance(suspected_radius, float):
+            suspected_radius = self.axes_manager.signal_axes[-3].value2index(suspected_radius)
         center, lengths, angle = solve_ellipse(self.sum().data,
                                                num_points=num_points,
                                                interactive=interactive,
@@ -116,8 +117,12 @@ class DiffractionSignal(EMSignal):
         rag = None
         if self._lazy:
             rag = False
+        if isinstance(radius[0], float)or isinstance(radius[1], float):
+            radius[0] = self.axes_manager.signal_axes[-1].value2index(radius[0])
+            radius[1] = self.axes_manager.signal_axes[-1].value2index(radius[1])
         if radius[1] == -1:
             radius[1] = int(min(np.subtract(self.axes_manager.signal_shape, self.metadata.Signal.Ellipticity.center))-1)
+
         if segments is None:
             print(rag)
             polar_signal = self.map(convert,
