@@ -27,7 +27,7 @@ setup(name='empyer',
                         'numpy>=1.10,!=1.70.0',
                         'matplotlib',
                         'scipy'],
-      #include_package_data=True,
+      #  include_package_data=True, (this appearently breaks everything when you try to install the package :<)
       package_data={
           'empyer': ["hyperspy_extension.yaml"],
       },
