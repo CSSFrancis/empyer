@@ -1,4 +1,4 @@
-from hyperspy.api import load as hsload
+from hyperspy.io import load as hsload
 from .signals.em_signal import EMSignal
 from .signals.diffraction_signal import DiffractionSignal
 from .signals.polar_signal import PolarSignal
