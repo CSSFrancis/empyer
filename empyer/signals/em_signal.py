@@ -172,7 +172,7 @@ class EMSignal(Signal2D):
 
     def mask_border(self, pixels=1):
         self.add_mask()
-        if isinstance(pixels, int):
+        if not isinstance(pixels, int):
             pixels = (self.axes_manager.signal_axes[0].value2index(pixels))
         self.data.mask[..., -pixels:] = True
         self.data.mask[..., : pixels] = True
@@ -182,6 +182,10 @@ class EMSignal(Signal2D):
     def add_mask(self):
         if not isinstance(self.data, np.ma.masked_array):
             self.data = np.ma.asarray(self.data)
+            self.data.mask = False  # setting all values to unmasked
+
+    def reset_mask(self):
+        if isinstance(self.data, np.ma.masked_array):
             self.data.mask = False  # setting all values to unmasked
 
     def mask_circle(self, center, radius, unmask=False):
