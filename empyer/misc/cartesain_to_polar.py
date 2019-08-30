@@ -51,7 +51,7 @@ def convert(img, center=None, angle=None, lengths=None, radius=[0,100], phase_wi
     polar_img = np.reshape(polar_img, (int(radius[1]-radius[0]), phase_width))
 
     # outputting new mask
-    polar_img[polar_img < 0] = -10
+    polar_img[polar_img < -10] = -10
     return polar_img
 
 
