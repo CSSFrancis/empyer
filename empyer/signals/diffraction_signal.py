@@ -10,6 +10,7 @@ from hyperspy._signals.lazy import LazySignal
 class DiffractionSignal(EMSignal):
     """
     The Diffraction Signal class extends the Hyperspy 2d signal class
+    This class name should be changed....
     """
     _signal_type = "DiffractionSignal"
 
