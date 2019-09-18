@@ -1,6 +1,7 @@
 from empyer.signals.em_signal import EMSignal
 from hyperspy._signals.lazy import LazySignal
-
+from hyperspy.signals import Signal2D
+import numpy as np
 
 class PowerSignal(EMSignal):
     _signal_type = "power_signal"
@@ -72,8 +73,24 @@ class PowerSignal(EMSignal):
         """
         if symmetry is None:
             sym_map = self.isig[k_region[0]:k_region[1], :].sum(axis=[-1,-2]).transpose()
-        else:
+
+        elif isinstance(symmetry, int):
             sym_map = self.isig[k_region[0]:k_region[1], symmetry].sum(axis=[-1]).transpose()
+
+        else:
+            sym_map = Signal2D(data = np.zeros(self.axes_manager.navigation_shape))
+            for sym in symmetry:
+                sym_map = self.isig[k_region[0]:k_region[1], sym].sum(axis=[-1]).transpose() + sym_map
+
+
+        """
+        else:
+            x = isinstance(symmetry, int)
+            if x == True:
+                sym_map = self.isig[k_region[0]:k_region[1], symmetry].sum(axis=[-1]).transpose()
+            else:
+                sym_map = self.isig[k_region[0]:k_region[1], symmetry].sum(axis=[-1]).transpose()       
+        """
         return sym_map
 
 

@@ -20,7 +20,9 @@ class TestPowerSignal(TestCase):
         self.ps.get_i_vs_k(symmetry=[6])
 
     def test_get_map(self):
-        mapped = self.ps.get_map()
+        mapped = self.ps.get_map(k_region=[3.0, 6.0])
+        mapped = self.ps.get_map(k_region=[3.0, 6.0], symmetry=10)
+        mapped = self.ps.get_map(k_region=[3.0, 6.0], symmetry=[8, 9, 10])
         print(mapped)
         mapped.plot()
         plt.show()
