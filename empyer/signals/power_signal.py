@@ -51,8 +51,7 @@ class PowerSignal(EMSignal):
         if symmetry is None:
             i = self.isig[:, :].sum(axis=[0, 1, 2])
         else:
-            i = self.isig[:, symmetry].sum(axis=[0, 1, 2])
-
+            i = self.isig[symmetry, :].sum(axis=[0, 1])
         return i
 
     def get_map(self, k_region=[3.0, 6.0], symmetry=None):
@@ -71,7 +70,7 @@ class PowerSignal(EMSignal):
             2 dimensional map of from the power spectrum
         """
         if symmetry is None:
-            sym_map = self.isig[k_region[0]:k_region[1], :].sum(axis=[-1,-2]).transpose()
+            sym_map = self.isig[:, k_region[0]:k_region[1]].sum(axis=[-1,-2]).transpose()
         else:
             sym_map = self.isig[k_region[0]:k_region[1], symmetry].sum(axis=[-1]).transpose()
         return sym_map
