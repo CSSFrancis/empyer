@@ -34,10 +34,10 @@ In order to calculate angular correlations, start by loading a 4-D data set.
 
 .. code:: python
 
-    import empyer
+    import hyperspy.api as hs
     import matplotlib.pyplot as plt
 
-    dif_signal = empyer.load(file, signal_type ='diffraction_signal')
+    dif_signal = hs.load(file, signal_type ='diffraction_signal')
 
     # adding a mask to the signal for to block the beam stop
     dif_signal.mask_below(.1)
@@ -49,3 +49,5 @@ In order to calculate angular correlations, start by loading a 4-D data set.
     ang_signal = polar_signal.autocorrelation()
     pow_signal = ang_signal.get_power_spectrum()
 
+.. image:: PolarSpectum.png
+    :width: 600

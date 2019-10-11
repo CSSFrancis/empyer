@@ -5,7 +5,7 @@ from matplotlib.patches import Ellipse
 from empyer.misc.cartesain_to_polar import convert
 
 
-def solve_ellipse(img, interactive=False, num_points=500, plot=False):
+def solve_ellipse(img, interactive=False, num_points=500, plot=False, suspected_radius=None):
     """Takes a 2-d array and allows you to solve for the equivalent ellipse. Everything is done in array coord.
 
     Fitzgibbon, A. W., Fisher, R. B., Hill, F., & Eh, E. (1999). Direct Least Squres Fitting of Ellipses.
@@ -116,14 +116,7 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False):
     #  non-interactive, works better if there is an intense ring
     # TODO: Make method more robust with respect to obviously wrong points
     else:
-        i_shape = np.shape(img)
-        flattened_array = img.flatten()
-        indexes = np.argsort(flattened_array)
-        if isinstance(flattened_array, np.ma.masked_array):
-            indexes = indexes[flattened_array.mask[indexes] == False]
-        # take top 5000 points make sure exclude zero beam
-        coords[0] = np.floor_divide(indexes[-num_points:], i_shape[1])  # x axis (row)
-        coords[1] = np.remainder(indexes[-num_points:], i_shape[1]) # y axis (col)
+        coords = get_max_positions(img, num_points=num_points, radius=suspected_radius)
     a = fit_ellipse(np.array(coords[0]), np.array(coords[1]))
     center = ellipse_center(a)  # (x,y)
     lengths = ellipse_axis_length(a)
@@ -181,3 +174,20 @@ def advanced_solve_ellipse(img, center, lengths, angle, phase_width, radius, num
 
 def invcot(val):
     return (np.pi/2) - np.arctan(val)
+
+
+def get_max_positions(image, num_points=None, radius=None):
+    i_shape = np.shape(image)
+    flattened_array = image.flatten()
+    indexes = np.argsort(flattened_array)
+
+    if isinstance(flattened_array, np.ma.masked_array):
+        indexes = indexes[flattened_array.mask[indexes] == False]
+    if radius is not None:
+        center = [np.floor_divide(np.mean(indexes[-num_points:]), i_shape[1]),
+                  np.remainder(np.mean(indexes[-num_points:]), i_shape[1])]
+        print(center)
+    # take top 5000 points make sure exclude zero beam
+    cords = [np.floor_divide(indexes[-num_points:], i_shape[1]),
+             np.remainder(indexes[-num_points:], i_shape[1])]  # [x axis (row),y axis (col)]
+    return cords

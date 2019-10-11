@@ -1,6 +1,6 @@
 from unittest import TestCase
 import numpy as np
-from empyer.misc.ellipse_analysis import solve_ellipse
+from empyer.misc.ellipse_analysis import solve_ellipse, get_max_positions
 from empyer.misc.cartesain_to_polar import convert
 from empyer.misc.image import random_ellipse
 import matplotlib.pyplot as plt
@@ -8,22 +8,28 @@ import matplotlib.pyplot as plt
 
 class TestConvert(TestCase):
     def setUp(self):
-        self.ellipse = np.random.rand(100, 200, 200)
+        self.ellipse = np.random.rand(100, 200, 200)*90
         self.center = [110, 100]
         self.lengths = np.random.rand(100, 2)*30+50
         self.lengths = [sorted(l, reverse=True) for l in self.lengths]
         self.angles = np.random.rand(100)*np.pi
-        self.rand_points = np.array([random_ellipse(num_points=600, center=self.center, foci=l, angle=a) for
+        self.rand_points = np.array([random_ellipse(num_points=1000, center=self.center, foci=l, angle=a) for
                        l, a in zip(self.lengths, self.angles)])
         for i, rand_point in enumerate(self.rand_points):
             self.ellipse[i, rand_point[:, 0], rand_point[:, 1]] = 100
-        self.ellipse = np.random.poisson(self.ellipse)
+        self.ellipse = np.random.poisson(self.ellipse / 100 * 10 / 10 * 100)
+
+    def test_get_max_coords(self):
+        plt.imshow(self.ellipse[0,:,:])
+        c = get_max_positions(image=self.ellipse[0,:,:],radius=100, num_points=500)
+        plt.scatter(c[0], c[1])
+        plt.show()
 
     def test_solve_one_ellipse(self):
         e = self.ellipse[0, :, :]
         l = self.lengths[0]
         a = self.angles[0]
-        solve_ellipse(e, num_points=100)
+        solve_ellipse(e, num_points=1000)
         print("Length: ", l, "Angle: ", a)
 
     def test_solve_ellipse(self):

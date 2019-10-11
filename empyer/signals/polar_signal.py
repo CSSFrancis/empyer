@@ -59,18 +59,16 @@ class PolarSignal(EMSignal):
 
         """
         if isinstance(cut, float):
-            cut = self.axes_manager.signal_axes[-3].value2index(cut)
+            cut = self.axes_manager.signal_axes[1].value2index(cut)
+        self.add_mask()
         if isinstance(self.data, np.ma.masked_array):
             mask = np.reshape(self.data.mask, newshape=(-1, *reversed(self.axes_manager.signal_shape)))
-        else:
-            mask = None
         correlation = self._map_iterate(angular_correlation,
                                         iterating_kwargs=(('mask', mask),),
                                         binning=binning_factor,
                                         cut_off=cut,
                                         normalize=normalize,
                                         inplace=False)
-        correlation.mask_where(condition=(correlation.data == 0))
         passed_meta_data = self.metadata.as_dictionary()
         angular = CorrelationSignal(correlation, metadata=passed_meta_data)
         shift = cut // binning_factor

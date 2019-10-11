@@ -7,11 +7,10 @@ from empyer.signals.diffraction_signal import PolarSignal
 
 class TestPolarSignal(TestCase):
     def setUp(self):
-        d = np.random.rand(10, 10, 200, 720)
-        d[:,:,50, 185] = 100
-        d[:, :, 50, 365] = 100
-        d[:, :, 50, 545] = 100
-        d[:, :, 50, 5] = 100
+        d = np.ones(shape=(5, 5, 20, 90))
+        d[:, :, 5, 15] = 100
+        d[:, :, 5, 45] = 100
+        d[:, :, 5, 75] = 100  # setting up three-fold symmetry
         self.s = Signal2D(d)
         self.ps = PolarSignal(self.s)
         self.ps.set_axes(2,
@@ -21,18 +20,17 @@ class TestPolarSignal(TestCase):
 
     def test_autocorrelation(self):
         ac = self.ps.autocorrelation()
-        self.assertGreater(ac.data[1, 1, 50, 180],45)
+        self.assertGreater(ac.data[1, 1, 5, 30], 17)
+        self.assertLess(ac.data[1, 1, 5, 29], .1)
 
     def test_autocorrelation_mask(self):
-        self.ps.masig[:, 0:20] = True
-        self.ps.mask_above(value=40)
+        self.ps.mask_below(value=40)
         ac = self.ps.autocorrelation()
-        ac.plot()
-        plt.show()
-        self.assertLess(ac.data[1, 1, 50, 180], 45)
+        self.assertEqual(ac.data[1, 1, 1, 1], 0)
 
     def test_fem(self):
         self.ps.fem(version='omega')
+        self.ps.
         self.ps.fem(version='rings')
 
     def test_fem_with_filter(self):

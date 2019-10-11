@@ -24,3 +24,5 @@ class TestConvert(TestCase):
         even = np.sum(conversion, axis=0)
         self.assertLess((s > max(s)/2).sum(), 4)
 
+
+

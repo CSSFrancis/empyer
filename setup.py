@@ -11,7 +11,7 @@ def readme():
 
 
 setup(name='empyer',
-      version='0.210',
+      version='0.226',
       description='Electron Microscopy tools for analyzing 4 and 5 dimensional STEM datasets',
       long_description=readme(),
       keywords='STEM Electron Microscopy Glass',
@@ -22,13 +22,12 @@ setup(name='empyer',
       packages=['empyer',
                 'empyer.misc',
                 'empyer.signals',
-                'empyer.simulate',
-                'empyer.tests'],
-      install_requires=['hyperspy >=1.3',
+                'empyer.simulate'],
+      install_requires=['hyperspy >=1.5',
                         'numpy>=1.10,!=1.70.0',
                         'matplotlib',
                         'scipy'],
-      include_package_data=True,
+      #  include_package_data=True, (this appearently breaks everything when you try to install the package :<)
       package_data={
           'empyer': ["hyperspy_extension.yaml"],
       },

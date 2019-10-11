@@ -1,5 +1,9 @@
 from empyer.signals.em_signal import EMSignal
 from hyperspy._signals.lazy import LazySignal
+from hyperspy.signals import Signal2D, Signal1D
+from hyperspy.drawing.utils import plot_images
+
+import numpy as np
 
 
 class PowerSignal(EMSignal):
@@ -50,13 +54,18 @@ class PowerSignal(EMSignal):
         """
         if symmetry is None:
             i = self.isig[:, :].sum(axis=[0, 1, 2])
-        else:
-            i = self.isig[:, symmetry].sum(axis=[0, 1, 2])
 
+        elif isinstance(symmetry, int):
+            i = self.isig[symmetry, :].sum()
+            print(i)
+
+        else:
+            i = Signal1D(data=np.zeros(self.axes_manager.signal_shape[1]))
+            for sym in symmetry:
+               i = self.isig[sym, :].sum() + i
         return i
 
     def get_map(self, k_region=[3.0, 6.0], symmetry=None):
-        # TODO: symmetry is still broken :/ I don't know why it doesn't like using arrays to slice....
         """Creates a 2 dimensional map of from the power spectrum.
 
         Parameters
@@ -71,13 +80,24 @@ class PowerSignal(EMSignal):
             2 dimensional map of from the power spectrum
         """
         if symmetry is None:
-            sym_map = self.isig[k_region[0]:k_region[1], :].sum(axis=[-1,-2]).transpose()
+            sym_map = self.isig[:, k_region[0]:k_region[1]].sum(axis=[-1, -2]).transpose()
+
+        elif isinstance(symmetry, int):
+            sym_map = self.isig[symmetry, k_region[0]:k_region[1]].sum(axis=[-1]).transpose()
+
         else:
-            sym_map = self.isig[k_region[0]:k_region[1], symmetry].sum(axis=[-1]).transpose()
+            sym_map = Signal2D(data=np.zeros(self.axes_manager.navigation_shape))
+            for sym in symmetry:
+                sym_map = self.isig[sym, k_region[0]:k_region[1]].sum(axis=[-1]).transpose() + sym_map
         return sym_map
 
+    def plot_even_symmetries(self, k_region=[3.0, 6.0], *args, **kwargs):
+        summed = [self.get_map(k_region=k_region)]
+        maps = summed + [self.get_map(k_region=k_region, symmetry=i) for i in range(2, 11, 2)]
+        plot_images(images=maps, label=["summed", "2-Fold", "4-Fold", "6-Fold", "8-Fold", "10-Fold"], *args, **kwargs)
 
-class LazyPowerSignal(LazySignal,PowerSignal):
+
+class LazyPowerSignal(LazySignal, PowerSignal):
 
     _lazy = True
 
