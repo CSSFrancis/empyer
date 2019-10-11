@@ -49,5 +49,5 @@ In order to calculate angular correlations, start by loading a 4-D data set.
     ang_signal = polar_signal.autocorrelation()
     pow_signal = ang_signal.get_power_spectrum()
 
-.. image:: PolarSpectum.png
+.. image:: _static/PolarSpectum.png
     :width: 600
