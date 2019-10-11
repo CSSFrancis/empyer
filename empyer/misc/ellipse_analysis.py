@@ -116,7 +116,7 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False, suspected_
     #  non-interactive, works better if there is an intense ring
     # TODO: Make method more robust with respect to obviously wrong points
     else:
-        coords = get_max_positions(img, num_points=num_points,radius=suspected_radius)
+        coords = get_max_positions(img, num_points=num_points, radius=suspected_radius)
     a = fit_ellipse(np.array(coords[0]), np.array(coords[1]))
     center = ellipse_center(a)  # (x,y)
     lengths = ellipse_axis_length(a)
