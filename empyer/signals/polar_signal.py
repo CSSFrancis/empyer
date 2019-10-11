@@ -69,7 +69,6 @@ class PolarSignal(EMSignal):
                                         cut_off=cut,
                                         normalize=normalize,
                                         inplace=False)
-        correlation.mask_where(condition=(correlation.data == 0))
         passed_meta_data = self.metadata.as_dictionary()
         angular = CorrelationSignal(correlation, metadata=passed_meta_data)
         shift = cut // binning_factor

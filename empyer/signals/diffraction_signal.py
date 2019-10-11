@@ -10,6 +10,7 @@ from hyperspy._signals.lazy import LazySignal
 class DiffractionSignal(EMSignal):
     """
     The Diffraction Signal class extends the Hyperspy 2d signal class
+    This class name should be changed....
     """
     _signal_type = "DiffractionSignal"
 
@@ -124,7 +125,6 @@ class DiffractionSignal(EMSignal):
             radius[1] = int(min(np.subtract(self.axes_manager.signal_shape, self.metadata.Signal.Ellipticity.center))-1)
 
         if segments is None:
-            print(rag)
             polar_signal = self.map(convert,
                                     center=self.metadata.Signal.Ellipticity.center,
                                     angle=self.metadata.Signal.Ellipticity.angle,
@@ -134,7 +134,6 @@ class DiffractionSignal(EMSignal):
                                     parallel=parallel,
                                     inplace=inplace,
                                     show_progressbar=False)
-            print(np.shape(polar_signal))
         else:
             len_of_segments = np.array(self.axes_manager.navigation_shape) // segments
             extra_len = np.array(self.axes_manager.navigation_shape) % segments
@@ -160,8 +159,6 @@ class DiffractionSignal(EMSignal):
                                              show_progressbar=False,
                                              radius=radius,
                                              phase_width=phase_width)
-            print(polar_signal.inav[1, 1])
-
             print("done")
 
 

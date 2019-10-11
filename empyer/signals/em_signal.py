@@ -41,7 +41,7 @@ class EMSignal(Signal2D):
         Signal2D.__init__(self, *args, **kwargs)
         self.manav = MaskSlicer(self, isNavigation=True)
         self.masig = MaskSlicer(self, isNavigation=False)
-        self.mask_passer= None
+        self.mask_passer = None
 
     def as_lazy(self, *args, **kwargs):
         res = super().as_lazy(*args, **kwargs)
