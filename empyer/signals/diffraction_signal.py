@@ -86,6 +86,33 @@ class DiffractionSignal(EMSignal):
         self.metadata.set_item("Signal.Ellipticity.calibrated", True)
         return center, lengths, angle
 
+    def get_darkfield_image(self, position, radius = 0.5):
+        """Creates a dark-field image from an artifical appature at some position with some radius. Allows for decimial
+        spacing.
+
+        Parameters
+        ------------------
+        position :  tuple
+            The position of the circle to create the darkfield image
+        radius : float
+            The radius of the circle for the dark-field image
+
+        Returns
+        ----------
+        darkfield_image: Signal2D
+        """
+        if isinstance(radius, float):
+            radius = self.axes_manager.signal_axes[-1].value2index(radius)
+        if isinstance(position[0], float) or isinstance(position[1], float):
+            position[0] = self.axes_manager.signal_axes[-1].value2index(position[0])
+            position[1] = self.axes_manager.signal_axes[-1].value2index(position[1])
+        x_ind, y_ind = np.meshgrid(range(-radius, radius + 1), range(-radius, radius + 1))
+        r = np.sqrt(x_ind ** 2 + y_ind ** 2)
+        inside = r < radius
+        x_ind, y_ind = x_ind[inside]+int(position[0]), y_ind[inside]+int(position[1])
+        # need to update Hyperspy with the ability to use boolean arrays to slice and image.
+
+        return darkfield_image
     def calculate_polar_spectrum(self,
                                  phase_width=720,
                                  radius=[0, -1],

@@ -85,6 +85,10 @@ class PolarSignal(EMSignal):
                          offset=offset)
         return angular
 
+    def correlation_lengths(self):
+        """Calculates the average correlation length across the sample 
+        """
+
     def fem(self, version="omega"):
         """Calculated the variance among some image
 
