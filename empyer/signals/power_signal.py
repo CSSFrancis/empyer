@@ -91,10 +91,11 @@ class PowerSignal(EMSignal):
                 sym_map = self.isig[sym, k_region[0]:k_region[1]].sum(axis=[-1]).transpose() + sym_map
         return sym_map
 
-    def plot_even_symmetries(self, k_region=[3.0, 6.0], *args, **kwargs):
+    def plot_symmetries(self,symmetries=[2,4,6,8,10], k_region=[3.0, 6.0], *args, **kwargs):
         summed = [self.get_map(k_region=k_region)]
-        maps = summed + [self.get_map(k_region=k_region, symmetry=i) for i in range(2, 11, 2)]
-        plot_images(images=maps, label=["summed", "2-Fold", "4-Fold", "6-Fold", "8-Fold", "10-Fold"], *args, **kwargs)
+        maps = summed + [self.get_map(k_region=k_region, symmetry=i) for i in symmetries]
+        l = ["summed"] + [str(i) +"-fold" for i in symmetries]
+        plot_images(images=maps, label=l, *args, **kwargs)
 
 
 class LazyPowerSignal(LazySignal, PowerSignal):
