@@ -113,6 +113,7 @@ class DiffractionSignal(EMSignal):
         # need to update Hyperspy with the ability to use boolean arrays to slice and image.
 
         return darkfield_image
+
     def calculate_polar_spectrum(self,
                                  phase_width=720,
                                  radius=[0, -1],
