@@ -59,10 +59,19 @@ def angular_correlation(r_theta_img, mask=None, binning=1, cut_off=0, normalize=
 
 
 def power_spectrum(correlation, method="FFT"):
-    """
-    :param correlation: Taking the FFT of the angular correlation to find the symmetry present
-    :param method: Right now this doesn't actually do anything but I want to add in other methods.
-    :return: pow_spectrum: The resulting power spectrum from the angular correlation.  Gives indexes 0-180.
+    """Take the power spectrum for some correlation.  Takes the FFT of the correlation
+
+    Parameters
+    --------------
+    correlation: array-like
+        Taking the FFT of the angular correlation to find the symmetry present
+    method: str ("FFT")
+        Right now this doesn't actually do anything but I want to add in other methods.
+
+    Returns
+    -----------
+    pow_spectrum: array-like
+        The resulting power spectrum from the angular correlation.  Gives indexes 0-180.
     """
 
     if method is "FFT":
@@ -72,7 +81,12 @@ def power_spectrum(correlation, method="FFT"):
 
 
 def get_S_Q(r_theta_img, plot=False):
+    """Get the S of Q for the images.
 
+    Parameters
+    ------------
+    r_theta_img:
+    """
     # TODO: add in what the physical r is for the function...
 
     S_Q = [np.nansum(r) for r in r_theta_img]

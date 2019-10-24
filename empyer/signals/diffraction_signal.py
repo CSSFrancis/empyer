@@ -44,6 +44,8 @@ class DiffractionSignal(EMSignal):
             self.metadata.set_item("Signal.type", "diffraction_signal")
 
     def as_lazy(self, *args, **kwargs):
+        """Returns the signal as a lazy signal.
+        """
         res = super().as_lazy(*args, **kwargs)
         res.__class__ = LazyDiffractionSignal
         res.__init__(**res._to_dictionary())
@@ -86,7 +88,7 @@ class DiffractionSignal(EMSignal):
         self.metadata.set_item("Signal.Ellipticity.calibrated", True)
         return center, lengths, angle
 
-    def get_darkfield_image(self, position, radius = 0.5):
+    def get_darkfield_image(self, position, radius=0.5):
         """Creates a dark-field image from an artifical appature at some position with some radius. Allows for decimial
         spacing.
 

@@ -33,6 +33,8 @@ class CorrelationSignal(EMSignal):
         self.metadata.set_item("Signal.type", "correlation_signal")
 
     def as_lazy(self, *args, **kwargs):
+        """Returns the signal as a lazy signal.
+        """
         res = super().as_lazy(*args, **kwargs)
         res.__class__ = LazyCorrelationSignal
         res.__init__(**res._to_dictionary())
@@ -70,6 +72,8 @@ class CorrelationSignal(EMSignal):
         return power
 
     def get_summed_power_spectrum(self):
+        """Returns the power spectrum from the summed correlation signal.
+        """
         # TODO: Add in the ability to get the summed power spectrum over an axis.
         summed_pow = self.sum(axis=(0, 1))
         return summed_pow.get_power_spectrum()
