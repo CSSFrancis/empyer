@@ -1,11 +1,7 @@
 import hyperspy.api as hs
 import numpy as np
 import random
-
-from empyer.misc.angular_correlation import angular_correlation
-from scipy.interpolate import RectBivariateSpline
 import matplotlib.pyplot as plt
-
 
 def s_g_kernel(kernel_size, d_hkl, cluster_size, voltage):
     """
@@ -62,14 +58,16 @@ def atomic_displacement_kernel(kernel_size, displacement_factor):
 
 
 # Functions for simulating rotations
-def random_rotation():
-    u = random.uniform(0, 1)
-    v = random.uniform(0, 1)
-    p = random.uniform(0, 1)
-    alpha = 2 * np.pi * u
-    beta = np.arccos(2 * v -1)
-    rotation_vector = (np.cos(alpha)*np.sin(beta), np.sin(beta), np.sin(alpha)*np.cos(beta))
-    theta = 2 * np.pi * p
+def random_rotation(acceptable_rotation_vectors=None):
+    if not acceptable_rotation_vectors:
+        u = random.uniform(0, 1)
+        v = random.uniform(0, 1)
+        p = random.uniform(0, 1)
+        alpha = 2 * np.pi * u
+        beta = np.arccos(2 * v -1)
+        rotation_vector = (np.cos(alpha)*np.sin(beta), np.sin(beta), np.sin(alpha)*np.cos(beta))
+        theta = 2 * np.pi * p
+    else:
     return rotation_vector, theta
 
 
@@ -124,6 +122,17 @@ def mult_quaternions(Q1,Q2):
             -x1*z0 + y1*w0 + z1*x0 + w1*y0,
             x1*y0 - y1*x0 + z1*w0 +w1*z0])
 
+
+def four_d_Circle(radius,img_dimensions):
+    """Creates a the 4d equivilent of a rod?"""
+    kern =np.zeros(shape=(int(radius)*2+1,int(radius)*2+1, img_dimensions[0], img_dimensions[1]))
+    X, Y = np.ogrid[:int(radius)*2+1, :int(radius)*2+1]
+    center_row, center_col = int(radius), int(radius)
+    dist_from_center = (X - center_row) ** 2 + (Y - center_col)**2
+    radius = radius ** 2
+    masked_circle = dist_from_center < radius
+    kern[masked_circle,:,:] =1
+    return kern
 
 
 
