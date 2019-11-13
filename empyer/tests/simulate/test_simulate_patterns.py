@@ -11,7 +11,7 @@ from empyer.misc.angular_correlation import angular_correlation,power_spectrum
 
 class TestSimulations(TestCase):
     def test_simulate_cube(self):
-        data = simulate_cube()
+        data = simulate_cube(accept_angle=.5)
         s = hs.signals.Signal2D(data)
         s.plot()
         plt.show()

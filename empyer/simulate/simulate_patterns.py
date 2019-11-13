@@ -96,7 +96,7 @@ def simulate_symmetry(symmetry=4, I=1, k=4, r=1, iterations=1000):
     return observed_int
 
 
-def random_pattern(symmetry, k, radius,):
+def random_pattern(symmetry, k, radius, accept_angle=None):
     """Creates a random pattern of some symmetry at some k
 
     Parameters
@@ -114,7 +114,7 @@ def random_pattern(symmetry, k, radius,):
     angle = (2*np.pi)/symmetry
     k = k  # +np.random.randn()/10 # normal distribution about k
     k = [[np.cos(angle*i)*k, np.sin(angle*i)*k] for i in range(symmetry)]
-    rotation_vector, theta = random_rotation()
+    rotation_vector, theta = random_rotation(acceptable_rotation_vectors=accept_angle)
     rand_angle = np.random.rand()*np.pi*2
     k = [list(rotate(x, y, rand_angle))+[0] for x, y in k]
     s = [sg(acc_voltage=200, rotation_vector=rotation_vector, theta=theta, k0=speckle) for speckle in k]
@@ -122,11 +122,11 @@ def random_pattern(symmetry, k, radius,):
     return k, observed_intensity
 
 
-def simulate_pattern(symmetry, k, num_clusters, probe_size, r, center, angle=None, lengths=None):
+def simulate_pattern(symmetry, k, num_clusters, probe_size, r, center, angle=None, lengths=None, acceptAngle=None):
     image = np.zeros(shape=(256, 256))
     xInd, yInd = np.mgrid[:256, :256]
     for i in range(num_clusters):
-        k_val, observed_int = random_pattern(symmetry=symmetry, k=k, radius=r)
+        k_val, observed_int = random_pattern(symmetry=symmetry, k=k, radius=r, accept_angle=acceptAngle)
         for pos, inten in zip(k_val, observed_int):
             circle = (xInd - pos[0] - center[0]) ** 2 + (yInd - pos[1] - center[1]) ** 2
             image[circle < probe_size] += inten
@@ -136,7 +136,7 @@ def simulate_pattern(symmetry, k, num_clusters, probe_size, r, center, angle=Non
     return image
 
 
-def simulate_cube(probe=2, positions=101, length=50, number_clusters=1000, radius=5):
+def simulate_cube(probe=2, positions=101, length=50, number_clusters=50, radius=5, accept_angle=None):
     """The general concept here is you start with a bunch of random positions for the clusters.  For all of the
     positions you then calculate the intensity of the spots and every diffraction pattern is just what patterns are
     at some postion..."""
@@ -152,7 +152,7 @@ def simulate_cube(probe=2, positions=101, length=50, number_clusters=1000, radiu
                                  center=[128, 128],
                                  angle=0,
                                  lengths=[75, 75],
-                                 ) for s in symmetry]
+                                 acceptAngle=accept_angle) for s in symmetry]
     four = np.ones((positions, positions, 256, 256))
     c = circle(radius=radius, center=pos, dim=(positions, positions))
     circlesize = np.divide(np.shape(c),2)
@@ -163,11 +163,13 @@ def simulate_cube(probe=2, positions=101, length=50, number_clusters=1000, radiu
         four[index[0]:index[1],index[2]:index[3],:,:] =four[index[0]:index[1],index[2]:index[3],:,:] + section
     return four
 
+
 def clusterConvolve(two_d_image,two_d_kern):
     image_shape = np.shape(two_d_image)
     section = np.repeat(two_d_kern[:, :, np.newaxis], image_shape[0], axis=2)
     section = np.repeat(section[:, :, :, np.newaxis], image_shape[1], axis=3)
     return section*two_d_image
+
 
 def circle(radius, center, dim):
     """Creates a the 4d equivilent of a rod?"""

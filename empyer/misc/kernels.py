@@ -68,6 +68,17 @@ def random_rotation(acceptable_rotation_vectors=None):
         rotation_vector = (np.cos(alpha)*np.sin(beta), np.sin(beta), np.sin(alpha)*np.cos(beta))
         theta = 2 * np.pi * p
     else:
+        while True:
+            u = random.uniform(0, 1)
+            v = random.uniform(0, 1)
+            p = random.uniform(0, 1)
+            alpha = 2 * np.pi * u
+            beta = np.arccos(2 * v - 1)
+            rotation_vector = (np.cos(alpha) * np.sin(beta), np.sin(beta), np.sin(alpha) * np.cos(beta))
+            theta = 2 * np.pi * p
+            if angle_between([1, 1, 1] ,rotation_vector) < acceptable_rotation_vectors:
+                print(rotation_vector,angle_between([1, 1, 1] ,rotation_vector))
+                break
     return rotation_vector, theta
 
 
@@ -135,8 +146,9 @@ def four_d_Circle(radius,img_dimensions):
     return kern
 
 
-
-
+def angle_between(x,y):
+    c = np.dot(x, y) / np.linalg.norm(x) / np.linalg.norm(y)  # -> cosine of the angle
+    return np.arccos(c)
 
 
 
