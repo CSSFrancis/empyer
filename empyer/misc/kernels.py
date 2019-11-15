@@ -41,13 +41,13 @@ def s_g_kernel(kernel_size, d_hkl, cluster_size, voltage):
     return k
 
 
-def s_g_kern_toAng(kern, d_hkl):
+def s_g_kern_to_ang(kern, d_hkl):
     factor = (d_hkl*np.pi/180)
     dict0 = {'size':  kern.axes_manager[0].size, 'name': 's_x', 'units': 'degrees',
              'scale': kern.axes_manager[0].scale/factor, 'offset': 0}
     dict1 = {'size': kern.axes_manager[0].size, 'name': 's_y', 'units': 'degrees',
-             'scale': kern.axes_manager[0].scale/factor,'offset': 0}
-    ang = hs.signals.Signal2D(data=kern.data, axes=[dict0,dict1] )
+             'scale': kern.axes_manager[0].scale/factor, 'offset': 0}
+    ang = hs.signals.Signal2D(data=kern.data, axes=[dict0, dict1])
     return ang
 
 
