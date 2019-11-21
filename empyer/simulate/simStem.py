@@ -35,8 +35,8 @@ def shape_function(radius, s_g):
     n:float
         Shape function for some deviation parameter and radius
     """
-    C = 2* np.pi*s_g*radius
-    n = ((3*(np.sin(C)-C*np.cos(C)))/C**3)**2
+    c = 2* np.pi*s_g*radius
+    n = ((3*(np.sin(c)-c*np.cos(c)))/c**3)**2
     return n
 
 
@@ -57,14 +57,7 @@ def s_g_kernel(kernel_size, d_hkl, cluster_size, voltage):
     scaling = 1/(kernel_size / 3 * cluster_size)
     sg = np.power((np.square(xx) + np.square(yy)), 0.5)
     print(d_hkl)
-    #sg_1 = np.power(sg,-1)
     dot = np.subtract(2*wavelength*d_hkl, np.multiply(sg, d_hkl))
-    #mag_1 = ((wavelength**2 + d_hkl**2)**.5)
-    #mag_2 = np.power(np.add(np.power(np.subtract(wavelength, sg)**2,2), d_hkl**2),.5)
-    #mag = np.multiply(mag_1, mag_2)
-    #ang = np.divide(dot, mag)
-    #d = np.subtract(wavelength, sg)
-    #mag = np.power(np.subtract(wavelength**2, np.multiply(cos)),.5)
     angles = np.divide(sg, d_hkl)
     sg_surf = np.multiply(sg, (2 * np.pi * cluster_size))
     kernel = np.power(np.multiply(np.divide((np.sin(sg_surf) -

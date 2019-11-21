@@ -37,8 +37,9 @@ class TestPowerSignal(TestCase):
         plt.show()
 
     def test_plot_maps(self):
-        self.ps.plot_even_symmetries(k_region=[1.0, 1.5])
-        self.ps.plot_even_symmetries(k_region=[1.0, 1.5], suptitle="TEST",cmap="hot")
+        self.ps.plot_symmetries(k_region=[1.0, 1.5])
+        self.ps.plot_symmetries(symmetries=[1,2,3,4,5],k_region=[1.0, 1.5], suptitle="TEST",cmap="hot")
+
         plt.show()
 
     def test_lazy(self):
