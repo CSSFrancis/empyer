@@ -11,7 +11,7 @@ from empyer.misc.angular_correlation import angular_correlation,power_spectrum
 
 class TestSimulations(TestCase):
     def test_simulate_cube(self):
-        data = simulate_cube(accept_angle=.5)
+        data = simulate_cube(accept_angle=.1)
         s = hs.signals.Signal2D(data)
         s.plot()
         plt.show()
@@ -27,12 +27,10 @@ class TestSimulations(TestCase):
     def test_simulation(self):
         p =random_pattern(4, 4)
 
-
     def test_simulate_image(self):
         i = simulate_pattern(4, k=100, num_clusters=100, probe_size=10, center=[256, 256], angle=0, lengths=[10, 10])
         plt.imshow(i)
         plt.show()
-
 
     def test_cartesian_to_ellipse(self):
         x, y = cartesian_to_ellipse(center=[256, 256], angle=np.pi /4, lengths=[1.5, 1])

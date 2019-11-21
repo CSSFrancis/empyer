@@ -17,22 +17,41 @@ def random_2d_clusters(num_clusters=100, grid_size=(100, 100)):
     cluster symmetries: array-like
         The symmetries of the clusters.  Only 2,4,6,8, and 10 allowed.
     """
-    cluster_positions = list(zip(*[np.random.randint(grid_size[0], num_clusters),
-                                   np.random.randint(grid_size[1], num_clusters)]))
+    cluster_positions = list(zip(*[np.random.randint(0, grid_size[0]-1, num_clusters),
+                                   np.random.randint(0, grid_size[1]-1, num_clusters)]))
     cluster_symmetries = np.random.choice([2, 4, 6, 8, 10], num_clusters)
     return cluster_positions, cluster_symmetries
 
-def simulate_pattern(symmetry, k, num_clusters, probe_size, r, center, angle=None, lengths=None, accept_angle=None):
-    image = np.zeros(shape=(256, 256))
-    xInd, yInd = np.mgrid[:256, :256]
-    for i in range(num_clusters):
-        k_val, observed_int = random_pattern(symmetry=symmetry, k=k, radius=r, accept_angle=accept_angle)
-        for pos, inten in zip(k_val, observed_int):
-            circle = (xInd - pos[0] - center[0]) ** 2 + (yInd - pos[1] - center[1]) ** 2
-            image[circle < probe_size] += inten
-            #image[circle < probe_size] += 10
-    if angle and lengths:
-        image = distort(image, center, angle, lengths)
+
+def simulate_pattern(symmetry, k, radius,  conv_angle, roation_vector=(1.0,0), roation=0, ):
+    """Simulates one pattern for some cluster given some k, symmetry, rotation vector and rotation about that vector.
+
+    Parameters
+    -------------
+    symmetry: int
+        The symmetry of the pattern
+    k: float
+        The k vector for the cluster. The interplanar spacing for the nano-crystal
+    radius: float
+        Radius of the cluster in nm.
+    conv_angle: float
+        The convergance angle for the experiment. Sets the width of the Ewald's sphere and the size of the speckles.
+    rotation_vector: tuple
+        The vecotor which describes the rotation from the beam direction
+    rotation: float
+        The rotation about the rotation vector for the pattern.
+
+    Returns
+    ------------
+    pattern: array-like
+        The pattern for the cluster
+    """
+    angle = (2*np.pi)/symmetry  # angle between speckles on the pattern
+    k = [[np.cos(angle*i) * k, np.sin(angle * i) * k] for i in range(symmetry)]  # vectors for the speckles perp to BA
+    s = [sg(acc_voltage=200, rotation_vector=rotation_vector, theta=theta, k0=speckle) for speckle in k]
+
+    s = [sg(acc_voltage=200, rotation_vector=ro, theta=theta, k0=speckle) for speckle in k]
+    observed_intensity = [100 * shape_function(r=radius, s=dev) for dev in s]
     return image
 
 
@@ -61,6 +80,6 @@ def simulate_cube(probe=2, positions=101, length=50, number_clusters=50, radius=
         index = np.array(pos[0] - circlesize[0],
                          pos[0] + circlesize[0],
                          pos[1] - circlesize[1],
-                         pos[1] + circlesize[1]],dtype=int)
+                         pos[1] + circlesize[1],dtype=int)
         four[index[0]:index[1], index[2]:index[3], :, :] = four[index[0]:index[1], index[2]:index[3], :,:] + section
     return four

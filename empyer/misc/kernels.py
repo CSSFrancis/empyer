@@ -3,6 +3,7 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 
+
 def s_g_kernel(kernel_size, d_hkl, cluster_size, voltage):
     """
     Parameters
