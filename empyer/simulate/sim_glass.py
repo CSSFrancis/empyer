@@ -1,5 +1,7 @@
 import numpy as np
 from empyer.misc.image import distort
+from empyer.misc.kernels import sg, shape_function
+from skimage.draw import circle
 
 
 def random_2d_clusters(num_clusters=100, grid_size=(100, 100)):
@@ -23,7 +25,7 @@ def random_2d_clusters(num_clusters=100, grid_size=(100, 100)):
     return cluster_positions, cluster_symmetries
 
 
-def simulate_pattern(symmetry, k, radius,  conv_angle, roation_vector=(1.0,0), roation=0, ):
+def simulate_pattern(symmetry, k, radius,size=(512,512), rotation_vector=(0,0,1),rotion=.6, scale=10):
     """Simulates one pattern for some cluster given some k, symmetry, rotation vector and rotation about that vector.
 
     Parameters
@@ -46,12 +48,17 @@ def simulate_pattern(symmetry, k, radius,  conv_angle, roation_vector=(1.0,0), r
     pattern: array-like
         The pattern for the cluster
     """
+    image = np.zeros(size)
     angle = (2*np.pi)/symmetry  # angle between speckles on the pattern
-    k = [[np.cos(angle*i) * k, np.sin(angle * i) * k] for i in range(symmetry)]  # vectors for the speckles perp to BA
-    s = [sg(acc_voltage=200, rotation_vector=rotation_vector, theta=theta, k0=speckle) for speckle in k]
-
-    s = [sg(acc_voltage=200, rotation_vector=ro, theta=theta, k0=speckle) for speckle in k]
+    k = [[np.cos(angle*i) * k, np.sin(angle * i) * k, 0] for i in range(symmetry)]  # vectors for the speckles perp to BA
+    print(k)
+    s = [sg(acc_voltage=200, rotation_vector=rotation_vector, theta=rotion, k0=speckle) for speckle in k]
+    print(s)
     observed_intensity = [100 * shape_function(r=radius, s=dev) for dev in s]
+    circles = [circle(int(k1[0]*scale+size[0]/2),int(k1[1]*scale+size[1]/2),radius=radius) for k1 in k]
+    print(circles)
+    for (r,c),i in zip(circles, observed_intensity):
+        image[r, c] = i
     return image
 
 

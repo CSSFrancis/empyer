@@ -90,10 +90,10 @@ def sg(acc_voltage, rotation_vector, theta, k0=(4,0,0)):
     acc_voltage: int
         In kV the voltage of the instrument for calculating Ewald's sphere
     rotation_vector: list
-        The vector that the system is rotaed around
+        The vector that the system is rotated around
     theta: float
         The angle of rotation
-    k: tuple
+    k0: tuple
         The (x,y,z) of the original s value from the optic axis.
     """
     es_radius = 1/get_wavelength(acc_voltage)

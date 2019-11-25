@@ -15,8 +15,7 @@ class TestGlassSimulations(TestCase):
         self.assertLessEqual(np.max(pos), 1000)
         self.assertGreaterEqual(np.min(pos), 0)
 
-    def test_simulate_pattern():
-
-
-
-
+    def test_simulate_pattern(self):
+        i = simulate_pattern(symmetry=12,k=12,radius=6)
+        plt.imshow(i)
+        plt.show()
