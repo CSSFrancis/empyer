@@ -89,7 +89,7 @@ class PolarSignal(EMSignal):
         """Calculates the average correlation length across the sample 
         """
 
-    def fem(self, version="omega"):
+    def fem(self, version="omega", indicies=None):
         """Calculated the variance among some image
 
         Parameters
@@ -97,7 +97,49 @@ class PolarSignal(EMSignal):
         version : str
             The name of the FEM equation to use. 'rings' calculates the mean of the variances of all the patterns at
             some k.  'omega' calculates the variance of the annular means for every value of k.
+        patterns: indicies
+            Calculates the FEM pattern using only some of the patterns based on their indexes
         """
+
+        if version is "omega":
+            if indicies:
+                var = stack([self.inav[ind] for ind in indicies])
+                print(var)
+                v = var.map(square, inplace=False).nanmean(axis=-2)
+                center = var.nanmean(axis=-2)
+                center.map(square)
+                center = center.nanmean()
+                int_vs_k = ((v - center) / center).nanmean()
+            else:
+                with self.unfolded(unfold_navigation=True, unfold_signal=False):
+                    v = self.map(square, inplace=False).nanmean(axis=-2)
+                    center = self.nanmean(axis=-2)
+                    center.map(square)
+                    center = center.nanmean()
+                    int_vs_k=((v - center) / center).nanmean()
+                self.set_signal_type("PolarSignal")
+
+        if version is 'rings':
+            if indicies:
+                var = stack([self.inav[ind] for ind in indicies])
+                print(var)
+                v = var.map(square, inplace=False).nanmean().nanmean(axis=-2)
+                center = var.nanmean(axis=-2)
+                center.map(square)
+                center = center.nanmean()
+                int_vs_k = ((v - center) / center)
+            else:
+                with self.unfolded(unfold_navigation=True, unfold_signal=False):
+                    v = self.map(square, inplace=False).nanmean().nanmean(axis=-2)
+                    center = self.nanmean(axis=-2)
+                    center.map(square)
+                    center = center.nanmean()
+                    int_vs_k = ((v - center) / center)
+                self.set_signal_type("PolarSignal")
+        int_vs_k.axes_manager[0].units = "$nm^{-1}$"
+        int_vs_k.axes_manager[0].name = "k"
+        return int_vs_k
+"""
         if not self.metadata.has_item('HAADF'):
             print("No thickness filter applied...")
             if version is 'rings':
@@ -142,8 +184,9 @@ class PolarSignal(EMSignal):
             int_vs_k = stack(int_vs_k)
             int_vs_k.axes_manager.navigation_axes[0].offset = thickness[0]
             int_vs_k.axes_manager.navigation_axes[0].scale = thickness[1] - thickness[0]
+"""
 
-        return int_vs_k
+
 
 
 class LazyPolarSignal(LazySignal,PolarSignal):

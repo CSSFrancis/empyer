@@ -29,14 +29,14 @@ class TestPolarSignal(TestCase):
         self.assertEqual(ac.data[1, 1, 1, 1], 0)
 
     def test_fem(self):
-        self.ps.fem(version='omega')
-        self.ps.
+        self.ps.fem(version='omega').plot()
         self.ps.fem(version='rings')
 
     def test_fem_with_filter(self):
-        self.ps.add_haadf_intensities(np.random.normal(size=(10, 10)), 1.5, .1)
-        vari = self.ps.fem(version="omega")
+        vari = self.ps.fem(version="omega", indicies=[[1, 1], [1, 2], [1, 3], [2, 3]])
         self.ps.plot()
+        plt.show()
+        vari.plot()
         plt.show()
         self.ps.fem(version="rings")
 
