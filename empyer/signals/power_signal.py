@@ -104,7 +104,7 @@ class PowerSignal(EMSignal):
             specific integers or list of symmetries to average over when creating the map of the correlations.
         """
         summed = [self.get_map(k_region=k_region)]
-        maps = summed + [self.get_map(k_region=k_region, symmetry=i) for i in symmetries]
+        maps = summed + [self.get_map(k_region=k_region, symmetry=i) for i in symmetry]
         l = ["summed"] + [str(i) +"-fold" for i in symmetry]
         plot_images(images=maps, label=l, *args, **kwargs)
 

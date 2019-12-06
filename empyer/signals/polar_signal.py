@@ -100,41 +100,34 @@ class PolarSignal(EMSignal):
         patterns: indicies
             Calculates the FEM pattern using only some of the patterns based on their indexes
         """
+        print("Here")
 
         if version is "omega":
             if indicies:
                 var = stack([self.inav[ind] for ind in indicies])
-                print(var)
-                v = var.map(square, inplace=False).nanmean(axis=-2)
-                center = var.nanmean(axis=-2)
-                center.map(square)
-                center = center.nanmean()
-                int_vs_k = ((v - center) / center).nanmean()
+                annular_mean = var.nanmean(axis=-2)
+                annular_mean_squared = annular_mean.nanmean() ** 2
+                v = (annular_mean ** 2).nanmean()
+                int_vs_k = (annular_mean_squared / v) - 1
             else:
                 with self.unfolded(unfold_navigation=True, unfold_signal=False):
-                    v = self.map(square, inplace=False).nanmean(axis=-2)
-                    center = self.nanmean(axis=-2)
-                    center.map(square)
-                    center = center.nanmean()
-                    int_vs_k=((v - center) / center).nanmean()
+                    annular_mean = self.nanmean(axis=-2)
+                    annular_mean_squared = annular_mean.nanmean()**2
+                    v = (annular_mean ** 2).nanmean()
+                    int_vs_k = (annular_mean_squared / v) - 1
                 self.set_signal_type("PolarSignal")
 
         if version is 'rings':
             if indicies:
-                var = stack([self.inav[ind] for ind in indicies])
-                print(var)
-                v = var.map(square, inplace=False).nanmean().nanmean(axis=-2)
-                center = var.nanmean(axis=-2)
-                center.map(square)
-                center = center.nanmean()
-                int_vs_k = ((v - center) / center)
+                s = stack([self.inav[ind] for ind in indicies])
+                ring_squared_average = (s ** 2).nanmean(axis=-2)
+                ring_squared = s.nanmean(axis=-2) ** 2
+                int_vs_k = (ring_squared_average / ring_squared) - 1
             else:
                 with self.unfolded(unfold_navigation=True, unfold_signal=False):
-                    v = self.map(square, inplace=False).nanmean().nanmean(axis=-2)
-                    center = self.nanmean(axis=-2)
-                    center.map(square)
-                    center = center.nanmean()
-                    int_vs_k = ((v - center) / center)
+                    ring_squared_average = (self ** 2).nanmean(axis=-2)
+                    ring_squared = self.nanmean(axis=-2) ** 2
+                    int_vs_k = (ring_squared_average / ring_squared) - 1
                 self.set_signal_type("PolarSignal")
         int_vs_k.axes_manager[0].units = "$nm^{-1}$"
         int_vs_k.axes_manager[0].name = "k"

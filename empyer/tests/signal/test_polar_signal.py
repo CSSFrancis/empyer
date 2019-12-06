@@ -13,7 +13,7 @@ class TestPolarSignal(TestCase):
         d[:, :, 5, 75] = 100  # setting up three-fold symmetry
         self.s = Signal2D(d)
         self.ps = PolarSignal(self.s)
-        self.ps.set_axes(2,
+        self.ps.set_axes(3,
                          name="k",
                          scale=1,
                          units='nm^-1')
@@ -28,9 +28,13 @@ class TestPolarSignal(TestCase):
         ac = self.ps.autocorrelation()
         self.assertEqual(ac.data[1, 1, 1, 1], 0)
 
-    def test_fem(self):
-        self.ps.fem(version='omega').plot()
-        self.ps.fem(version='rings')
+    def test_fem_omega(self):
+        fem_results = self.ps.fem(version='omega')
+        self.assertAlmostEqual(np.sum(fem_results.data), 0)
+
+    def test_fem_rings(self):
+        self.ps.fem(version='rings').plot()
+
 
     def test_fem_with_filter(self):
         vari = self.ps.fem(version="omega", indicies=[[1, 1], [1, 2], [1, 3], [2, 3]])
