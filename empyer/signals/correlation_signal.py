@@ -1,10 +1,10 @@
-from empyer.signals.em_signal import EMSignal
+from empyer.signals.amorphous2d import Amorphous2D
 from empyer.signals.power_signal import PowerSignal
 from empyer.misc.angular_correlation import power_spectrum
 from hyperspy._signals.lazy import LazySignal
 
 
-class CorrelationSignal(EMSignal):
+class CorrelationSignal(Amorphous2D):
     """Create a  Correlation Signal from a numpy array.
 
     Parameters
@@ -29,7 +29,7 @@ class CorrelationSignal(EMSignal):
     _signal_type = "correlation_signal"
 
     def __init__(self, *args, **kwargs):
-        EMSignal.__init__(self, *args, **kwargs)
+        Amorphous2D.__init__(self, *args, **kwargs)
         self.metadata.set_item("Signal.type", "correlation_signal")
 
     def as_lazy(self, *args, **kwargs):

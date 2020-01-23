@@ -2,12 +2,12 @@ import numpy as np
 
 from empyer.misc.ellipse_analysis import solve_ellipse
 from empyer.misc.cartesain_to_polar import convert
-from empyer.signals.em_signal import EMSignal
+from empyer.signals.amorphous2d import Amorphous2D
 from empyer.signals.polar_signal import PolarSignal
 from hyperspy._signals.lazy import LazySignal
 
 
-class DiffractionSignal(EMSignal):
+class DiffractionSignal(Amorphous2D):
     """
     The Diffraction Signal class extends the Hyperspy 2d signal class
     This class name should be changed....
@@ -36,7 +36,7 @@ class DiffractionSignal(EMSignal):
             typically contains all the parameters that has been
             imported from the original data file.
         """
-        EMSignal.__init__(self, *args, **kwargs)
+        Amorphous2D.__init__(self, *args, **kwargs)
         if not hasattr(self.metadata.Signal, 'Ellipticity.calibrated'):
             self.metadata.set_item("Signal.Ellipticity.calibrated", False)
 

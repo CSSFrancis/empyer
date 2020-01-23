@@ -1,4 +1,4 @@
-from empyer.signals.em_signal import EMSignal
+from empyer.signals.amorphous2d import Amorphous2D
 from hyperspy._signals.lazy import LazySignal
 from hyperspy.signals import Signal2D, Signal1D
 from hyperspy.drawing.utils import plot_images
@@ -6,7 +6,7 @@ from hyperspy.drawing.utils import plot_images
 import numpy as np
 
 
-class PowerSignal(EMSignal):
+class PowerSignal(Amorphous2D):
     _signal_type = "power_signal"
 
     def __init__(self, *args, **kwargs):
@@ -31,7 +31,7 @@ class PowerSignal(EMSignal):
             typically contains all the parameters that has been
             imported from the original data file.
         """
-        EMSignal.__init__(self, *args, **kwargs)
+        Amorphous2D.__init__(self, *args, **kwargs)
         self.metadata.set_item("Signal.type", "power_signal")
 
     def as_lazy(self, *args, **kwargs):

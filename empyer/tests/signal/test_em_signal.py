@@ -5,7 +5,7 @@ import time
 import matplotlib.pyplot as plt
 
 from hyperspy._signals.signal2d import Signal2D
-from empyer.signals.em_signal import EMSignal
+from empyer.signals.amorphous2d import Amorphous2D
 import empyer as em
 
 
@@ -18,7 +18,7 @@ class TestEMSignal(TestCase):
         d[:, :,  4, 3] = 10
         d[:, :,  2, 3] = 10
 
-        self.em_sig = EMSignal(data=d)
+        self.em_sig = Amorphous2D(data=d)
 
     def test_mask_slicing(self):
         self.em_sig.manav[:, :].masig[:, :] = True

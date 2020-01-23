@@ -1,5 +1,5 @@
 import numpy as np
-from empyer.signals.em_signal import EMSignal
+from empyer.signals.amorphous2d import Amorphous2D
 from empyer.signals.correlation_signal import CorrelationSignal
 from empyer.misc.angular_correlation import angular_correlation
 from empyer.misc.image import square
@@ -7,7 +7,7 @@ from hyperspy.utils import stack
 from hyperspy._signals.lazy import LazySignal
 
 
-class PolarSignal(EMSignal):
+class PolarSignal(Amorphous2D):
     _signal_type = "polar_signal"
 
     def __init__(self, *args, **kwargs):
@@ -31,7 +31,7 @@ class PolarSignal(EMSignal):
             typically contains all the parameters that has been
             imported from the original data file.
         """
-        EMSignal.__init__(self, *args, **kwargs)
+        Amorphous2D.__init__(self, *args, **kwargs)
         self.metadata.set_item("Signal.type", "polar_signal")
 
     def as_lazy(self, *args, **kwargs):
