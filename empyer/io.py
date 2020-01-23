@@ -1,7 +1,7 @@
 from hyperspy.io import load as hsload
 from .signals.amorphous2d import Amorphous2D
 from .signals.diffraction_signal import DiffractionSignal
-from .signals.polar_signal import PolarSignal
+from .signals.polar_signal import PolarAmorphous2D
 from .signals.correlation_signal import CorrelationSignal
 from .signals.power_signal import PowerSignal
 
@@ -111,9 +111,9 @@ def to_polar_signal(signal=None):
     """
     ax = signal.axes_manager.as_dictionary()
     ax = [ax[key]for key in ax]
-    ps = PolarSignal(signal,
-                     metadata=signal.metadata.as_dictionary(),
-                     axes=ax)
+    ps = PolarAmorphous2D(signal,
+                          metadata=signal.metadata.as_dictionary(),
+                          axes=ax)
     return ps
 
 

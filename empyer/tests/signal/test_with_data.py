@@ -25,7 +25,7 @@ class TestDiffractionSignal(TestCase):
         ps = self.d.calculate_polar_spectrum(phase_width=720, radius=[0,200])
         ps.inav[1,1].plot()
         plt.show()
-        ac = ps.autocorrelation(cut=50)
+        ac = ps.to_correlation(cut=50)
         ac.sum(axis=(0, 1)).isig[:, :7.0].plot()
         plt.show()
         ac.get_summed_power_spectrum().isig[0:20, :7.0].plot(cmap='hot')
@@ -36,7 +36,7 @@ class TestDiffractionSignal(TestCase):
     def test_segmented_convert(self):
         ps = self.d.calculate_polar_spectrum(radius=[0,200], segments=2, phase_width=360)
         plt.show()
-        ac = ps.autocorrelation()
+        ac = ps.to_correlation()
         ac.get_summed_power_spectrum().isig[0:20, 3.0:7.0].plot()
         plt.show()
 
@@ -55,14 +55,14 @@ class TestDiffractionSignal(TestCase):
         p = self.d.calculate_polar_spectrum()
         p.inav[1, 1].plot()
         plt.show()
-        s = p.autocorrelation().get_summed_power_spectrum().isig[0:12, 3.5:6.0]
+        s = p.to_correlation().get_summed_power_spectrum().isig[0:12, 3.5:6.0]
         s.plot()
         plt.show()
 
     def test_polar_unwrapping2(self):
         self.d.determine_ellipse()
         p = self.d.calculate_polar_spectrum()
-        a = p.autocorrelation()
+        a = p.to_correlation()
         a.get_summed_power_spectrum().isig[2, 3.25:5.5].plot()
         a2.get_summed_power_spectrum().isig[2, 3.25:5.5].plot()
         plt.show()

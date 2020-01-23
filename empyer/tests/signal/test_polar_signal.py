@@ -2,7 +2,7 @@ from unittest import TestCase
 import numpy as np
 import matplotlib.pyplot as plt
 from hyperspy.signals import Signal2D, BaseSignal
-from empyer.signals.diffraction_signal import PolarSignal
+from empyer.signals.diffraction_signal import PolarAmorphous2D
 
 
 class TestPolarSignal(TestCase):
@@ -12,20 +12,20 @@ class TestPolarSignal(TestCase):
         d[:, :, 5, 45] = 100
         d[:, :, 5, 75] = 100  # setting up three-fold symmetry
         self.s = Signal2D(d)
-        self.ps = PolarSignal(self.s)
+        self.ps = PolarAmorphous2D(self.s)
         self.ps.set_axes(3,
                          name="k",
                          scale=1,
                          units='nm^-1')
 
     def test_autocorrelation(self):
-        ac = self.ps.autocorrelation()
+        ac = self.ps.to_correlation()
         self.assertGreater(ac.data[1, 1, 5, 30], 17)
         self.assertLess(ac.data[1, 1, 5, 29], .1)
 
     def test_autocorrelation_mask(self):
         self.ps.mask_below(value=40)
-        ac = self.ps.autocorrelation()
+        ac = self.ps.to_correlation()
         self.assertEqual(ac.data[1, 1, 1, 1], 0)
 
     def test_fem_omega(self):

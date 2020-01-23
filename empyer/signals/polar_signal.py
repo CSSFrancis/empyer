@@ -7,7 +7,7 @@ from hyperspy.utils import stack
 from hyperspy._signals.lazy import LazySignal
 
 
-class PolarSignal(Amorphous2D):
+class PolarAmorphous2D(Amorphous2D):
     _signal_type = "polar_signal"
 
     def __init__(self, *args, **kwargs):
@@ -40,7 +40,7 @@ class PolarSignal(Amorphous2D):
         res.__init__(**res._to_dictionary())
         return res
 
-    def autocorrelation(self, binning_factor=1, cut=0, normalize=True):
+    def to_correlation(self, binning_factor=1, cut=0, normalize=True):
         # TODO: Add the ability to cutoff like slicing (maybe use np.s)
         """Create a Correlation Signal from a numpy array.
 
@@ -85,11 +85,7 @@ class PolarSignal(Amorphous2D):
                          offset=offset)
         return angular
 
-    def correlation_lengths(self):
-        """Calculates the average correlation length across the sample 
-        """
-
-    def fem(self, version="omega", indicies=None):
+    def get_variance(self, version="omega", indicies=None):
         """Calculated the variance among some image
 
         Parameters
@@ -131,57 +127,11 @@ class PolarSignal(Amorphous2D):
         int_vs_k.axes_manager[0].units = "$nm^{-1}$"
         int_vs_k.axes_manager[0].name = "k"
         return int_vs_k
-"""
-        if not self.metadata.has_item('HAADF'):
-            print("No thickness filter applied...")
-            if version is 'rings':
-                var = self.nanmean(axis=-1)
-                var.map(square)
-                var = var.nanmean()
-                center = self.nanmean(axis=-1).nanmean()
-                center.map(square)
-                int_vs_k = (var - center) / center
-                print(int_vs_k.axes_manager)
-            elif version is 'omega':
-                var = self.map(square, show_progressbar=False, inplace=False).nanmean().nanmean(axis=1)
-                center = self.nanmean(axis=-1)
-                center.map(square)
-                center = center.nanmean()
-                int_vs_k = (var - center) / center
-                print(int_vs_k.axes_manager)
-        else:
-            filt, thickness = self.thickness_filter()
-            if version is 'rings':
-                int_vs_k = []
-                for i, th in enumerate(thickness):
-                    index = np.where(filt.transpose() == i+1)
-                    index = tuple(zip(index[0], index[1]))
-                    var = stack([self.inav[ind] for ind in index])
-                    v = var.map(square, inplace=False).nanmean().nanmean(axis=-2)
-                    center = var.nanmean(axis=-2)
-                    center.map(square)
-                    center = center.nanmean()
-                    int_vs_k.append((v - center) / center)
-            if version is 'omega':
-                int_vs_k = []
-                for i, th in enumerate(thickness):
-                    index = np.where(filt.transpose() == i+1)
-                    index = tuple(zip(index[0], index[1]))
-                    var = stack([self.inav[ind] for ind in index])
-                    v = var.map(square, inplace=False).nanmean(axis=-2)
-                    center = var.nanmean(axis=-2)
-                    center.map(square)
-                    center = center.nanmean()
-                    int_vs_k.append(((v - center) / center).nanmean())
-            int_vs_k = stack(int_vs_k)
-            int_vs_k.axes_manager.navigation_axes[0].offset = thickness[0]
-            int_vs_k.axes_manager.navigation_axes[0].scale = thickness[1] - thickness[0]
-"""
 
 
 
 
-class LazyPolarSignal(LazySignal,PolarSignal):
+class LazyPolarSignal(LazySignal, PolarAmorphous2D):
 
     _lazy = True
 

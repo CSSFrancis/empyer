@@ -35,7 +35,7 @@ def correlation(signal_file, args):
     file_name = os.path.splitext(signal_file)[0]
     ps = ds.calculate_polar_spectrum()
     ps.save(filename=file_name+'_polar.hdf5', overwrite=True)
-    acs = ps.autocorrelation()
+    acs = ps.to_correlation()
     acs.save(filename=file_name + '_angular.hdf5', overwrite=True)
     pow_s = acs.get_power_spectrum()
     pow_s.save(filename=file_name+'_angularPower.hdf5', overwrite=True)

@@ -66,6 +66,11 @@ class Amorphous2D(Signal2D):
         self.metadata.HAADF.filter_intercept = intercept
         return
 
+    def apply_filter(self, filter, axis):
+        """Applies a 2-D filter on either the navigation or the signal axis
+        """
+        pass
+
     def add_mask(self):
         if not isinstance(self.data, np.ma.masked_array):
             self.data = np.ma.asarray(self.data)
