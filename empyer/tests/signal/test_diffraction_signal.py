@@ -104,8 +104,12 @@ class TestSegmentedDiffractionSignal(TestCase):
 
     def test_lazy(self):
         lazy = self.ds.as_lazy()
+        print(lazy.data)
         self.assertIsInstance(lazy, LazyDiffractionSignal)
         lazy.determine_ellipse()
+        print(lazy.data)
         lazy.mask_below(10)
-        lazy.manav[2:4,1].mask_below(10)
+        print(type(lazy.data))
+        lazy.manav[2:4, 1].mask_below(10)
         lazy.calculate_polar_spectrum()
+        print(type(lazy.data))

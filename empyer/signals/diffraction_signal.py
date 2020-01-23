@@ -163,7 +163,8 @@ class DiffractionSignal(EMSignal):
                                     radius=radius,
                                     parallel=parallel,
                                     inplace=inplace,
-                                    show_progressbar=False)
+                                    show_progressbar=False,
+                                    ragged=rag)
         else:
             len_of_segments = np.array(self.axes_manager.navigation_shape) // segments
             extra_len = np.array(self.axes_manager.navigation_shape) % segments
@@ -188,7 +189,8 @@ class DiffractionSignal(EMSignal):
                                              inplace=inplace,
                                              show_progressbar=False,
                                              radius=radius,
-                                             phase_width=phase_width)
+                                             phase_width=phase_width,
+                                             ragged=rag)
             print("done")
 
 

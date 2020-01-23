@@ -1,6 +1,6 @@
 import numpy as np
 
-from hyperspy.signals import Signal2D
+from hyperspy._signals.signal2d import Signal2D
 from hyperspy.misc.slicing import SpecialSlicers
 from hyperspy._signals.lazy import LazySignal
 
@@ -49,7 +49,7 @@ class EMSignal(Signal2D):
         res.__init__(**res._to_dictionary())
         return res
 
-    def add_haadf_intensities(self, intensity_array, slope, intercept):
+    def add_haadf_intensities(self, intensity_array, slope=None, intercept=None):
         """Add High Angle Annular Dark Field intensities for each point.
 
         Parameters
@@ -66,13 +66,22 @@ class EMSignal(Signal2D):
         if self.axes_manager.navigation_shape != np.shape(np.transpose(intensity_array)):
             print("The navigation axes and intensity array don't match")
             return
-        self.metadata.HAADF.intensity = np.transpose(intensity_array)
+        ax = [a.get_axis_dictionary() for a in self.axes_manager.navigation_axes]
+        self.metadata.HAADF.intensity = Signal2D(data=np.transpose(intensity_array), axes=ax)
         self.metadata.HAADF.filter_slope = slope
         self.metadata.HAADF.filter_intercept = intercept
         return
 
     def get_thicknesses(self):
-        return self.metadata.HAADF.intensity*self.metadata.HAADF.filter_slope+self.metadata.HAADF.filter_intercept
+        if self.metadata.HAADF.filter_slope and self.metadata.HAADF.filter_intercept:
+            return self.metadata.HAADF.intensity*self.metadata.HAADF.filter_slope+self.metadata.HAADF.filter_intercept
+        else:
+            print("You need a slope and an intercept to get the thicknesses from the High Angle Annular Dark field "
+                  "Image")
+            return
+
+    def plot_haadf(self):
+        pass
 
     def thickness_filter(self):
         """Filter based on HAADF intensities
@@ -178,6 +187,9 @@ class EMSignal(Signal2D):
         if not isinstance(self.data, np.ma.masked_array):
             self.data = np.ma.asarray(self.data)
             self.data.mask = False  # setting all values to unmasked
+
+    def mask_beam_stop(self):
+
 
     def reset_mask(self):
         if isinstance(self.data, np.ma.masked_array):

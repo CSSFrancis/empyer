@@ -100,7 +100,6 @@ class PolarSignal(EMSignal):
         patterns: indicies
             Calculates the FEM pattern using only some of the patterns based on their indexes
         """
-        print("Here")
 
         if version is "omega":
             if indicies:
