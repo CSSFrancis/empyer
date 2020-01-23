@@ -35,6 +35,8 @@ class PowerSignal(EMSignal):
         self.metadata.set_item("Signal.type", "power_signal")
 
     def as_lazy(self, *args, **kwargs):
+        """Returns the signal as a lazy signal.
+        """
         res = super().as_lazy(*args, **kwargs)
         res.__class__ = LazyPowerSignal
         res.__init__(**res._to_dictionary())
@@ -91,10 +93,20 @@ class PowerSignal(EMSignal):
                 sym_map = self.isig[sym, k_region[0]:k_region[1]].sum(axis=[-1]).transpose() + sym_map
         return sym_map
 
-    def plot_even_symmetries(self, k_region=[3.0, 6.0], *args, **kwargs):
+    def plot_symmetries(self, k_region=[3.0, 6.0], symmetry=[2, 4, 6, 8, 10], *args, **kwargs):
+        """Plots the symmetries in the list of symmetries. Plot symmetries takes all of the arguements that imshow does.
+
+        Parameters
+        -------------
+         k_region: array-like
+           upper and lower k values to integrate over, allows both ints and floats for indexing
+        symmetry: list
+            specific integers or list of symmetries to average over when creating the map of the correlations.
+        """
         summed = [self.get_map(k_region=k_region)]
-        maps = summed + [self.get_map(k_region=k_region, symmetry=i) for i in range(2, 11, 2)]
-        plot_images(images=maps, label=["summed", "2-Fold", "4-Fold", "6-Fold", "8-Fold", "10-Fold"], *args, **kwargs)
+        maps = summed + [self.get_map(k_region=k_region, symmetry=i) for i in symmetry]
+        l = ["summed"] + [str(i) +"-fold" for i in symmetry]
+        plot_images(images=maps, label=l, *args, **kwargs)
 
 
 class LazyPowerSignal(LazySignal, PowerSignal):

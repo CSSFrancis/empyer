@@ -1,9 +1,6 @@
 import hyperspy.api as hs
 import numpy as np
 import random
-
-from empyer.misc.angular_correlation import angular_correlation
-from scipy.interpolate import RectBivariateSpline
 import matplotlib.pyplot as plt
 
 
@@ -45,13 +42,13 @@ def s_g_kernel(kernel_size, d_hkl, cluster_size, voltage):
     return k
 
 
-def s_g_kern_toAng(kern, d_hkl):
+def s_g_kern_to_ang(kern, d_hkl):
     factor = (d_hkl*np.pi/180)
     dict0 = {'size':  kern.axes_manager[0].size, 'name': 's_x', 'units': 'degrees',
              'scale': kern.axes_manager[0].scale/factor, 'offset': 0}
     dict1 = {'size': kern.axes_manager[0].size, 'name': 's_y', 'units': 'degrees',
-             'scale': kern.axes_manager[0].scale/factor,'offset': 0}
-    ang = hs.signals.Signal2D(data=kern.data, axes=[dict0,dict1] )
+             'scale': kern.axes_manager[0].scale/factor, 'offset': 0}
+    ang = hs.signals.Signal2D(data=kern.data, axes=[dict0, dict1])
     return ang
 
 
@@ -62,14 +59,27 @@ def atomic_displacement_kernel(kernel_size, displacement_factor):
 
 
 # Functions for simulating rotations
-def random_rotation():
-    u = random.uniform(0, 1)
-    v = random.uniform(0, 1)
-    p = random.uniform(0, 1)
-    alpha = 2 * np.pi * u
-    beta = np.arccos(2 * v -1)
-    rotation_vector = (np.cos(alpha)*np.sin(beta), np.sin(beta), np.sin(alpha)*np.cos(beta))
-    theta = 2 * np.pi * p
+def random_rotation(acceptable_rotation_vectors=None):
+    if not acceptable_rotation_vectors:
+        u = random.uniform(0, 1)
+        v = random.uniform(0, 1)
+        p = random.uniform(0, 1)
+        alpha = 2 * np.pi * u
+        beta = np.arccos(2 * v -1)
+        rotation_vector = (np.cos(alpha)*np.sin(beta), np.sin(beta), np.sin(alpha)*np.cos(beta))
+        theta = 2 * np.pi * p
+    else:
+        while True:
+            u = random.uniform(0, 1)
+            v = random.uniform(0, 1)
+            p = random.uniform(0, 1)
+            alpha = 2 * np.pi * u
+            beta = np.arccos(2 * v - 1)
+            rotation_vector = (np.cos(alpha) * np.sin(beta), np.sin(beta), np.sin(alpha) * np.cos(beta))
+            theta = 2 * np.pi * p
+            if angle_between([1, 1, 1] ,rotation_vector) < acceptable_rotation_vectors:
+                print(rotation_vector,angle_between([1, 1, 1] ,rotation_vector))
+                break
     return rotation_vector, theta
 
 
@@ -80,10 +90,10 @@ def sg(acc_voltage, rotation_vector, theta, k0=(4,0,0)):
     acc_voltage: int
         In kV the voltage of the instrument for calculating Ewald's sphere
     rotation_vector: list
-        The vector that the system is rotaed around
+        The vector that the system is rotated around
     theta: float
         The angle of rotation
-    k: tuple
+    k0: tuple
         The (x,y,z) of the original s value from the optic axis.
     """
     es_radius = 1/get_wavelength(acc_voltage)
@@ -125,9 +135,21 @@ def mult_quaternions(Q1,Q2):
             x1*y0 - y1*x0 + z1*w0 +w1*z0])
 
 
+def four_d_Circle(radius,img_dimensions):
+    """Creates a the 4d equivilent of a rod?"""
+    kern =np.zeros(shape=(int(radius)*2+1,int(radius)*2+1, img_dimensions[0], img_dimensions[1]))
+    X, Y = np.ogrid[:int(radius)*2+1, :int(radius)*2+1]
+    center_row, center_col = int(radius), int(radius)
+    dist_from_center = (X - center_row) ** 2 + (Y - center_col)**2
+    radius = radius ** 2
+    masked_circle = dist_from_center < radius
+    kern[masked_circle,:,:] =1
+    return kern
 
 
-
+def angle_between(x,y):
+    c = np.dot(x, y) / np.linalg.norm(x) / np.linalg.norm(y)  # -> cosine of the angle
+    return np.arccos(c)
 
 
 

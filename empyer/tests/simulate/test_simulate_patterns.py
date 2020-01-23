@@ -1,14 +1,21 @@
 from unittest import TestCase
 import numpy as np
 import matplotlib.pyplot as plt
+import hyperspy.api as hs
 
-from empyer.simulate.simulate_patterns import simulate_pattern, simulate_symmetry, cartesian_to_ellipse, random_pattern
+from empyer.simulate.simulate_patterns import simulate_pattern, simulate_symmetry, cartesian_to_ellipse, random_pattern, simulate_cube
 from empyer.misc.ellipse_analysis import solve_ellipse
 from empyer.misc.cartesain_to_polar import convert
 from empyer.misc.angular_correlation import angular_correlation,power_spectrum
 
 
 class TestSimulations(TestCase):
+    def test_simulate_cube(self):
+        data = simulate_cube(accept_angle=.1)
+        s = hs.signals.Signal2D(data)
+        s.plot()
+        plt.show()
+
     def test_simulate_symmetry(self):
         sim = simulate_symmetry(symmetry=6, iterations=10000)
         plt.plot(sim[0])
@@ -18,11 +25,12 @@ class TestSimulations(TestCase):
         plt.show()
 
     def test_simulation(self):
-        random_pattern(4, 4)
+        p =random_pattern(4, 4)
 
     def test_simulate_image(self):
-        i = simulate_pattern(4, k=100, num_clusters=3, probe_size=20, center=[256, 256], angle=0, lengths=[20, 10])
-        c, a, lengths = solve_ellipse(i)
+        i = simulate_pattern(4, k=100, num_clusters=100, probe_size=10, center=[256, 256], angle=0, lengths=[10, 10])
+        plt.imshow(i)
+        plt.show()
 
     def test_cartesian_to_ellipse(self):
         x, y = cartesian_to_ellipse(center=[256, 256], angle=np.pi /4, lengths=[1.5, 1])

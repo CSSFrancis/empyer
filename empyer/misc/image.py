@@ -206,3 +206,28 @@ def random_ellipse(num_points, center, foci, angle):
 def rotate(x, y, angle):
     return x*np.cos(angle)-y*np.sin(angle), y*np.cos(angle)+x*np.sin(angle)
 
+
+def distort(image, center, angle, lengths):
+    """Takes an image and distorts the image based on an elliptical distortion
+
+    Parameters
+    ---------------
+    image: array-like
+        The image to apply the elliptical distortion to
+    center: list
+        The center of the ellipse
+    angle: float
+        The angle of the major axis in radians
+    lengths: The lengths of the major and minor axis of the ellipse
+
+    Returns
+    ------------
+    distorted:array-like
+        The elliptically distorted image
+    """
+    img_shape = np.shape(image)
+    initial_y, initial_x = range(-center[1], img_shape[-2]-center[1]), range(-center[0], img_shape[-1]-center[0])
+    spline = RectBivariateSpline(initial_x, initial_y, image, kx=1, ky=1)
+    xInd, yInd = cartesian_to_ellipse(center=center, angle=angle, lengths=lengths)
+    distorted = np.array(spline.ev(yInd, xInd))
+    return distorted
