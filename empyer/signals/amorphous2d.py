@@ -1,4 +1,5 @@
 import numpy as np
+import dask.array as da
 
 from hyperspy._signals.signal2d import Signal2D
 from empyer.misc.masks import MaskSlicer, MaskPasser
@@ -52,6 +53,10 @@ class Amorphous2D(Signal2D):
             An intensity array which is the same size of the navigation axis.  Acts as a measure of the thickness if
             there is a calculated normalized intensity. For masking in real space.  Matches data input NOT the real
             space coordinates from Hyperspy. (To match Hyperspy use np.transpose on intensity array)
+        slope: None or float
+            The slope to measure thickness from HAADF intensities
+        intercept: None or float
+            THe intercept to measure thickness from HAADF intensities
         """
         if not self.metadata.has_item('HAADF'):
             self.metadata.add_node('HAADF.intensity')
@@ -66,8 +71,25 @@ class Amorphous2D(Signal2D):
         self.metadata.HAADF.filter_intercept = intercept
         return
 
-    def apply_filter(self, filter, axis):
+    def axis_map(self,axes, function, show_progressbar=None, parallel=None, inplace=True, ragged=None, **kwargs):
         """Applies a 2-D filter on either the navigation or the signal axis
+        Parameters
+        --------------
+        axes: list
+            The indexes of the axes to be operated on for the 2D transformation
+        function:function
+            Any function that can be applied to a 2D signal
+        show_progressbar: (None or bool)
+            If True, display a progress bar. If None, the default from the preferences settings is used.
+        parallel:(None or bool)
+            If True, perform computation in parallel using multiple cores. If None, the default from the preferences
+            settings is used.
+        inplace: bool
+            if True (default), the data is replaced by the result. Otherwise a new Signal with the results is returned.
+        ragged:(None or bool)
+            Indicates if the results for each navigation pixel are of identical shape (and/or numpy arrays to begin with). If None, the appropriate choice is made while processing. Note: None is not allowed for Lazy signals!
+        **kwargs (dict)
+            All extra keyword arguments are passed to the provided function
         """
         pass
 
@@ -80,7 +102,7 @@ class Amorphous2D(Signal2D):
         """ Change the signal to lazy loading signal.  For large signals.
         """
         res = super().as_lazy(*args, **kwargs)
-        res.__class__ = LazyEMSignal
+        res.__class__ = LazyAmorphousSignal
         res.__init__(**res._to_dictionary())
         return res
 
@@ -209,9 +231,13 @@ class Amorphous2D(Signal2D):
         pass
 
 
-class LazyEMSignal(LazySignal, Amorphous2D):
+class LazyAmorphousSignal(LazySignal, Amorphous2D):
 
     _lazy = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    def add_mask(self):
+        if not isinstance(self.data._meta,  np.ma.core.MaskedArray):
+            self.data = da.ma.masked_array(self.data)
