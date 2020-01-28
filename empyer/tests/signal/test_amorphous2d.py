@@ -18,59 +18,12 @@ class TestAmorphous2D(TestCase):
         d[:, :,  2, 3] = 10
         self.am_sig = Amorphous2D(data=d)
 
-    def test_add_mask(self):
-        self.am_sig.add_mask()
-        self.assertIsInstance(self.am_sig.data, np.ma.masked_array)
+    def test_mask(self):
+        self.assertEqual(self.am_sig.metadata.Mask.nav_mask, False)
+        self.assertEqual(self.am_sig.metadata.Mask.sig_mask, False)
 
-    def test_mask_slicing(self):
-        self.am_sig.manav[:, :].masig[1, 0:4] = True
-        validation_array = np.zeros((8,9,10,11), dtype=bool)
-        validation_array[:,:,0:4,1]=True
-        np.testing.assert_array_equal(self.am_sig.data.mask,validation_array)
-
-    def test_mask_slicing2(self):
-        self.am_sig.manav[:, 1].masig[2:5, 3:10] = True
-        np.testing.assert_array_equal(self.am_sig.inav[:, 1].isig[2:5, 3:10].data.mask,
-                                      np.ones((9, 7, 3), dtype=bool))
-
-    def test_mask_conditional_slicing(self):
-        self.am_sig.masig[self.am_sig.(value=0.5)
-        self.assertGreater(self.am_sig.min(axis=(0, 1, 2, 3)).data, 0.5)
-
-    def test_slice_mask_below(self):
-        self.am_sig.manav[0:2, 0:2].mask_below(.5)
-        self.assertGreater(self.am_sig.inav[0:2, 0:2].min(axis=(0, 1, 2, 3)).data, 0.5)
-        self.assertLess(self.ds.min(axis=(0, 1, 2, 3)).data, 0.5)
-
-    def test_slice_mask_below2(self):
-        self.am_sig.manav[0:2, 0:2].masig[1:2, :].mask_below(.5)
-        self.assertGreater(self.am_sig.inav[0:2, 0:2].isig[1:2, :].min(axis=(0, 1, 2, 3)).data, 0.5)
-        self.assertLess(self.am_sig.min(axis=(0, 1, 2, 3)).data, 0.5)
-
-    def test_mask_above(self):
-        self.am_sig.mask_above(value=0.5)
-        self.assertLess(self.ds.max(axis=(0, 1, 2, 3)).data, 0.5)
-
-    def test_slice_mask_above(self):
-        self.am_sig.manav[0:2, 0:2].mask_above(.5)
-        self.assertLess(self.am_sig.inav[0:2, 0:2].max(axis=(0, 1, 2, 3)).data, 0.5)
-        self.assertGreater(self.am_sig.max(axis=(0, 1, 2, 3)).data, 0.5)
-
-    def test_slice_mask_above2(self):
-        self.ds.manav[0:2, 0:2].masig[1:2, :].mask_above(.5)
-        self.assertLess(self.ds.inav[0:2, 0:2].isig[1:2, :].max(axis=(0, 1, 2, 3)).data, 0.5)
-        self.assertGreater(self.ds.max(axis=(0, 1, 2, 3)).data, 0.5)
-
-    def test_slice_mask_where(self):
-        self.ds.manav[0:2, 0:2].masig[1:5, :].mask_where(self.ds.inav[0:2, 0:2].isig[1:5, :].data == 10)
-        self.assertLess(self.ds.inav[0:2, 0:2].isig[1:5, :].max(axis=(0, 1, 2, 3)).data, 1)
-
-    def test_mask_circle_slice(self):
-        self.ds.manav[0:2, 0:2].mask_circle(center=(5, 5), radius=3)
-        self.assertTrue(self.ds.inav[1, 1].isig[5, 5].data.mask)
-        self.assertTrue(self.ds.inav[1, 1].isig[7, 5].data.mask)
-        self.assertFalse(self.ds.inav[1, 1].isig[1:2, 5].data.mask)
-        self.assertFalse(self.ds.inav[1, 3].isig[5:6, 5].data.mask)
+    def test_mask_circle_int(self):
+        self.am_sig.mask_circle(center=(5, 5), radius=5)
 
     def test_add_haadf(self):
         print(self.am_sig.metadata)

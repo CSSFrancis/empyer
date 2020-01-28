@@ -2,8 +2,8 @@ import numpy as np
 import dask.array as da
 
 from hyperspy._signals.signal2d import Signal2D
-from empyer.misc.masks import MaskSlicer, MaskPasser
 from hyperspy._signals.lazy import LazySignal
+from empyer.misc.masks import _circular_mask, _beam_stop_mask,_determine_center,_rectangular_mask,_ring_mask
 
 
 class Amorphous2D(Signal2D):
@@ -40,9 +40,11 @@ class Amorphous2D(Signal2D):
         Notes: For more parameters see hyperspy's Signal2D Class
         """
         Signal2D.__init__(self, *args, **kwargs)
-        self.manav = MaskSlicer(self, isNavigation=True)
-        self.masig = MaskSlicer(self, isNavigation=False)
-        self.mask_passer = None
+        if not self.metadata.has_item('Mask'):
+            self.metadata.add_node('Mask.sig_mask')
+            self.metadata.add_node("Mask.nav_mask")
+            self.metadata.Mask.sig_mask = False
+            self.metadata.Mask.nav_mask = False
 
     def add_haadf_intensities(self, intensity_array, slope=None, intercept=None):
         """Add High Angle Annular Dark Field intensities for each point.
@@ -93,11 +95,6 @@ class Amorphous2D(Signal2D):
         """
         pass
 
-    def add_mask(self):
-        if not isinstance(self.data, np.ma.masked_array):
-            self.data = np.ma.asarray(self.data)
-            self.data.mask = False  # setting all values to unmasked
-
     def as_lazy(self, *args, **kwargs):
         """ Change the signal to lazy loading signal.  For large signals.
         """
@@ -127,7 +124,6 @@ class Amorphous2D(Signal2D):
         pass
 
     def mask_border(self, pixels=1):
-        self.add_mask()
         if not isinstance(pixels, int):
             pixels = (self.axes_manager.signal_axes[0].value2index(pixels))
         self.data.mask[..., -pixels:] = True
@@ -139,7 +135,6 @@ class Amorphous2D(Signal2D):
         pass
 
     def mask_circle(self, center, radius, unmask=False):
-        # TODO: Add more shapes
         """Applies a mask to every pixel using a shape and the appropriate definition
 
         Parameters
@@ -152,17 +147,13 @@ class Amorphous2D(Signal2D):
         unmask: bool
             Unmask any pixels in the defined shape
         """
-        self.add_mask()
         if not all(isinstance(item, int) for item in center):
             center = (self.axes_manager.signal_axes[1].value2index(center[1]),
                       self.axes_manager.signal_axes[0].value2index(center[0]))
         if not isinstance(radius, int):
             radius = self.axes_manager.signal_axes[0].value2index(radius)
-        x_ind, y_ind = np.meshgrid(range(-radius, radius + 1), range(-radius, radius + 1))
-        r = np.sqrt(x_ind ** 2 + y_ind ** 2)
-        inside = r < radius
-        x_ind, y_ind = x_ind[inside] + int(center[0]), y_ind[inside] + int(center[1])
-        self.data.mask[..., x_ind, y_ind] = not unmask
+        dimensions = self.axes_manager.signal_shape
+        mask = circular_mask(center, radius, dimensions)
         return
 
     def mask_reset(self):
