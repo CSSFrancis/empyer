@@ -1,8 +1,9 @@
 from unittest import TestCase
 import numpy as np
-from empyer.misc.masks import _circular_mask,_determine_center,_rectangular_mask,_ring_mask,_beam_stop_mask
+from empyer.misc.masks import _circular_mask,_rectangular_mask,_ring_mask,_beam_stop_mask
 import matplotlib.pyplot as plt
 import glob
+
 
 class TestBinning(TestCase):
     def setUp(self):
@@ -21,12 +22,9 @@ class TestBinning(TestCase):
 
     def test_circular_mask(self):
         m = _circular_mask(center=(10, 10), radius=5, dim=(20, 20))
-        self.assertEqual(m [0,0], False)
-        self.assertEqual(m[16,10], False)
+        self.assertEqual(m[0, 0], False)
+        self.assertEqual(m[16, 10], False)
         self.assertEqual(m[15, 10], True)
-
-    def test_determine_center(self):
-        return
 
     def test_rectangular_mask(self):
         m = _rectangular_mask(x1=10, x2=15, y1=10, y2=15, dim=(20, 20))

@@ -3,7 +3,7 @@ import dask.array as da
 
 from hyperspy._signals.signal2d import Signal2D
 from hyperspy._signals.lazy import LazySignal
-from empyer.misc.masks import _circular_mask, _beam_stop_mask,_determine_center,_rectangular_mask,_ring_mask
+from empyer.misc.masks import Mask
 
 
 class Amorphous2D(Signal2D):
@@ -40,11 +40,19 @@ class Amorphous2D(Signal2D):
         Notes: For more parameters see hyperspy's Signal2D Class
         """
         Signal2D.__init__(self, *args, **kwargs)
+        self.manav = Mask(self,is_navigation=True)
+        self.masig = Mask(self,is_navigation=False)
         if not self.metadata.has_item('Mask'):
             self.metadata.add_node('Mask.sig_mask')
             self.metadata.add_node("Mask.nav_mask")
-            self.metadata.Mask.sig_mask = False
-            self.metadata.Mask.nav_mask = False
+            self.metadata.Mask.sig_mask = np.zeros(shape=self.axes_manager.signal_shape, dtype=bool)
+            self.metadata.Mask.nav_mask = np.zeros(shape=self.axes_manager.navigation_shape, dtype=bool)
+
+        if not self.metadata.has_item('Sum'):
+            self.metadata.add_node("Sum.sig_sum")
+            self.metadata.add_node("Sum.nav_sum")
+            self.metadata.Sum.sig_sum = self.sum(axis=self.axes_manager.signal_axes)
+            self.metadata.Mask.nav_sum = self.sum(axis=self.axes_manager.navigation_axes)
 
     def add_haadf_intensities(self, intensity_array, slope=None, intercept=None):
         """Add High Angle Annular Dark Field intensities for each point.
@@ -123,43 +131,6 @@ class Amorphous2D(Signal2D):
     def get_direct_beam_pos(self, method):
         pass
 
-    def mask_border(self, pixels=1):
-        if not isinstance(pixels, int):
-            pixels = (self.axes_manager.signal_axes[0].value2index(pixels))
-        self.data.mask[..., -pixels:] = True
-        self.data.mask[..., : pixels] = True
-        self.data.mask[..., : pixels, :] = True
-        self.data.mask[..., -pixels:, :] = True
-
-    def mask_beam_stop(self):
-        pass
-
-    def mask_circle(self, center, radius, unmask=False):
-        """Applies a mask to every pixel using a shape and the appropriate definition
-
-        Parameters
-        ----------
-        shape: str
-            Acceptable shapes ['rectangle, 'circle']
-        data: list
-            Define shapes. eg 'rectangle' -> [x1,x2,y1,y2] 'circle' -> [radius, x,y]
-            data allows indexing with floats and the axes described for the signal
-        unmask: bool
-            Unmask any pixels in the defined shape
-        """
-        if not all(isinstance(item, int) for item in center):
-            center = (self.axes_manager.signal_axes[1].value2index(center[1]),
-                      self.axes_manager.signal_axes[0].value2index(center[0]))
-        if not isinstance(radius, int):
-            radius = self.axes_manager.signal_axes[0].value2index(radius)
-        dimensions = self.axes_manager.signal_shape
-        mask = circular_mask(center, radius, dimensions)
-        return
-
-    def mask_reset(self):
-        if isinstance(self.data, np.ma.masked_array):
-            self.data.mask = False  # setting all values to unmasked
-
     def set_axes(self, index, name=None, scale=None, units=None, offset=None):
         """Set axes of the signal
 
@@ -223,12 +194,7 @@ class Amorphous2D(Signal2D):
 
 
 class LazyAmorphousSignal(LazySignal, Amorphous2D):
-
     _lazy = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-    def add_mask(self):
-        if not isinstance(self.data._meta,  np.ma.core.MaskedArray):
-            self.data=da.ma.masked_array(self.data)
