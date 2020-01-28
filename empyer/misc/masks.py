@@ -1,68 +1,37 @@
-from hyperspy.misc.slicing import SpecialSlicers
+import numpy as np
+from skimage.morphology import watershed
+from skimage.filters import s
+
+def _circular_mask(center, radius, x_len,y_len, x_start=0, y_start=0, scale=1):
+    x, y = np.ogrid[x_start-center[0]:x_len-center[0]:scale, y_start-center[1]:y_len-center[1]:scale]
+    mask = x * x + y * y <= radius * radius
+    return mask
 
 
-class MaskSlicer(SpecialSlicers):
-    """
-    Expansion of the Special Slicer class. Used for applying a mask
-    """
-    def __setitem__(self, key, value):
-        if isinstance(self.obj, MaskPasser):
-            array_slices = self.obj.signal._get_array_slices(key, self.isNavigation)
-            if self.isNavigation == self.obj.isNavigation:
-                print("You can't used masig or manav twice")
-            self.obj.signal.add_mask()
-            array_slices = tuple([slice1 if not (slice1 == slice(None, None, None)) else slice2 for
-                                  slice1, slice2 in zip(self.obj.slice, array_slices)])
-            self.obj.signal.data.mask[array_slices] = value
-        else:
-            array_slices = self.obj._get_array_slices(key, self.isNavigation)
-            self.obj.add_mask()
-            self.obj.data.mask[array_slices] = value
-
-    def __getitem__(self, key, out=None):
-        if isinstance(self.obj, MaskPasser):
-            if self.isNavigation == self.obj.isNavigation:
-                print("You can't used masig or manav twice")
-                return
-            array_slices = self.obj.signal._get_array_slices(key, self.isNavigation)
-            array_slices = tuple([slice1 if not (slice1 == slice(None, None, None)) else slice2 for
-                                  slice1, slice2 in zip(self.obj.slice, array_slices)])
-            return MaskPasser(self.obj.signal, array_slices, self.isNavigation)
-        else:
-            array_slices = self.obj._get_array_slices(key, self.isNavigation)
-            return MaskPasser(self.obj, array_slices, self.isNavigation)
+def _rectangular_mask(x1,x2,y1,y2, x_len,y_len, x_start=0, y_start=0, scale=1):
+    x, y = np.ogrid[x_start:x_len:scale, y_start:y_len:scale]
+    x_mask = x1<=x<=x2
+    y_mask = y1<=y<=y2
+    mask = x_mask+y_mask
+    return mask
 
 
-class MaskPasser():
-    def __init__(self, s, sl, nav):
-        self.signal = s
-        self.slice = sl
-        self.isNavigation = nav
-        self.manav = MaskSlicer(self, isNavigation=True)
-        self.masig = MaskSlicer(self, isNavigation=False)
+def _ring_mask(center, outer_radius, inner_radius, x_len,y_len, x_start=0, y_start=0, scale=1):
+    x, y = np.ogrid[x_start-center[0]:x_len-center[0]:scale, y_start-center[1]:y_len-center[1]:scale]
+    outer_mask = x * x + y * y <= outer_radius * outer_radius
+    inner_mask = x * x + y * y <= inner_radius * inner_radius
+    mask = outer_mask-inner_mask
+    return mask
 
-    def mask_circle(self, center, radius, unmask=False):
-        # TODO: Add more shapes
-        """Applies a mask to every pixel using a shape and the appropriate definition
 
-        Parameters
-        ----------
-        center: tuple
-            The (x,y) center of the circle
-        radius: float or int
-            The radius of the circle
-        unmask: bool
-            Unmask any pixels in the defined shape
-        """
-        self.signal.add_mask()
-        if not all(isinstance(item, int) for item in center):
-            center = (self.signal.axes_manager.signal_axes[1].value2index(center[1]),
-                     self.signal.axes_manager.signal_axes[0].value2index(center[0]))
-        if not isinstance(radius, int):
-            radius = self.signal.axes_manager.signal_axes[0].value2index(radius)
-        x_ind, y_ind = np.meshgrid(range(-radius, radius + 1), range(-radius, radius + 1))
-        r = np.sqrt(x_ind ** 2 + y_ind ** 2)
-        inside = r < radius
-        x_ind, y_ind = x_ind[inside]+int(center[0]), y_ind[inside]+int(center[1])
-        self.signal.data.mask[self.slice][..., x_ind, y_ind] = not unmask
-        return
+def _beam_stop_mask(summed_image, method="watershed", **kwargs):
+    if method is "watershed":
+        watershed(summed_image, 1, **kwargs)
+    if method is "min":
+
+def _determine_center(summed_image, mask,):
+
+
+
+
+

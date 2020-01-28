@@ -25,13 +25,14 @@ class TestLazyAmorphous2D(TestCase):
 
     def test_mask(self):
         self.lazy_am_sig.add_mask()
-        print(self.lazy_am_sig.data)
+        self.assertIsInstance(self.lazy_am_sig.data._meta,np.ma.core.MaskedArray)
 
     def test_mask_slicing(self):
-        self.am_sig.manav[:, :].masig[1, 0:4] = True
+        self.lazy_am_sig.isig[1,:4]=1
+        self.lazy_am_sig.isig[1, 0:4] = np.ma.masked
         validation_array = np.zeros((8,9,10,11), dtype=bool)
         validation_array[:,:,0:4,1]=True
-        np.testing.assert_array_equal(self.am_sig.data.mask,validation_array)
+        np.testing.assert_array_equal(self.am_sig.data.compute().mask, validation_array)
 
     def test_mask_slicing2(self):
         self.am_sig.manav[:, 1].masig[2:5, 3:10] = True

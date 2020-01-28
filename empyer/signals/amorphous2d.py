@@ -240,4 +240,4 @@ class LazyAmorphousSignal(LazySignal, Amorphous2D):
 
     def add_mask(self):
         if not isinstance(self.data._meta,  np.ma.core.MaskedArray):
-            self.data = da.ma.masked_array(self.data)
+            self.data=da.ma.masked_array(self.data)
