@@ -1,9 +1,10 @@
 import numpy as np
-import dask.array as da
 
 from hyperspy._signals.signal2d import Signal2D
 from hyperspy._signals.lazy import LazySignal
 from empyer.misc.masks import Mask
+from empyer.misc.ellipse_analysis import solve_ellipse
+from empyer.misc.cartesain_to_polar import convert
 
 
 class Amorphous2D(Signal2D):
@@ -81,7 +82,7 @@ class Amorphous2D(Signal2D):
         self.metadata.HAADF.filter_intercept = intercept
         return
 
-    def axis_map(self,axes, function, show_progressbar=None, parallel=None, inplace=True, ragged=None, **kwargs):
+    def axis_map(self, function, is_navigation=False, inplace=False, **kwargs):
         """Applies a 2-D filter on either the navigation or the signal axis
         Parameters
         --------------
@@ -98,10 +99,19 @@ class Amorphous2D(Signal2D):
             if True (default), the data is replaced by the result. Otherwise a new Signal with the results is returned.
         ragged:(None or bool)
             Indicates if the results for each navigation pixel are of identical shape (and/or numpy arrays to begin with). If None, the appropriate choice is made while processing. Note: None is not allowed for Lazy signals!
+        is_navigation:(bool)
+            If the function should be operating on the navigation axes rather than the signal axis.
         **kwargs (dict)
             All extra keyword arguments are passed to the provided function
         """
-        pass
+        if is_navigation:
+            print(self)
+            print(self.transpose())
+            print(self)
+            return self.T.map(function **kwargs).T
+        else:
+            return self.map(function, **kwargs)
+        return
 
     def as_lazy(self, *args, **kwargs):
         """ Change the signal to lazy loading signal.  For large signals.
@@ -112,10 +122,24 @@ class Amorphous2D(Signal2D):
         return res
 
     def center_direct_beam(self, center):
-        pass
+        """Center the direct beam.  Shifts the center by shifting the offset so the center is in the middle.
 
-    def estimate_affine(self, method):
-        pass
+        Parameters
+        --------------
+        center: tuple
+            The x and y coordinates of the center. Either as integers or real float values.
+        """
+        if not all(isinstance(item, int) for item in center):
+            center = (self.axes_manager.signal_axes[1].value2index(center[1]),
+                      self.axes_manager.signal_axes[0].value2index(center[0]))
+        self.axes_manager.signal_axes[0].offset = -center[0]
+        self.axes_manager.signal_axes[1].offset = -center[1]
+
+    def estimate_distortion(self, **kwargs):
+        masked_sum = self.metadata.Sum.sig_sum
+        masked_sum[self.masig] = 0
+        center, lengths, angle = solve_ellipse(masked_sum, **kwargs)
+        return center, lengths, angle
 
     def get_thicknesses(self):
         """ Returns a Signal2D object with the thicknesses based on the High Angular annular detector and the
@@ -127,9 +151,6 @@ class Amorphous2D(Signal2D):
             print("You need a slope and an intercept to get the thicknesses from the High Angle Annular Dark field "
                   "Image")
             return
-
-    def get_direct_beam_pos(self, method):
-        pass
 
     def set_axes(self, index, name=None, scale=None, units=None, offset=None):
         """Set axes of the signal
@@ -179,18 +200,36 @@ class Amorphous2D(Signal2D):
         th_filter[(twosigma / 2 < deviation) & (deviation <= twosigma)] = 4
         thickness = [np.mean(thickness) - 3*twosigma/2,
                      np.mean(thickness) - twosigma/2,
-                     np.mean(thickness) +twosigma/2,
+                     np.mean(thickness) + twosigma/2,
                      np.mean(thickness) + 3 * twosigma / 2]
         return th_filter, thickness
 
-    def to_polar(self, affine):
+    def to_polar(self, center=None, lengths=None, angle=None, phase_width=None, radius=[0,-1],**kwargs):
+        if not phase_width:
+            phase_width = round((self.axes_manager.signal_shape[0]*3.14/2)/180)*180
+        if isinstance(radius[0], float) or isinstance(radius[1], float):
+            radius[0] = self.axes_manager.signal_axes[-1].value2index(radius[0])
+            radius[1] = self.axes_manager.signal_axes[-1].value2index(radius[1])
+        if radius[1] == -1:
+            radius[1] = int(min(np.subtract(self.axes_manager.signal_shape, center)) - 1)
+
+        polar_signal = self.axis_map(convert,
+                                     center=self.metadata.Signal.Ellipticity.center,
+                                     angle=self.metadata.Signal.Ellipticity.angle,
+                                     lengths=self.metadata.Signal.Ellipticity.lengths,
+                                     phase_width=phase_width,
+                                     radius=radius,
+                                     **kwargs,
+                                     scale=[(2 * np.pi/phase_width),self.axes_manager.signal_axes[1].scale],
+                                     units=["Radians,$\Theta$", "$nm^-1$"])
+
         pass
 
     def to_correlation(self):
         pass
 
     def get_virtual_image(self, roi):
-        pass
+        return
 
 
 class LazyAmorphousSignal(LazySignal, Amorphous2D):
@@ -198,3 +237,31 @@ class LazyAmorphousSignal(LazySignal, Amorphous2D):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    def axis_map(self, function, is_navigation=False, **kwargs):
+        """Applies a 2-D filter on either the navigation or the signal axis
+        Parameters
+        --------------
+        axes: list
+            The indexes of the axes to be operated on for the 2D transformation
+        function:function
+            Any function that can be applied to a 2D signal
+        show_progressbar: (None or bool)
+            If True, display a progress bar. If None, the default from the preferences settings is used.
+        parallel:(None or bool)
+            If True, perform computation in parallel using multiple cores. If None, the default from the preferences
+            settings is used.
+        inplace: bool
+            if True (default), the data is replaced by the result. Otherwise a new Signal with the results is returned.
+        ragged:(None or bool)
+            Indicates if the results for each navigation pixel are of identical shape (and/or numpy arrays to begin with). If None, the appropriate choice is made while processing. Note: None is not allowed for Lazy signals!
+        is_navigation:(bool)
+            If the function should be operating on the navigation axes rather than the signal axis.
+        **kwargs (dict)
+            All extra keyword arguments are passed to the provided function
+        """
+        if is_navigation:
+            return self.Transpose(optimze=True).map(function, **kwargs)
+        else:
+            return self.map(function, **kwargs)
+        return

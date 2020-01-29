@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 from empyer.signals.amorphous2d import Amorphous2D
 import empyer as em
+from skimage.morphology import opening
 
 
 class TestAmorphous2D(TestCase):
@@ -33,6 +34,12 @@ class TestAmorphous2D(TestCase):
 
     def test_HAADF(self):
         self.am_sig.add_haadf_intensities(np.random.normal(size=(8, 9)), 1.5, .1)
+
+    # Testing mapping on the signal and the navigation axes
+
+    def test_map_skimage(self):
+        #self.am_sig.axis_map(function=opening)
+        self.am_sig.axis_map(function=opening, is_navigation=True)
 
     # Tests for Masking with amorphous signal...
     def test_mask(self):
