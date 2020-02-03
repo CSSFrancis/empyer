@@ -41,10 +41,12 @@ class TestAmorphous2D(TestCase):
         a_sig = Amorphous2D(data=d)
         a_sig.inav[1, 1].isig[:, :] = np.ones(shape=(10, 11)) * 100
         def as_is(image):
+            #print(image.max())
             return image
-        a_sig.axis_map(function=as_is, is_navigation=False, inplace=True)
-        a_sig.plot()
-        plt.show()
+        #mapped = a_sig.axis_map(function=as_is, is_navigation=False, inplace=False)
+        #print(mapped)
+        #a_sig.plot()
+        #plt.show()
         a_sig.axis_map(function=as_is, is_navigation=True, inplace=True)
         a_sig.plot()
         plt.show()

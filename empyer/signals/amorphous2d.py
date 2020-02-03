@@ -9,6 +9,7 @@ from empyer.misc.cartesain_to_polar import convert
 from hyperspy.defaults_parser import preferences
 from hyperspy.docstrings.signal import SHOW_PROGRESSBAR_ARG, PARALLEL_ARG
 from hyperspy.external.progressbar import progressbar
+from empyer.misc.utils import map_result_construction
 
 
 class Amorphous2D(Signal2D):
@@ -263,20 +264,21 @@ class Amorphous2D(Signal2D):
         It is faster than using the navigation iterator.
         """
         self._make_sure_data_is_contiguous()
-        axes = [axis.index_in_array for
-                axis in self.axes_manager.navigation_axes]
+        axes = [axis.index_in_array for axis in self.axes_manager.navigation_axes]
         if axes:
             unfolded_axis = self.axes_manager.signal_axes[0].index_in_array
             new_shape = [1] * len(self.data.shape)
             for axis in axes:
                 new_shape[axis] = self.data.shape[axis]
             new_shape[unfolded_axis] = -1
-        else:  # signal_dimension == 0
-            new_shape = (-1, 1)
+        else:  # navigation_dimension == 0
+            new_shape = (1,-1)
             axes = [1]
             unfolded_axis = 0
         # Warning! if the data is not contigous it will make a copy!!
+        print(new_shape)
         data = self.data.reshape(new_shape)
+        print(data.shape)
         getitem = [0] * len(data.shape)
         for axis in axes:
             getitem[axis] = slice(None)
@@ -358,8 +360,7 @@ class Amorphous2D(Signal2D):
         else:
             size = max(1, self.axes_manager.navigation_size)
 
-        from hyperspy.misc.utils import (create_map_objects,
-                                         map_result_construction)
+        from hyperspy.misc.utils import (create_map_objects)
         func, iterators = create_map_objects(function, size, iterating_kwargs,
                                              **kwargs)
         if is_navigation:
@@ -386,8 +387,9 @@ class Amorphous2D(Signal2D):
                             thismap(func, zip(*iterators))):
             # In what follows we assume that res is a numpy scalar or array
             # The following line guarantees that that's the case.
-
+            print("this is Res ", res[1, 1])
             res = np.asarray(res)
+            print(ind)
             res_data.flat[ind] = res
             if ragged is False:
                 # to be able to break quickly and not waste time / resources
@@ -413,14 +415,18 @@ class Amorphous2D(Signal2D):
         if not ragged:
             sig_shape = () if shapes[0] == (1,) else shapes[0]
             if is_navigation:
-                res_data = np.stack(res_data.ravel()).reshape(sig_shape + self.axes_manager._signal_shape_in_array)
+                res_data = np.stack(res_data.ravel(), axis=2).reshape(sig_shape + self.axes_manager._signal_shape_in_array)
+                # Im not sure why the axis needs to be two.. I mean I know it has to do with how the axes need to be
+                # oriented but if you had 3 navigation axes it would probably have to be 3.. I'll figure out later
             else:
                 res_data = np.stack(res_data.ravel()).reshape(self.axes_manager._navigation_shape_in_array + sig_shape)
         res = map_result_construction(self, inplace, res_data, ragged,
-                                      sig_shape)
+                                      sig_shape, is_navigation)
         return res
 
     _map_iterate.__doc__ %= (SHOW_PROGRESSBAR_ARG, PARALLEL_ARG)
+
+
 
     def to_correlation(self):
         pass
