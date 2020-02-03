@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from empyer.signals.amorphous2d import Amorphous2D
 import empyer as em
 from skimage.morphology import opening
+from skimage.filters import gaussian
 
 
 class TestAmorphous2D(TestCase):
@@ -26,7 +27,6 @@ class TestAmorphous2D(TestCase):
                          self.am_sig.metadata.Sum.sig_sum)
 
     def test_add_haadf(self):
-        print(self.am_sig.metadata)
         self.am_sig.add_haadf_intensities(np.ones((8, 9)))
         nptest.assert_array_equal(self.am_sig.metadata.HAADF.intensity, np.ones((9, 8)))
         self.assertEqual(self.am_sig.axes_manager.navigation_axes[0].scale,
@@ -36,10 +36,29 @@ class TestAmorphous2D(TestCase):
         self.am_sig.add_haadf_intensities(np.random.normal(size=(8, 9)), 1.5, .1)
 
     # Testing mapping on the signal and the navigation axes
+    def test_axes_map(self):
+        d = np.random.rand(8, 9, 10, 11)
+        a_sig = Amorphous2D(data=d)
+        a_sig.inav[1, 1].isig[:, :] = np.ones(shape=(10, 11)) * 100
+        def as_is(image):
+            return image
+        a_sig.axis_map(function=as_is, is_navigation=False, inplace=True)
+        a_sig.plot()
+        plt.show()
+        a_sig.axis_map(function=as_is, is_navigation=True, inplace=True)
+        a_sig.plot()
+        plt.show()
 
     def test_map_skimage(self):
-        #self.am_sig.axis_map(function=opening)
-        self.am_sig.axis_map(function=opening, is_navigation=True)
+        d = np.random.rand(8, 9, 10, 11)
+        a_sig = Amorphous2D(data=d)
+        print(a_sig)
+        a_sig.inav[1,1].isig[:,:]= np.ones(shape=(10,11))*100
+        a_sig.plot()
+        plt.show()
+        a_sig.axis_map(function=gaussian, is_navigation=True, inplace=True)
+        a_sig.plot()
+        plt.show()
 
     # Tests for Masking with amorphous signal...
     def test_mask(self):
