@@ -21,7 +21,7 @@ class TestDiffractionSignal(TestCase):
         self.ds = DiffractionSignal(self.s)
 
     def test_ellipse(self):
-        self.ds.determine_ellipse()
+        self.ds.determine_ellipse(plot=True)
         print("Centers: ", self.center, self.ds.metadata.Signal.Ellipticity.center)
         print("Lengths: ", self.lengths, self.ds.metadata.Signal.Ellipticity.lengths)
         print("Angle: ", self.angle, self.ds.metadata.Signal.Ellipticity.angle)

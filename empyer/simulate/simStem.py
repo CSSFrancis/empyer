@@ -5,7 +5,6 @@ from empyer.misc.image import rotate
 from empyer.misc.kernels import sg, shape_function
 from skimage.draw import circle
 import matplotlib.pyplot as plt
-from matplotlib
 
 
 class SimulationCube(object):
@@ -47,30 +46,43 @@ class SimulationCube(object):
         else:
             rand_vector = [1,0,0]
             rand_rot = 0
-        for s, r, k, v, a in zip(rand_sym,rand_r, rand_k, rand_vector, rand_rot)
-            self.clusters.append(Cluster(s,r,k,rand_pos,v,a)
+        for s, r, k, v, a in zip(rand_sym,rand_r, rand_k, rand_vector, rand_rot):
+            self.clusters.append(Cluster(s,r,k,rand_pos,v,a))
         return
 
-
-
-
-    def show_projection(self, illuminate_vector, acceptance, size=512):
+    def show_projection(self, acceptance, size=512):
         """Plots the 2-d projection.  Creates a 2-D projection of the clusters in the amorphous matrix.
-        """
-        plt.figure()
-        ax =plt.gca()
-        for cluster in self.clusters:
-            a = Circle(xy = (cluster.position/self.dimensions*size),
-                       radius = (cluster.radius/self.dimensions)*size,
-            ax.add
 
+        Parameters:
+        ------------
+        acceptance: float
+            The angle of acceptance.  Only clusters within this projection will be allowed.
+        size: int
+            The size of the image made
+
+        """
         return
 
-    def get_4d_stem(self, convergence_angle, accelerating_voltage, image_size=(256, 256), illumination_vector=(1,0,0)):
+    def get_4d_stem(self, convergence_angle, accelerating_voltage, simulation_size=(200,200256, 256)):
+        """Returns an amorphous2d object which shows the 4d STEM projection for some set of clusters along some
+        illumination
+
+        Parameters
+        ------------
+        convergence_angle: float
+            The convergance angle for the experiment
+        accelerating_voltage: float
+            The accelerating voltage for the experiment in kV
+        simulation_size: tuple
+            The size of the image for both the reciporical space image and the real space image.
+
+        Returns
+        ------------
+        dataset: Amorphus2D
+            Returns a 4 dimensional dataset which represents the cube
+        """
 
         return dataset
-
-
 
 
 class Cluster(object):
@@ -93,20 +105,27 @@ class Cluster(object):
         self.rotation_angle = rotation_angle
         self.k = k
 
-    def get_diffraction(self, img_size=(512, 512), accelerating_voltage=200, scale=None):
-        if scale is None:
-            scale = (4*self.k)/img_size
-        image = np.ones(img_size) * .01
+    def get_diffraction(self, img_size=8.0, num_pixels=512, accelerating_voltage=200, scale=None):
+        """Takes some image size in inverse nm and then plots the resulting
+        :param img_size:
+        :param accelerating_voltage:
+        :param scale:
+        :return:
+        """
+        scale = img_size/num_pixels-1
+        np.ogrid[-img_size:img_size+scale:scale,-img_size:img_size+scale:scale]
         angle = (2 * np.pi) / self.symmetry  # angle between speckles on the pattern
         k = [[np.cos(angle * i) * self.k, np.sin(angle * i) * self.k] for i in
              range(self.symmetry)]  # vectors for the speckles perp to BA
-        k = [list(rotate(x, y, rotation)) + [0] for x, y in k]
-        print(k)
-        s = [sg(acc_voltage=200, rotation_vector=self.rotation_vector, theta=self.rotation_angle, k0=speckle)
-             for speckle in k]
-        print(s)
+        #k = [list(rotate(x, y, rotation)) + [0] for x, y in k]
+        deviation_parameters = [sg(acc_voltage=200,
+                                   rotation_vector=self.rotation_vector,
+                                   theta=self.rotation_angle,
+                                   k0=speckle)
+                                for speckle in k]
+
         observed_intensity = [200 * shape_function(r=self.radius, s=dev) for dev in s]
-        circles = [circle(int(k1[0] * scale + img_size[0] / 2), int(k1[1] * scale + img_size[1] / 2), radius=radius) for k1 in
+        circles = [circle(int(k1[0] * scale + img_size/ 2), int(k1[1] * scale + img_size/ 2), radius=self.radius) for k1 in
                    k]
         print(circles)
         for (r, c), i in zip(circles, observed_intensity):

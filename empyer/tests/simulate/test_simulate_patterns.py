@@ -28,7 +28,7 @@ class TestSimulations(TestCase):
         p =random_pattern(4, 4)
 
     def test_simulate_image(self):
-        i = simulate_pattern(4, k=100, num_clusters=100, probe_size=10, center=[256, 256], angle=0, lengths=[10, 10])
+        i = simulate_pattern(4, k=100, num_clusters=100, r=1, probe_size=10, center=[128, 128], angle=.2, lengths=[10, 10])
         plt.imshow(i)
         plt.show()
 

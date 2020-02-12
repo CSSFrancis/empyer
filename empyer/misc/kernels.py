@@ -108,11 +108,19 @@ def sg(acc_voltage, rotation_vector, theta, k0=(4,0,0)):
     q3 = mult_quaternions(mult_quaternions(q2,q1),q2_conj)
     q3 = q3[1:]
     dist = np.sqrt(q3[0]**2+q3[1]**2+(-es_radius - q3[2])**2)
-    s = dist-es_radius
+    s = es_radius-dist
     return s
 
 
-def shape_function(r, s,):
+def shape_function(r, s):
+    """The shape function for a cluster
+
+    Parmaters
+    ---------------
+    r: float
+        The radius of the cluster
+    s: The deviation parameter
+    """
     C = 2*np.pi*s*r
     n = ((3*(np.sin(C)-C*np.cos(C)))/C**3)**2
     return n
