@@ -5,8 +5,6 @@ import time
 import matplotlib.pyplot as plt
 
 from empyer.signals.amorphous2d import Amorphous2D
-import empyer as em
-from skimage.morphology import opening
 from skimage.filters import gaussian
 
 
@@ -43,10 +41,6 @@ class TestAmorphous2D(TestCase):
         def as_is(image):
             #print(image.max())
             return image
-        #mapped = a_sig.axis_map(function=as_is, is_navigation=False, inplace=False)
-        #print(mapped)
-        #a_sig.plot()
-        #plt.show()
         a_sig.axis_map(function=as_is, is_navigation=True, inplace=True)
         a_sig.plot()
         plt.show()
@@ -98,7 +92,10 @@ class TestAmorphous2D(TestCase):
         self.am_sig.manav[0.0:15.0, 0.0:15.0] = True
         self.assertEqual(self.am_sig.metadata.Mask.nav_mask[1, 1], True)
 
-    def test_lazy_signal(self):
+    # Testing the conversion to a polar signal.
+    def test_constant_signal(self):
+        polar = self.am_sig.to_polar()
+    def test_to_lazy_signal(self):
         lazy = self.am_sig.as_lazy()
         print(lazy)
 

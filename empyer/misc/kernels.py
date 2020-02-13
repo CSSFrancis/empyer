@@ -83,7 +83,7 @@ def random_rotation(acceptable_rotation_vectors=None):
     return rotation_vector, theta
 
 
-def sg(acc_voltage, rotation_vector, theta, k0=(4,0,0)):
+def sg(acc_voltage, rotation_vector, theta, k0=(4, 0, 0)):
     """
     Parameters
     ----------------
@@ -110,6 +110,28 @@ def sg(acc_voltage, rotation_vector, theta, k0=(4,0,0)):
     dist = np.sqrt(q3[0]**2+q3[1]**2+(-es_radius - q3[2])**2)
     s = es_radius-dist
     return s
+
+def sg_nano(wavelength, k0=[4,0,0], illumination_unit_vector = [0,0,1]):
+    """
+    Parameters
+    ----------------
+    acc_voltage: int
+        In kV the voltage of the instrument for calculating Ewald's sphere
+    rotation_vector: list
+        The vector that the system is rotated around
+    theta: float
+        The angle of rotation
+    k0: tuple
+        The (x,y,z) of the original s value from the optic axis.
+    """
+    es_radius = 1 / wavelength
+    x, y = np.ogrid[-1:1:.05, -1:1:.05]
+    k0 = np.array(k0) + (es_radius*np.array(illumination_unit_vector))
+    x = x
+    y = y  # determining the x,y vectors for the intensity profile
+    z = (es_radius**2 - (x+k0[0])**2 - (y+k0[0])**2)**.5
+    dev = (x**2 + y**2 + (z-k0[2])**2)**.5
+    return dev
 
 
 def shape_function(r, s):

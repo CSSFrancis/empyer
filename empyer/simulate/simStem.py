@@ -172,6 +172,13 @@ def shape_function(radius, s_g):
     return n
 
 
+def get_triangle(accelerating_voltage=200, semi_angle=0.74, k=4.0):
+    wavelength = get_wavelength(acc_voltage=accelerating_voltage)
+    sphere_width = semi_angle *
+
+
+
+
 def s_g_kernel(kernel_size, d_hkl, cluster_size, voltage):
     """ Simulates a 2-d projection of the s_g kernel... (Maybe make 3-D if useful)
     Parameters

@@ -127,14 +127,17 @@ class Mask(object):
                       self.obj.axes_manager.signal_axes[0].value2index(center[0]))
         if not isinstance(radius, int):
             radius = self.obj.axes_manager.signal_axes[0].value2index(radius)
-        dimensions = self.obj.axes_manager.signal_shape
+        if self.is_navigation:
+            dimensions = self.obj.axes_manager.navigation_shape
+        else:
+            dimensions = self.obj.axes_manager.signal_shape
         mask = _circular_mask(center, radius, dimensions)
 
         if self.is_navigation:
             if unmask:
                 self.obj.metadata.Mask.nav_mask = self.obj.metadata.Mask.nav_mask ^ mask
             else:
-                self.obj.metadata.Mask.nav_mask = self.obj.metadata.Mask.nav_mask or mask
+                self.obj.metadata.Mask.nav_mask = self.obj.metadata.Mask.nav_mask + mask
         else:
             if unmask:
                 self.obj.metadata.Mask.sig_mask = self.obj.metadata.Mask.sig_mask ^ mask

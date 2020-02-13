@@ -1,4 +1,6 @@
 import numpy as np
+import dask.array as da
+import dask.delayed as dd
 
 from hyperspy._signals.signal2d import Signal2D
 from hyperspy.signal import BaseSignal
@@ -10,6 +12,7 @@ from hyperspy.defaults_parser import preferences
 from hyperspy.docstrings.signal import SHOW_PROGRESSBAR_ARG, PARALLEL_ARG
 from hyperspy.external.progressbar import progressbar
 from empyer.misc.utils import map_result_construction
+from itertools import product
 
 
 class Amorphous2D(Signal2D):
@@ -441,30 +444,76 @@ class LazyAmorphousSignal(LazySignal, Amorphous2D):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def axis_map(self, function, is_navigation=False, **kwargs):
-        """Applies a 2-D filter on either the navigation or the signal axis
-        Parameters
-        --------------
-        axes: list
-            The indexes of the axes to be operated on for the 2D transformation
-        function:function
-            Any function that can be applied to a 2D signal
-        show_progressbar: (None or bool)
-            If True, display a progress bar. If None, the default from the preferences settings is used.
-        parallel:(None or bool)
-            If True, perform computation in parallel using multiple cores. If None, the default from the preferences
-            settings is used.
-        inplace: bool
-            if True (default), the data is replaced by the result. Otherwise a new Signal with the results is returned.
-        ragged:(None or bool)
-            Indicates if the results for each navigation pixel are of identical shape (and/or numpy arrays to begin with). If None, the appropriate choice is made while processing. Note: None is not allowed for Lazy signals!
-        is_navigation:(bool)
-            If the function should be operating on the navigation axes rather than the signal axis.
-        **kwargs (dict)
-            All extra keyword arguments are passed to the provided function
-        """
+    def _map_iterate(self,
+                     function,
+                     iterating_kwargs=(),
+                     show_progressbar=None,
+                     parallel=None,
+                     ragged=None,
+                     inplace=True,
+                     is_navigation=False,
+                     **kwargs):
+        if ragged not in (True, False):
+            raise ValueError('"ragged" kwarg has to be bool for lazy signals')
         if is_navigation:
-            return self.Transpose(optimze=True).map(function, **kwargs)
+            size = max(1, self.axes_manager.signal_size)
         else:
-            return self.map(function, **kwargs)
-        return
+            size = max(1, self.axes_manager.navigation_size)
+        from hyperspy.misc.utils import (create_map_objects,
+                                         map_result_construction)
+        func, iterators = create_map_objects(function, size, iterating_kwargs,
+                                             **kwargs)
+        if is_navigation:
+            iterators = (self._iterate_navigation(), ) + iterators
+        else:
+            iterators = (self._iterate_signal(), ) + iterators
+        if is_navigation:
+            res_shape = self.axes_manager._signal_shape_in_array
+        else:
+            res_shape = self.axes_manager._navigation_shape_in_array
+        # no navigation
+        if not len(res_shape) and ragged:
+            res_shape = (1,)
+
+        all_delayed = [dd(func)(data) for data in zip(*iterators)]
+
+        if ragged:
+            sig_shape = ()
+            sig_dtype = np.dtype('O')
+        else:
+            one_compute = all_delayed[0].compute()
+            sig_shape = one_compute.shape
+            sig_dtype = one_compute.dtype
+        pixels = [
+            da.from_delayed(
+                res, shape=sig_shape, dtype=sig_dtype) for res in all_delayed
+        ]
+
+        for step in reversed(res_shape):
+            _len = len(pixels)
+            starts = range(0, _len, step)
+            ends = range(step, _len + step, step)
+            if is_navigation:
+                pixels = [da.stack(pixels[s:e], axis=2) for s, e in zip(starts, ends)]
+            else:
+                pixels = [da.stack(pixels[s:e], axis=0) for s, e in zip(starts, ends)]
+        result = pixels[0]
+        res = map_result_construction(
+            self, inplace, result, ragged, sig_shape, lazy=True)
+        return res
+
+    def _iterate_navigation(self):
+        if self.axes_manager.signal_size < 2:
+            yield self()
+            return
+        nav_dim = self.axes_manager.navigation_dimension
+        sig_dim = self.axes_manager.signal_dimension
+        sig_indices = self.axes_manager.signal_indices_in_array[::-1]
+        sig_lengths = np.atleast_1d(
+            np.array(self.data.shape)[list(sig_indices)])
+        getitem = [slice(None)] * (nav_dim + sig_dim)
+        data = self._lazy_data()
+        for indices in product(*[range(l) for l in sig_lengths]):
+            for res, ind in zip(indices, sig_indices):
+                getitem[ind] = res
+            yield data[tuple(getitem)]
