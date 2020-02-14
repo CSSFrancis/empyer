@@ -61,7 +61,7 @@ def convert(img, mask, center=None, angle=None, lengths=None, radius=[0,100], ph
     if normalized:
         ellipse_grid = np.reshape(list(zip(np.reshape(final_x[:,0:2], -1), np.reshape(final_y[:,0:2], -1))),
                                   (int(radius[1]-radius[0]),2,2)) # add zero column and then do fancy vector stuff takin
-        #the vectors which cross the paralellegram. 
+        #the vectors which cross the paralellegram.
         [ellipse_grid[i][0]for i in range(int(radius[1]-radius[0])-1)]
 
 
