@@ -18,20 +18,15 @@ class TestConvert(TestCase):
 
     def test_2d_convert(self):
         start = time.time()
-        plt.imshow(self.d)
-        plt.show()
-        print("The sum is:", np.sum(self.d))
-        conversion, mask = convert(self.d, mask=None, radius=[0,200], center=self.center, angle=self.angle,
-                                   lengths=self.lengths, phase_width=720,normalized=True)
-        print("the sum is", np.sum(conversion))
-        plt.imshow(conversion)
-        plt.show()
-
+        conversion, mask = convert(self.d, mask=None, radius=[0, 200], center=self.center, angle=self.angle,
+                                   lengths=self.lengths, phase_width=720, normalized=False)
         stop = time.time()
-        print((stop-start))
+        print("The time for conversion is :", stop-start)
         s = np.sum(conversion, axis=1)
         even = np.sum(conversion, axis=0)
         self.assertLess((s > max(s)/2).sum(), 120)
+
+
 
 
 

@@ -39,7 +39,7 @@ def map_result_construction(signal,
                 sig.axes_manager._append_axis(sig_shape[-ind], navigate=True)
         else:
             for ind in range(len(sig_shape) - sig.axes_manager.signal_dimension, 0, -1):
-                sig.axes_manager._append_axis(sig_shape[-ind], navigate=Flase)
+                sig.axes_manager._append_axis(sig_shape[-ind], navigate=False)
     sig.get_dimensions_from_data()
     if not sig.axes_manager._axes:
         add_scalar_axis(sig)

@@ -10,12 +10,12 @@ from skimage.filters import gaussian
 
 class TestAmorphous2D(TestCase):
     def setUp(self):
-        d = np.random.rand(8, 9, 10,11)
-        d[:, :, 6, 5] = 10
-        d[:, :,  7, 3] = 10
-        d[:, :, 6, 4] = 10
-        d[:, :,  4, 3] = 10
-        d[:, :,  2, 3] = 10
+        d = np.random.rand(8, 9, 100,110)
+        d[:, :, 60, 50] = 10
+        d[:, :,  70, 30] = 10
+        d[:, :, 60, 40] = 10
+        d[:, :,  40, 30] = 10
+        d[:, :,  20, 30] = 10
         self.am_sig = Amorphous2D(data=d)
 
     def test_summed(self):
@@ -93,8 +93,13 @@ class TestAmorphous2D(TestCase):
         self.assertEqual(self.am_sig.metadata.Mask.nav_mask[1, 1], True)
 
     # Testing the conversion to a polar signal.
-    def test_constant_signal(self):
-        polar = self.am_sig.to_polar()
+    def test_estimate_distortion(self):
+        self.am_sig.estimate_distortion()
+    def test_to_polar_signal(self):
+        polar = self.am_sig.to_polar(inplace=False)
+        print(polar)
+
+
     def test_to_lazy_signal(self):
         lazy = self.am_sig.as_lazy()
         print(lazy)

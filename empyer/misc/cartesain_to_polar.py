@@ -1,11 +1,9 @@
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
-import time
-
 from empyer.misc.image import ellipsoid_list_to_cartesian
 
 
-def convert(img, mask, center=None, angle=None, lengths=None, radius=[0,100], phase_width=720, normalized=False):
+def convert(img, center=None, angle=None, lengths=None, radius=[0,100], phase_width=720, normalized=False):
     """ Function for converting an image in cartesian coordinates to polar coordinates.
 
     Parameters
@@ -43,27 +41,22 @@ def convert(img, mask, center=None, angle=None, lengths=None, radius=[0,100], ph
                                                    axes_lengths=lengths,
                                                    angle=angle)
     intensity = img
-    # setting masked values to negative values. Anything interpolated from masked values becomes negative
-    if mask is not None:
-        intensity[mask] = -999999
-    tic =time.time()
-    spline = RectBivariateSpline(initial_x, initial_y, intensity, kx=1, ky=1)  # bi-linear spline (Takes 90% of time)
-    toc =time.time()
-    print("time is:", toc-tic)
-    tic = time.time()
+
+    spline = RectBivariateSpline(initial_y, initial_x, intensity, kx=1, ky=1)  # bi-linear spline (Takes 90% of time)
     polar_img = np.array(spline.ev(final_x, final_y))
-    toc = time.time()
-    print("time is:", toc - tic)
+
+    # Regular grid interpolate
     if normalized:
         # So as long as the phase information is sampled at a higher rate than the orginal we will only have 
-        polar_img = [[abs(spline.integral(x1,x2,y1,y2))for x1,y1,x2,y2 in zip(xr1,yr1,xr2,yr2)]
-                     for xr1,yr1,xr2,yr2 in zip(final_x[:-1,:-1],final_y[:-1,:-1],final_x[1:,1:],final_y[1:,1:])]
+        polar_img = [[abs(spline.integral(x1, x2, y1, y2))for x1, y1, x2, y2 in zip(xr1, yr1, xr2, yr2)]
+                     for xr1, yr1, xr2, yr2 in zip(final_x[:-1, :-1], final_y[:-1, :-1], final_x[1:, 1:], final_y[1:, 1:])]
+        # integral not properly calculated. It needs to have a lot higher phase scanning and even then it doesn't
+        # sample all of the image.
+        print("This function is not fully implemented")
     else:
         polar_img = np.reshape(polar_img, (int(radius[1] - radius[0]), phase_width))
-        mask = polar_img < -10
 
-
-    return polar_img, mask
+    return polar_img
 
 
 

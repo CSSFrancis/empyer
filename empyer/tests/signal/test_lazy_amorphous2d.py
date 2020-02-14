@@ -93,3 +93,11 @@ class TestLazyAmorphous2D(TestCase):
         # testing using floats
         self.am_sig.manav[0.0:15.0, 0.0:15.0] = True
         self.assertEqual(self.am_sig.metadata.Mask.nav_mask[1, 1], True)
+
+    # Testing polar converion
+    def test_estimate_distortion(self):
+        self.am_sig.estimate_distortion()
+
+    def test_to_polar_signal(self):
+        polar = self.am_sig.to_polar(inplace=False, ragged=False)
+        print(polar)

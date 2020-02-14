@@ -49,8 +49,8 @@ class Amorphous2D(Signal2D):
         Notes: For more parameters see hyperspy's Signal2D Class
         """
         Signal2D.__init__(self, *args, **kwargs)
-        self.manav = Mask(self,is_navigation=True)
-        self.masig = Mask(self,is_navigation=False)
+        self.manav = Mask(self, is_navigation=True)
+        self.masig = Mask(self, is_navigation=False)
         if not self.metadata.has_item('Mask'):
             self.metadata.add_node('Mask.sig_mask')
             self.metadata.add_node("Mask.nav_mask")
@@ -60,8 +60,8 @@ class Amorphous2D(Signal2D):
         if not self.metadata.has_item('Sum'):
             self.metadata.add_node("Sum.sig_sum")
             self.metadata.add_node("Sum.nav_sum")
-            self.metadata.Sum.sig_sum = self.sum(axis=self.axes_manager.signal_axes)
-            self.metadata.Mask.nav_sum = self.sum(axis=self.axes_manager.navigation_axes)
+            self.metadata.Sum.sig_sum = self.sum(axis=self.axes_manager.navigation_axes)
+            self.metadata.Mask.nav_sum = self.sum(axis=self.axes_manager.signal_axes)
 
     def add_haadf_intensities(self, intensity_array, slope=None, intercept=None):
         """Add High Angle Annular Dark Field intensities for each point.
@@ -117,12 +117,6 @@ class Amorphous2D(Signal2D):
             if isinstance(value, BaseSignal):
                 ndkwargs += ((key, value),)
 
-        # Check if the signal axes have inhomogeneous scales and/or units and
-        # display in warning if yes.
-        if is_navigation:
-            axes_index =[ a.index for a in self.axes_manager.navigation_axes]
-        else:
-            axes_index =[a.index for a in self.axes_manager.signal_axes]
         res = self._map_iterate(function, iterating_kwargs=ndkwargs,
                                 show_progressbar=show_progressbar,
                                 parallel=parallel, inplace=inplace,
@@ -133,20 +127,21 @@ class Amorphous2D(Signal2D):
             if is_navigation:
                 self.transpose(optimize=optimize)
             if scale is not None:
-                for s, a in scale, axes_index:
+                for a, s in enumerate(scale):
                     self.axes_manager[a].scale = s
             if units is not None:
-                for u, a in units, axes_index:
+                for a,u in enumerate(units):
+                    print("The axis index is:", a)
                     self.axes_manager[a].units = u
             self.events.data_changed.trigger(obj=self)
         else:
             if is_navigation:
                 res.transpose(optimize=optimize)
             if scale is not None:
-                for s, a in scale, axes_index:
+                for a, s in enumerate(scale):
                     res.axes_manager[a].scale = s
             if units is not None:
-                for u, a in units, axes_index:
+                for a, u in enumerate(units):
                     res.axes_manager[a].units = u
         return res
 
@@ -173,9 +168,11 @@ class Amorphous2D(Signal2D):
         self.axes_manager.signal_axes[1].offset = -center[1]
 
     def estimate_distortion(self, **kwargs):
-        masked_sum = self.metadata.Sum.sig_sum
-        masked_sum[self.masig] = 0
-        center, lengths, angle = solve_ellipse(masked_sum, **kwargs)
+        masked_sum = self.metadata.Sum.sig_sum.data
+        print(self)
+        print(np.shape(self.metadata.Mask.sig_mask))
+        print(np.shape(self.metadata.Sum.sig_sum.data))
+        center, lengths, angle = solve_ellipse(masked_sum, mask=self.metadata.Mask.sig_mask, **kwargs)
         return center, lengths, angle
 
     def get_thicknesses(self):
@@ -241,24 +238,42 @@ class Amorphous2D(Signal2D):
                      np.mean(thickness) + 3 * twosigma / 2]
         return th_filter, thickness
 
-    def to_polar(self, center=None, lengths=None, angle=None, phase_width=None, radius=[0,-1],**kwargs):
+    def to_polar(self, center=None, lengths=None, angle=None, phase_width=None, radius=[0, -1],
+                 estimate_distortion=False, inplace=False,  **kwargs):
         if not phase_width:
             phase_width = round((self.axes_manager.signal_shape[0]*3.14/2)/180)*180
-        if isinstance(radius[0], float) or isinstance(radius[1], float):
-            radius[0] = self.axes_manager.signal_axes[-1].value2index(radius[0])
-            radius[1] = self.axes_manager.signal_axes[-1].value2index(radius[1])
-        if radius[1] == -1:
-            radius[1] = int(min(np.subtract(self.axes_manager.signal_shape, center)) - 1)
-
+        if phase_width is 0:
+            phase_width = 90
+        if estimate_distortion:
+            center, lengths, angles = self.estimate_distortion()
+        else:
+            if isinstance(radius[0], float) or isinstance(radius[1], float):
+                radius[0] = self.axes_manager.signal_axes[-1].value2index(radius[0])
+                radius[1] = self.axes_manager.signal_axes[-1].value2index(radius[1])
+            if radius[1] == -1:
+                if center is None:
+                    radius[1] = int(min(self.axes_manager.signal_shape) - 2)
+                else:
+                    radius[1] = int(min(np.subtract(self.axes_manager.signal_shape, center)) - 1)
+        print(phase_width)
         polar_signal = self.axis_map(convert,
-                                     center=self.metadata.Signal.Ellipticity.center,
-                                     angle=self.metadata.Signal.Ellipticity.angle,
-                                     lengths=self.metadata.Signal.Ellipticity.lengths,
+                                     center=center,
+                                     angle=angle,
+                                     lengths=lengths,
                                      phase_width=phase_width,
                                      radius=radius,
+                                     inplace=inplace,
                                      **kwargs,
-                                     scale=[(2 * np.pi/phase_width),self.axes_manager.signal_axes[1].scale],
+                                     scale=[(2 * np.pi/phase_width), self.axes_manager.signal_axes[1].scale],
                                      units=["Radians,$\Theta$", "$nm^-1$"])
+        print(np.shape(self.masig))
+        polar_mask = convert(self.metadata.Mask.sig_mask, angle=angle, lengths=lengths, radius=radius,
+                             phase_width=phase_width)
+        polar_mask = polar_mask > 0
+        if inplace:
+            self.masig = polar_mask
+        else:
+            polar_signal.masig = polar_mask
 
         return polar_signal
 
@@ -390,9 +405,7 @@ class Amorphous2D(Signal2D):
                             thismap(func, zip(*iterators))):
             # In what follows we assume that res is a numpy scalar or array
             # The following line guarantees that that's the case.
-            print("this is Res ", res[1, 1])
             res = np.asarray(res)
-            print(ind)
             res_data.flat[ind] = res
             if ragged is False:
                 # to be able to break quickly and not waste time / resources

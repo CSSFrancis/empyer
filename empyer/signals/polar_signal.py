@@ -97,7 +97,7 @@ class PolarAmorphous2D(Amorphous2D):
             Calculates the FEM pattern using only some of the patterns based on their indexes
         """
 
-        if version is "omega":
+        if version is "intrapattern":
             if indicies:
                 var = stack([self.inav[ind] for ind in indicies])
                 annular_mean = var.nanmean(axis=-2)
@@ -112,7 +112,7 @@ class PolarAmorphous2D(Amorphous2D):
                     int_vs_k = (annular_mean_squared / v) - 1
                 self.set_signal_type("PolarSignal")
 
-        if version is 'rings':
+        if version is 'innerpattern':
             if indicies:
                 s = stack([self.inav[ind] for ind in indicies])
                 ring_squared_average = (s ** 2).nanmean(axis=-2)
