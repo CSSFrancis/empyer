@@ -2,7 +2,7 @@ from unittest import TestCase
 import numpy as np
 from empyer.misc.cartesain_to_polar import convert
 from empyer.misc.image import random_ellipse
-from timeit import timeit
+import time
 
 
 class TestConvert(TestCase):
@@ -16,9 +16,10 @@ class TestConvert(TestCase):
         self.d[rand_points[:, 0], rand_points[:, 1]] = 10
 
     def test_2d_convert(self):
-        start = timeit()
-        conversion = convert(self.d, center=self.center, angle=self.angle, lengths=self.lengths, phase_width=720)
-        stop = timeit()
+        start = time.time()
+        conversion, mask = convert(self.d, mask=None, center=self.center, angle=self.angle, lengths=self.lengths,
+                                   phase_width=720,normalized=True)
+        stop = time.time()
         print((stop-start))
         s = np.sum(conversion, axis=1)
         even = np.sum(conversion, axis=0)
