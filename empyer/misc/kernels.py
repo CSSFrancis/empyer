@@ -137,7 +137,7 @@ def sg_nano(wavelength, k0=[4,0,0], illumination_unit_vector = [0,0,1]):
 def shape_function(r, s):
     """The shape function for a cluster
 
-    Parmaters
+    Parameters
     ---------------
     r: float
         The radius of the cluster

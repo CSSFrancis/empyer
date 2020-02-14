@@ -54,16 +54,13 @@ def convert(img, mask, center=None, angle=None, lengths=None, radius=[0,100], ph
     polar_img = np.array(spline.ev(final_x, final_y))
     toc = time.time()
     print("time is:", toc - tic)
-    polar_img = np.reshape(polar_img, (int(radius[1]-radius[0]), phase_width))
-    polar_img[polar_img < -10] = mask
-    print(spline.get_coeffs()[0])
-    print(spline.integral(1, 2, 1, 2))
     if normalized:
-        ellipse_grid = np.reshape(list(zip(np.reshape(final_x[:,0:2], -1), np.reshape(final_y[:,0:2], -1))),
-                                  (int(radius[1]-radius[0]),2,2)) # add zero column and then do fancy vector stuff takin
-        #the vectors which cross the paralellegram.
-        [ellipse_grid[i][0]for i in range(int(radius[1]-radius[0])-1)]
-
+        # So as long as the phase information is sampled at a higher rate than the orginal we will only have 
+        polar_img = [[abs(spline.integral(x1,x2,y1,y2))for x1,y1,x2,y2 in zip(xr1,yr1,xr2,yr2)]
+                     for xr1,yr1,xr2,yr2 in zip(final_x[:-1,:-1],final_y[:-1,:-1],final_x[1:,1:],final_y[1:,1:])]
+    else:
+        polar_img = np.reshape(polar_img, (int(radius[1] - radius[0]), phase_width))
+        mask = polar_img < -10
 
 
     return polar_img, mask
