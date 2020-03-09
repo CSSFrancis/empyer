@@ -3,7 +3,7 @@ import numpy as np
 from empyer.misc.ellipse_analysis import solve_ellipse
 from empyer.misc.cartesain_to_polar import convert
 from empyer.signals.amorphous2d import Amorphous2D
-from empyer.signals.polar_signal import PolarAmorphous2D
+from empyer.signals.polar_amorphous_2d import PolarAmorphous2D
 from hyperspy._signals.lazy import LazySignal
 
 
@@ -198,7 +198,7 @@ class DiffractionSignal(Amorphous2D):
         if self.metadata.Signal.has_item('Ellipticity'):
             del(passed_meta_data['Signal']['Ellipticity'])
 
-        polar = PolarAmorphous2D(polar_signal, metadata=passed_meta_data)
+        polar = polar_signal, metadata=passed_meta_data)
         polar.mask_below(value=-9)
 
         polar.axes_manager.navigation_axes = self.axes_manager.navigation_axes

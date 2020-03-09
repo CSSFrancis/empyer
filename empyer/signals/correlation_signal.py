@@ -40,7 +40,7 @@ class CorrelationSignal(Amorphous2D):
         res.__init__(**res._to_dictionary())
         return res
 
-    def get_power_spectrum(self, method="FFT"):
+    def to_power(self, method="FFT"):
         """
         Calculate a power spectrum from the correlation signal
 

@@ -1,8 +1,7 @@
 import numpy as np
-from empyer.signals.amorphous2d import Amorphous2D
 from empyer.signals.correlation_signal import CorrelationSignal
+from empyer.signals.amorphous2d import Amorphous2D
 from empyer.misc.angular_correlation import angular_correlation
-from empyer.misc.image import square
 from hyperspy.utils import stack
 from hyperspy._signals.lazy import LazySignal
 
@@ -41,9 +40,7 @@ class PolarAmorphous2D(Amorphous2D):
         return res
 
     def to_correlation(self, binning_factor=1, cut=0, normalize=True):
-        # TODO: Add the ability to cutoff like slicing (maybe use np.s)
         """Create a Correlation Signal from a numpy array.
-
 
         Parameters
         ----------
@@ -55,7 +52,7 @@ class PolarAmorphous2D(Amorphous2D):
             normalize with autocorrelation
         Returns
         ----------
-        angle : CorrelationSignal
+        corr : CorrelationSignal
 
         """
         if isinstance(cut, float):
@@ -70,20 +67,20 @@ class PolarAmorphous2D(Amorphous2D):
                                         normalize=normalize,
                                         inplace=False)
         passed_meta_data = self.metadata.as_dictionary()
-        angular = CorrelationSignal(correlation, metadata=passed_meta_data)
+        corr = CorrelationSignal(correlation, metadata=passed_meta_data)
         shift = cut // binning_factor
-        angular.axes_manager.navigation_axes = self.axes_manager.navigation_axes
-        angular.set_axes(-2,
-                         name="Radians",
-                         scale=self.axes_manager[-2].scale*binning_factor,
-                         units="rad")
+        corr.axes_manager.navigation_axes = self.axes_manager.navigation_axes
+        corr.set_axes(-2,
+                      name="Radians",
+                      scale=self.axes_manager[-2].scale*binning_factor,
+                      units="rad")
         offset = shift * self.axes_manager[-1].scale*binning_factor
-        angular.set_axes(-1,
-                         name="k",
-                         scale=self.axes_manager[-1].scale*binning_factor,
-                         units=self.axes_manager[-1].units,
-                         offset=offset)
-        return angular
+        corr.set_axes(-1,
+                      name="k",
+                      scale=self.axes_manager[-1].scale*binning_factor,
+                      units=self.axes_manager[-1].units,
+                      offset=offset)
+        return corr
 
     def get_variance(self, version="omega", indicies=None):
         """Calculated the variance among some image
@@ -127,8 +124,6 @@ class PolarAmorphous2D(Amorphous2D):
         int_vs_k.axes_manager[0].units = "$nm^{-1}$"
         int_vs_k.axes_manager[0].name = "k"
         return int_vs_k
-
-
 
 
 class LazyPolarSignal(LazySignal, PolarAmorphous2D):

@@ -12,6 +12,7 @@ from hyperspy.defaults_parser import preferences
 from hyperspy.docstrings.signal import SHOW_PROGRESSBAR_ARG, PARALLEL_ARG
 from hyperspy.external.progressbar import progressbar
 from empyer.misc.utils import map_result_construction
+from empyer.signals.polar_amorphous_2d import PolarAmorphous2D
 from itertools import product
 
 
@@ -272,8 +273,11 @@ class Amorphous2D(Signal2D):
         polar_mask = polar_mask > 0
         if inplace:
             self.masig = polar_mask
+            self.set_signal_type("PolarAmorphous2D")
         else:
             polar_signal.masig = polar_mask
+            polar_signal.set_signal_type("PolarAmorphous2D")
+            print(polar_signal)
 
         return polar_signal
 

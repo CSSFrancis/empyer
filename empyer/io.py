@@ -1,7 +1,7 @@
 from hyperspy.io import load as hsload
 from .signals.amorphous2d import Amorphous2D
 from .signals.diffraction_signal import DiffractionSignal
-from .signals.polar_signal import PolarAmorphous2D
+from .signals.polar_amorphous_2d import PolarAmorphous2D
 from .signals.correlation_signal import CorrelationSignal
 from .signals.power_signal import PowerSignal
 

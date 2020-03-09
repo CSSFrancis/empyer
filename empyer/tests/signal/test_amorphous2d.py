@@ -1,7 +1,6 @@
 from unittest import TestCase
 import numpy as np
 import numpy.testing as nptest
-import time
 import matplotlib.pyplot as plt
 
 from empyer.signals.amorphous2d import Amorphous2D
