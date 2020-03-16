@@ -6,7 +6,7 @@ from hyperspy.drawing.utils import plot_images
 import numpy as np
 
 
-class PowerSignal(Amorphous2D):
+class Power2D(Amorphous2D):
     _signal_type = "power_signal"
 
     def __init__(self, *args, **kwargs):
@@ -109,7 +109,7 @@ class PowerSignal(Amorphous2D):
         plot_images(images=maps, label=l, *args, **kwargs)
 
 
-class LazyPowerSignal(LazySignal, PowerSignal):
+class LazyPowerSignal(LazySignal, Power2D):
 
     _lazy = True
 

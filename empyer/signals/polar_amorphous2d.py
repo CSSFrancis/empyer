@@ -1,5 +1,5 @@
 import numpy as np
-from empyer.signals.correlation_signal import CorrelationSignal
+from empyer.signals.correlation2d import Correlation2D
 from empyer.signals.amorphous2d import Amorphous2D
 from empyer.misc.angular_correlation import angular_correlation
 from hyperspy.utils import stack
@@ -52,7 +52,7 @@ class PolarAmorphous2D(Amorphous2D):
             normalize with autocorrelation
         Returns
         ----------
-        corr : CorrelationSignal
+        corr : Correlation2D
 
         """
         if isinstance(cut, float):
@@ -67,7 +67,7 @@ class PolarAmorphous2D(Amorphous2D):
                                         normalize=normalize,
                                         inplace=False)
         passed_meta_data = self.metadata.as_dictionary()
-        corr = CorrelationSignal(correlation, metadata=passed_meta_data)
+        corr = Correlation2D(correlation, metadata=passed_meta_data)
         shift = cut // binning_factor
         corr.axes_manager.navigation_axes = self.axes_manager.navigation_axes
         corr.set_axes(-2,

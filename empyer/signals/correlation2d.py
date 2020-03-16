@@ -1,10 +1,10 @@
 from empyer.signals.amorphous2d import Amorphous2D
-from empyer.signals.power_signal import PowerSignal
+from empyer.signals.power2d import Power2D
 from empyer.misc.angular_correlation import power_spectrum
 from hyperspy._signals.lazy import LazySignal
 
 
-class CorrelationSignal(Amorphous2D):
+class Correlation2D(Amorphous2D):
     """Create a  Correlation Signal from a numpy array.
 
     Parameters
@@ -36,7 +36,7 @@ class CorrelationSignal(Amorphous2D):
         """Returns the signal as a lazy signal.
         """
         res = super().as_lazy(*args, **kwargs)
-        res.__class__ = LazyCorrelationSignal
+        res.__class__ = LazyCorrelation2D
         res.__init__(**res._to_dictionary())
         return res
 
@@ -56,7 +56,7 @@ class CorrelationSignal(Amorphous2D):
         passed_meta_data = self.metadata.as_dictionary()
         if self.metadata.has_item('Masks'):
             del (passed_meta_data['Masks'])
-        power = PowerSignal(power_signal)
+        power = Power2D(power_signal)
         power.axes_manager.navigation_axes = self.axes_manager.navigation_axes
 
         power.set_axes(-2,
@@ -79,7 +79,7 @@ class CorrelationSignal(Amorphous2D):
         return summed_pow.get_power_spectrum()
 
 
-class LazyCorrelationSignal(LazySignal,CorrelationSignal):
+class LazyCorrelation2D(LazySignal, Correlation2D):
 
     _lazy = True
 

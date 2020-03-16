@@ -1,8 +1,8 @@
 from hyperspy.io import load as hsload
 from .signals.amorphous2d import Amorphous2D
 from .signals.polar_amorphous2d import PolarAmorphous2D
-from .signals.correlation_signal import CorrelationSignal
-from .signals.power_signal import PowerSignal
+from .signals.correlation2d import Correlation2D
+from .signals.power2d import Power2D
 
 # Depreciated after version 0.210
 
@@ -112,9 +112,9 @@ def to_correlation_signal(signal=None):
 
     ax = signal.axes_manager.as_dictionary()
     ax = [ax[key]for key in ax]
-    cs = CorrelationSignal(signal,
-                           metadata=signal.metadata.as_dictionary(),
-                           axes=ax)
+    cs = Correlation2D(signal,
+                       metadata=signal.metadata.as_dictionary(),
+                       axes=ax)
     return cs
 
 
@@ -132,7 +132,7 @@ def to_power_signal(signal=None):
     """
     ax = signal.axes_manager.as_dictionary()
     ax = [ax[key]for key in ax]
-    ps = PowerSignal(signal,
-                     metadata=signal.metadata.as_dictionary(),
-                     axes=ax)
+    ps = Power2D(signal,
+                 metadata=signal.metadata.as_dictionary(),
+                 axes=ax)
     return ps
