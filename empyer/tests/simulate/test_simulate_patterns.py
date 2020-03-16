@@ -5,7 +5,7 @@ import hyperspy.api as hs
 
 from empyer.simulate.simulate_patterns import simulate_pattern, simulate_symmetry, cartesian_to_ellipse, random_pattern, simulate_cube
 from empyer.misc.ellipse_analysis import solve_ellipse
-from empyer.misc.cartesain_to_polar import convert
+from empyer.misc.cartesain_to_polar import to_polar_image
 from empyer.misc.angular_correlation import angular_correlation,power_spectrum
 
 
@@ -56,7 +56,7 @@ class TestSimulations(TestCase):
         self.assertAlmostEqual(l[0]/l[1], max(lengths)/min(lengths), places=-1)
         self.assertAlmostEqual(angle, a, places=1)
         # converting to polar coordinates
-        conversion = convert(img=i, center=c, lengths=l, angle=a)
+        conversion = to_polar_image(img=i, center=c, lengths=l, angle=a)
         ac = angular_correlation(conversion, normalize=True)
         ps = power_spectrum(ac)
         #plt.imshow(i)

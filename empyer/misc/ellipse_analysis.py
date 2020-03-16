@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numpy.linalg import eig, inv
 from matplotlib.patches import Ellipse
-from empyer.misc.cartesain_to_polar import convert
+from empyer.misc.cartesain_to_polar import to_polar_image
 
 
 def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False, suspected_radius=None):
@@ -166,7 +166,7 @@ def advanced_solve_ellipse(img, center, lengths, angle, phase_width, radius, num
     x = np.linspace(-5,5,20)
     y = np.linspace(-5, 5, 20)
 
-    pol =[[convert(img, angle=None, lengths=None, center=np.add(center[x1,y1]), phase_width=phase_width, radius=radius)
+    pol =[[to_polar_image(img, angle=None, lengths=None, center=np.add(center[x1, y1]), phase_width=phase_width, radius=radius)
            for x1 in x]for y1 in y]
     
 

@@ -7,12 +7,12 @@ from hyperspy.signal import BaseSignal
 from hyperspy._signals.lazy import LazySignal
 from empyer.misc.masks import Mask
 from empyer.misc.ellipse_analysis import solve_ellipse
-from empyer.misc.cartesain_to_polar import convert
+from empyer.misc.cartesain_to_polar import to_polar_image
 from hyperspy.defaults_parser import preferences
 from hyperspy.docstrings.signal import SHOW_PROGRESSBAR_ARG, PARALLEL_ARG
 from hyperspy.external.progressbar import progressbar
 from empyer.misc.utils import map_result_construction
-from empyer.signals.polar_amorphous_2d import PolarAmorphous2D
+from empyer.signals.polar_amorphous2d import PolarAmorphous2D
 from itertools import product
 
 
@@ -213,7 +213,7 @@ class Amorphous2D(Signal2D):
             self.axes_manager[index].offset = offset
 
     def thickness_filter(self):
-        """Filter based on HAADF intensities
+        """Filter based on HAADF intensities.  Requires that there is a HAADF Signal in the metadata.
 
         Returns
         ------------------
@@ -240,7 +240,7 @@ class Amorphous2D(Signal2D):
         return th_filter, thickness
 
     def to_polar(self, center=None, lengths=None, angle=None, phase_width=None, radius=[0, -1],
-                 estimate_distortion=False, inplace=False,  **kwargs):
+                 estimate_distortion=False, inplace=False, normalize=True,  **kwargs):
         if not phase_width:
             phase_width = round((self.axes_manager.signal_shape[0]*3.14/2)/180)*180
         if phase_width is 0:
@@ -257,19 +257,19 @@ class Amorphous2D(Signal2D):
                 else:
                     radius[1] = int(min(np.subtract(self.axes_manager.signal_shape, center)) - 1)
         print(phase_width)
-        polar_signal = self.axis_map(convert,
+        polar_signal = self.axis_map(to_polar_image,
                                      center=center,
                                      angle=angle,
                                      lengths=lengths,
                                      phase_width=phase_width,
                                      radius=radius,
                                      inplace=inplace,
+                                     normalize=normalize,
                                      **kwargs,
                                      scale=[(2 * np.pi/phase_width), self.axes_manager.signal_axes[1].scale],
                                      units=["Radians,$\Theta$", "$nm^-1$"])
-        print(np.shape(self.masig))
-        polar_mask = convert(self.metadata.Mask.sig_mask, angle=angle, lengths=lengths, radius=radius,
-                             phase_width=phase_width)
+        polar_mask = to_polar_image(self.metadata.Mask.sig_mask, angle=angle, lengths=lengths, radius=radius,
+                                    phase_width=phase_width)
         polar_mask = polar_mask > 0
         if inplace:
             self.masig = polar_mask
@@ -445,11 +445,6 @@ class Amorphous2D(Signal2D):
         return res
 
     _map_iterate.__doc__ %= (SHOW_PROGRESSBAR_ARG, PARALLEL_ARG)
-
-
-
-    def to_correlation(self):
-        pass
 
     def get_virtual_image(self, roi):
         return

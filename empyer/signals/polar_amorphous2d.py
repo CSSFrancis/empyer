@@ -82,14 +82,14 @@ class PolarAmorphous2D(Amorphous2D):
                       offset=offset)
         return corr
 
-    def get_variance(self, version="omega", indicies=None):
+    def get_variance(self, version="intrapattern", indicies=None):
         """Calculated the variance among some image
 
         Parameters
         ----------
         version : str
-            The name of the FEM equation to use. 'rings' calculates the mean of the variances of all the patterns at
-            some k.  'omega' calculates the variance of the annular means for every value of k.
+            The name of the FEM equation to use. 'intrapattern' calculates the mean of the variances of all the patterns at
+            some k.  'innerpattern' calculates the variance of the annular means for every value of k.
         patterns: indicies
             Calculates the FEM pattern using only some of the patterns based on their indexes
         """

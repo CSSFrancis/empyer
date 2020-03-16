@@ -1,7 +1,6 @@
 from hyperspy.io import load as hsload
 from .signals.amorphous2d import Amorphous2D
-from .signals.diffraction_signal import DiffractionSignal
-from .signals.polar_amorphous_2d import PolarAmorphous2D
+from .signals.polar_amorphous2d import PolarAmorphous2D
 from .signals.correlation_signal import CorrelationSignal
 from .signals.power_signal import PowerSignal
 
@@ -77,25 +76,6 @@ def to_em_signal(signal=None):
     ax = [ax[key]for key in ax]
     ds = Amorphous2D(signal, metadata=signal.metadata.as_dictionary(), axes=ax)
     return ds
-
-
-def to_diffraction_signal(signal=None):
-    """Hyperspy signal to diffraction_signal
-
-    Parameters
-    ---------------------
-    signal: Signal2D
-
-    Returns
-    ---------------------
-    ds: em_signal
-        A signal of type signal_type
-    """
-    ax = signal.axes_manager.as_dictionary()
-    ax = [ax[key]for key in ax]
-    ds = DiffractionSignal(signal, metadata=signal.metadata.as_dictionary(), axes=ax)
-    return ds
-
 
 def to_polar_signal(signal=None):
     """Hyperspy signal to polar_signal

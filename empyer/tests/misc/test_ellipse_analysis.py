@@ -1,7 +1,7 @@
 from unittest import TestCase
 import numpy as np
 from empyer.misc.ellipse_analysis import solve_ellipse, get_max_positions
-from empyer.misc.cartesain_to_polar import convert
+from empyer.misc.cartesain_to_polar import to_polar_image
 from empyer.misc.image import random_ellipse
 import matplotlib.pyplot as plt
 

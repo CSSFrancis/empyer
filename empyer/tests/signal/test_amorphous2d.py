@@ -94,6 +94,7 @@ class TestAmorphous2D(TestCase):
     # Testing the conversion to a polar signal.
     def test_estimate_distortion(self):
         self.am_sig.estimate_distortion()
+
     def test_to_polar_signal(self):
         polar = self.am_sig.to_polar(inplace=False)
         print(polar)

@@ -3,7 +3,7 @@ from scipy.interpolate import RectBivariateSpline
 from empyer.misc.image import ellipsoid_list_to_cartesian
 
 
-def convert(img, center=None, angle=None, lengths=None, radius=[0,100], phase_width=720, normalized=False):
+def to_polar_image(img, center=None, angle=None, lengths=None, radius=[0, 100], phase_width=720, normalized=False):
     """ Function for converting an image in cartesian coordinates to polar coordinates.
 
     Parameters
@@ -44,17 +44,11 @@ def convert(img, center=None, angle=None, lengths=None, radius=[0,100], phase_wi
 
     spline = RectBivariateSpline(initial_y, initial_x, intensity, kx=1, ky=1)  # bi-linear spline (Takes 90% of time)
     polar_img = np.array(spline.ev(final_x, final_y))
+    polar_img = np.reshape(polar_img, (int(radius[1] - radius[0]), phase_width))
 
-    # Regular grid interpolate
     if normalized:
-        # So as long as the phase information is sampled at a higher rate than the orginal we will only have 
-        polar_img = [[abs(spline.integral(x1, x2, y1, y2))for x1, y1, x2, y2 in zip(xr1, yr1, xr2, yr2)]
-                     for xr1, yr1, xr2, yr2 in zip(final_x[:-1, :-1], final_y[:-1, :-1], final_x[1:, 1:], final_y[1:, 1:])]
-        # integral not properly calculated. It needs to have a lot higher phase scanning and even then it doesn't
-        # sample all of the image.
-        print("This function is not fully implemented")
-    else:
-        polar_img = np.reshape(polar_img, (int(radius[1] - radius[0]), phase_width))
+        # Normalizing based on pixels. This involves knowing the area belonging to each pixel.
+        polar_img = [rad_pix*(rad+rad-1)*np.pi/phase_width for rad_pix,rad in zip(polar_img[:],final_rad) if final_rad is not 0]
 
     return polar_img
 

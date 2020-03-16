@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import hyperspy.api as hs
 
 from empyer.simulate.sim_glass import simulate_cube, simulate_pattern, random_2d_clusters
-from empyer.misc.cartesain_to_polar import convert
+from empyer.misc.cartesain_to_polar import to_polar_image
 from empyer.misc.angular_correlation import angular_correlation,power_spectrum
 
 
@@ -43,7 +43,7 @@ class TestGlassSimulations(TestCase):
         i= i+np.random.random((512,512))*3
         plt.imshow(i)
         plt.show()
-        pol = convert(i, center=(256,256), angle=None, lengths=None, radius=[0, 200], phase_width=720)
+        pol = to_polar_image(i, center=(256, 256), angle=None, lengths=None, radius=[0, 200], phase_width=720)
         plt.imshow(pol)
         plt.show()
         ang = angular_correlation(pol)
@@ -63,7 +63,7 @@ class TestGlassSimulations(TestCase):
         i = i+ np.random.random((512, 512))*np.max(i)/4
         plt.imshow(i)
         plt.show()
-        pol = convert(i, center=(256,256), angle=None, lengths=None, radius=[0, 200], phase_width=720)
+        pol = to_polar_image(i, center=(256, 256), angle=None, lengths=None, radius=[0, 200], phase_width=720)
         plt.imshow(pol)
         plt.show()
         ang = angular_correlation(pol)

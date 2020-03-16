@@ -20,8 +20,9 @@ def angular_correlation(r_theta_img, mask=None, binning=1, cut_off=0, normalize=
     """
     image = r_theta_img
     m = mask
+    print(np.shape(m))
     if m is not None:
-        mask_boolean = ~m  # inverting the boolean mask
+        mask_boolean = ~ m  # inverting the boolean mask
         mask_fft = np.fft.fft(mask_boolean, axis=1)
         number_unmasked = np.fft.ifft(mask_fft*np.conjugate(mask_fft), axis=1).real
         number_unmasked[number_unmasked < 1] = 1  # get rid of divide by zero error for completely masked rows
@@ -43,7 +44,7 @@ def angular_correlation(r_theta_img, mask=None, binning=1, cut_off=0, normalize=
     # this is to determine how many of the variables were non zero... This is really dumb.  but...
     # it works and I should stop trying to fix it (wreak it)
     if m is not None:
-        a = np.multiply(np.divide(a, number_unmasked), 720)
+        a = np.multiply(np.divide(a, np.transpose(number_unmasked)), 720)
 
     if normalize:
         a_prime = np.zeros(np.shape(a))
@@ -78,20 +79,3 @@ def power_spectrum(correlation, method="FFT"):
         pow_spectrum = np.fft.fft(correlation, axis=1).real
         pow_spectrum = np.power(pow_spectrum, 2)
     return pow_spectrum
-
-
-def get_S_Q(r_theta_img, plot=False):
-    """Get the S of Q for the images.
-
-    Parameters
-    ------------
-    r_theta_img:
-    """
-    # TODO: add in what the physical r is for the function...
-
-    S_Q = [np.nansum(r) for r in r_theta_img]
-    if plot:
-        plt.plot(S_Q)
-        plt.show()
-    return S_Q
-
