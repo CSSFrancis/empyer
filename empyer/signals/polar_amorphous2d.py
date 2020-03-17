@@ -57,16 +57,17 @@ class PolarAmorphous2D(Amorphous2D):
         """
         if isinstance(cut, float):
             cut = self.axes_manager.signal_axes[1].value2index(cut)
-        shift = cut // binning_factor
+        shift = cut // binning_factor + self.axes_manager.signal_axes[1].offset
         correlation_signal = self.axis_map(angular_correlation,
-                                           mask= self.masig,
+                                           mask = self.metadata.Mask.sig_mask,
                                            binning = binning_factor,
                                            cut_off = cut,
                                            normalize = normalize,
                                            inplace = inplace,
                                            scale=[self.axes_manager.signal_axes[0].scale,
                                                   self.axes_manager.signal_axes[1].scale]*binning_factor,
-                                           units=["Radiand,$\phi$", "$nm^-1$"])
+                                           units=["Radiand,$\phi$", "$nm^-1$"],
+                                           offset=[self.axes_manager.signal_axes[0].offset,shift])
         if inplace:
             self.masig = None
             self.set_signal_type("Corrleation2D")

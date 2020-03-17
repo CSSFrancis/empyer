@@ -20,7 +20,6 @@ def angular_correlation(r_theta_img, mask=None, binning=1, cut_off=0, normalize=
     """
     image = r_theta_img
     m = mask
-    print(np.shape(m))
     if m is not None:
         mask_boolean = ~ m  # inverting the boolean mask
         mask_fft = np.fft.fft(mask_boolean, axis=1)

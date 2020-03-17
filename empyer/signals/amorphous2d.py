@@ -12,7 +12,6 @@ from hyperspy.defaults_parser import preferences
 from hyperspy.docstrings.signal import SHOW_PROGRESSBAR_ARG, PARALLEL_ARG
 from hyperspy.external.progressbar import progressbar
 from empyer.misc.utils import map_result_construction
-from empyer.signals.polar_amorphous2d import PolarAmorphous2D
 from itertools import product
 
 
