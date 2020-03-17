@@ -92,8 +92,8 @@ class Amorphous2D(Signal2D):
         return
 
     def axis_map(self, function,
-            show_progressbar=None, parallel=None, inplace=True, ragged=None, is_navigation=False, scale=None, units=None,
-            optimize=True, **kwargs):
+                 show_progressbar=None, parallel=None, inplace=True, ragged=None, is_navigation=False, scale=None,
+                 units=None, offset=None, optimize=True, **kwargs):
         """Apply a function to the axes listed in axis list.
         The function must operate on numpy arrays. It is applied to the data at
         each coordinate pixel-py-pixel according to axis list.
@@ -134,6 +134,10 @@ class Amorphous2D(Signal2D):
                 for a,u in enumerate(units):
                     print("The axis index is:", a)
                     self.axes_manager[a].units = u
+            if offset is not None:
+                for a,o in enumerate(offset):
+                    print("The axis index is:", a)
+                    self.axes_manager[a].offset = o
             self.events.data_changed.trigger(obj=self)
         else:
             if is_navigation:
@@ -144,6 +148,9 @@ class Amorphous2D(Signal2D):
             if units is not None:
                 for a, u in enumerate(units):
                     res.axes_manager[a].units = u
+            if offset is not None:
+                for a, o in enumerate(offset):
+                    res.axes_manager[a].offset = o
         return res
 
     def as_lazy(self, *args, **kwargs):
@@ -447,7 +454,13 @@ class Amorphous2D(Signal2D):
     _map_iterate.__doc__ %= (SHOW_PROGRESSBAR_ARG, PARALLEL_ARG)
 
     def get_virtual_image(self, roi):
-        return
+        dark_field = roi(self, axes=self.axes_manager.signal_axes)
+        dark_field_sum = dark_field.sum(
+            axis=dark_field.axes_manager.signal_axes
+        )
+        dark_field_sum.metadata.General.title = "Virtual Dark Field"
+        vdfim = dark_field_sum.as_signal2D((0, 1))
+        return vdfim
 
 
 class LazyAmorphousSignal(LazySignal, Amorphous2D):

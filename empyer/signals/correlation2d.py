@@ -26,11 +26,11 @@ class Correlation2D(Amorphous2D):
         typically contains all the parameters that has been
         imported from the original data file.
     """
-    _signal_type = "correlation_signal"
+    _signal_type = "correlation2d"
 
     def __init__(self, *args, **kwargs):
         Amorphous2D.__init__(self, *args, **kwargs)
-        self.metadata.set_item("Signal.type", "correlation_signal")
+        self.metadata.set_item("Signal.type", "correlation2d")
 
     def as_lazy(self, *args, **kwargs):
         """Returns the signal as a lazy signal.

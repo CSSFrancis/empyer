@@ -7,7 +7,7 @@ from hyperspy._signals.lazy import LazySignal
 
 
 class PolarAmorphous2D(Amorphous2D):
-    _signal_type = "polar_signal"
+    _signal_type = "polar2d"
 
     def __init__(self, *args, **kwargs):
         """Create a  Polar Signal from a numpy array.
@@ -31,7 +31,7 @@ class PolarAmorphous2D(Amorphous2D):
             imported from the original data file.
         """
         Amorphous2D.__init__(self, *args, **kwargs)
-        self.metadata.set_item("Signal.type", "polar_signal")
+        self.metadata.set_item("Signal.type", "polar2d")
 
     def as_lazy(self, *args, **kwargs):
         res = super().as_lazy(*args, **kwargs)
@@ -39,7 +39,7 @@ class PolarAmorphous2D(Amorphous2D):
         res.__init__(**res._to_dictionary())
         return res
 
-    def to_correlation(self, binning_factor=1, cut=0, normalize=True):
+    def to_correlation(self, binning_factor=1, cut=0, normalize=True,inplace=False):
         """Create a Correlation Signal from a numpy array.
 
         Parameters
@@ -57,30 +57,23 @@ class PolarAmorphous2D(Amorphous2D):
         """
         if isinstance(cut, float):
             cut = self.axes_manager.signal_axes[1].value2index(cut)
-        self.add_mask()
-        if isinstance(self.data, np.ma.masked_array):
-            mask = np.reshape(self.data.mask, newshape=(-1, *reversed(self.axes_manager.signal_shape)))
-        correlation = self._map_iterate(angular_correlation,
-                                        iterating_kwargs=(('mask', mask),),
-                                        binning=binning_factor,
-                                        cut_off=cut,
-                                        normalize=normalize,
-                                        inplace=False)
-        passed_meta_data = self.metadata.as_dictionary()
-        corr = Correlation2D(correlation, metadata=passed_meta_data)
         shift = cut // binning_factor
-        corr.axes_manager.navigation_axes = self.axes_manager.navigation_axes
-        corr.set_axes(-2,
-                      name="Radians",
-                      scale=self.axes_manager[-2].scale*binning_factor,
-                      units="rad")
-        offset = shift * self.axes_manager[-1].scale*binning_factor
-        corr.set_axes(-1,
-                      name="k",
-                      scale=self.axes_manager[-1].scale*binning_factor,
-                      units=self.axes_manager[-1].units,
-                      offset=offset)
-        return corr
+        correlation_signal = self.axis_map(angular_correlation,
+                                           mask= self.masig,
+                                           binning = binning_factor,
+                                           cut_off = cut,
+                                           normalize = normalize,
+                                           inplace = inplace,
+                                           scale=[self.axes_manager.signal_axes[0].scale,
+                                                  self.axes_manager.signal_axes[1].scale]*binning_factor,
+                                           units=["Radiand,$\phi$", "$nm^-1$"])
+        if inplace:
+            self.masig = None
+            self.set_signal_type("Corrleation2D")
+        else:
+            correlation_signal.masig = None
+            correlation_signal.set_signal_type("Corrleation2D")
+        return correlation_signal
 
     def get_variance(self, version="intrapattern", indicies=None):
         """Calculated the variance among some image
