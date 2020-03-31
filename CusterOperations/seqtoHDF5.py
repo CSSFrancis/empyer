@@ -20,7 +20,6 @@ def loadMRCfile(filepath):
         image = np.reshape(np.frombuffer(dataset, dtype=np.float32),(frame_height,frame_width))
         return image
 
-
 def loadHeader(fileName, darkref):
     print('Reading file ' + fileName)
     with open(fileName, mode='rb') as file:  # b is important -> binary

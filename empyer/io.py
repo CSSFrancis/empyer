@@ -1,9 +1,8 @@
 from hyperspy.io import load as hsload
-from .signals.em_signal import EMSignal
-from .signals.diffraction_signal import DiffractionSignal
-from .signals.polar_signal import PolarSignal
-from .signals.correlation_signal import CorrelationSignal
-from .signals.power_signal import PowerSignal
+from .signals.amorphous2d import Amorphous2D
+from .signals.polar_amorphous2d import PolarAmorphous2D
+from .signals.correlation2d import Correlation2D
+from .signals.power2d import Power2D
 
 # Depreciated after version 0.210
 
@@ -75,27 +74,8 @@ def to_em_signal(signal=None):
     """
     ax = signal.axes_manager.as_dictionary()
     ax = [ax[key]for key in ax]
-    ds = EMSignal(signal, metadata=signal.metadata.as_dictionary(), axes=ax)
+    ds = Amorphous2D(signal, metadata=signal.metadata.as_dictionary(), axes=ax)
     return ds
-
-
-def to_diffraction_signal(signal=None):
-    """Hyperspy signal to diffraction_signal
-
-    Parameters
-    ---------------------
-    signal: Signal2D
-
-    Returns
-    ---------------------
-    ds: em_signal
-        A signal of type signal_type
-    """
-    ax = signal.axes_manager.as_dictionary()
-    ax = [ax[key]for key in ax]
-    ds = DiffractionSignal(signal, metadata=signal.metadata.as_dictionary(), axes=ax)
-    return ds
-
 
 def to_polar_signal(signal=None):
     """Hyperspy signal to polar_signal
@@ -111,9 +91,9 @@ def to_polar_signal(signal=None):
     """
     ax = signal.axes_manager.as_dictionary()
     ax = [ax[key]for key in ax]
-    ps = PolarSignal(signal,
-                     metadata=signal.metadata.as_dictionary(),
-                     axes=ax)
+    ps = PolarAmorphous2D(signal,
+                          metadata=signal.metadata.as_dictionary(),
+                          axes=ax)
     return ps
 
 
@@ -132,9 +112,9 @@ def to_correlation_signal(signal=None):
 
     ax = signal.axes_manager.as_dictionary()
     ax = [ax[key]for key in ax]
-    cs = CorrelationSignal(signal,
-                           metadata=signal.metadata.as_dictionary(),
-                           axes=ax)
+    cs = Correlation2D(signal,
+                       metadata=signal.metadata.as_dictionary(),
+                       axes=ax)
     return cs
 
 
@@ -152,7 +132,7 @@ def to_power_signal(signal=None):
     """
     ax = signal.axes_manager.as_dictionary()
     ax = [ax[key]for key in ax]
-    ps = PowerSignal(signal,
-                     metadata=signal.metadata.as_dictionary(),
-                     axes=ax)
+    ps = Power2D(signal,
+                 metadata=signal.metadata.as_dictionary(),
+                 axes=ax)
     return ps

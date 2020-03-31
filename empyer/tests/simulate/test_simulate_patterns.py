@@ -5,7 +5,7 @@ import hyperspy.api as hs
 
 from empyer.simulate.simulate_patterns import simulate_pattern, simulate_symmetry, cartesian_to_ellipse, random_pattern, simulate_cube
 from empyer.misc.ellipse_analysis import solve_ellipse
-from empyer.misc.cartesain_to_polar import convert
+from empyer.misc.cartesain_to_polar import to_polar_image
 from empyer.misc.angular_correlation import angular_correlation,power_spectrum
 
 
@@ -28,7 +28,7 @@ class TestSimulations(TestCase):
         p =random_pattern(4, 4)
 
     def test_simulate_image(self):
-        i = simulate_pattern(4, k=100, num_clusters=100, probe_size=10, center=[256, 256], angle=0, lengths=[10, 10])
+        i = simulate_pattern(4, k=100, num_clusters=100, r=1, probe_size=10, center=[128, 128], angle=.2, lengths=[10, 10])
         plt.imshow(i)
         plt.show()
 
@@ -56,7 +56,7 @@ class TestSimulations(TestCase):
         self.assertAlmostEqual(l[0]/l[1], max(lengths)/min(lengths), places=-1)
         self.assertAlmostEqual(angle, a, places=1)
         # converting to polar coordinates
-        conversion = convert(img=i, center=c, lengths=l, angle=a)
+        conversion = to_polar_image(img=i, center=c, lengths=l, angle=a)
         ac = angular_correlation(conversion, normalize=True)
         ps = power_spectrum(ac)
         #plt.imshow(i)
@@ -68,5 +68,9 @@ class TestSimulations(TestCase):
         #plt.imshow(ac)
         plt.imshow(ps[:, 0:12])
         plt.show()
+
+class TestMisallignment(TestCase):
+    def test_make_patterns(self):
+
 
 

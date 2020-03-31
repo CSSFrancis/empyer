@@ -1,0 +1,103 @@
+from unittest import TestCase
+import numpy as np
+import dask.array as da
+import numpy.testing as nptest
+import matplotlib.pyplot as plt
+
+from empyer.signals.amorphous2d import Amorphous2D, LazyAmorphousSignal
+from skimage.filters import gaussian
+
+
+class TestLazyAmorphous2D(TestCase):
+    def setUp(self):
+        d = np.random.rand(8, 9, 10,11)
+        d[:, :, 6, 5] = 10
+        d[:, :,  7, 3] = 10
+        d[:, :, 6, 4] = 10
+        d[:, :,  4, 3] = 10
+        d[:, :,  2, 3] = 10
+        am_sig = Amorphous2D(data=d)
+        self.am_sig= am_sig.as_lazy()
+
+    def test_is_Lazy(self):
+        self.assertIsInstance(self.am_sig, LazyAmorphousSignal)
+        self.assertIsInstance(self.am_sig.data, da.core.Array)
+
+    def test_add_haadf(self):
+        self.am_sig.add_haadf_intensities(np.ones((8, 9)))
+        nptest.assert_array_equal(self.am_sig.metadata.HAADF.intensity, np.ones((9, 8)))
+        self.assertEqual(self.am_sig.axes_manager.navigation_axes[0].scale,
+                         self.am_sig.metadata.HAADF.intensity.axes_manager[0].scale)
+
+    def test_HAADF(self):
+        self.am_sig.add_haadf_intensities(np.random.normal(size=(8, 9)), 1.5, .1)
+
+    # Testing mapping on the signal and the navigation axes
+    def test_axes_map(self):
+        d = np.random.rand(8, 9, 10, 11)
+        a_sig = Amorphous2D(data=d)
+        a_sig.inav[1, 1].isig[:, :] = np.ones(shape=(10, 11)) * 100
+        a_sig = a_sig.as_lazy()
+        def as_is(image):
+            #print(image.max())
+            return image
+        a_sig.axis_map(function=as_is, is_navigation=True, inplace=True, ragged=False)
+        a_sig.plot()
+        plt.show()
+
+    def test_map_skimage(self):
+        d = np.random.rand(8, 9, 10, 11)
+        a_sig = Amorphous2D(data=d)
+        a_sig.inav[1, 1].isig[:,:]= np.ones(shape=(10,11))*100
+        a_sig = a_sig.as_lazy()
+        print(a_sig)
+        a_sig.plot()
+        plt.show()
+        a_sig.axis_map(function=gaussian, is_navigation=True, inplace=True, ragged=False)
+        print(a_sig)
+        a_sig.plot()
+        plt.show()
+
+    # Tests for Masking with amorphous signal...
+    def test_mask(self):
+        nptest.assert_array_equal(self.am_sig.metadata.Mask.nav_mask, np.zeros((9, 8), dtype=bool))
+
+    def test_mask_circle(self):
+        # signal axis
+        self.am_sig.masig.mask_circle(center=(5, 5), radius=5)
+        self.assertEqual(self.am_sig.masig[5, 5], True)
+        # navigation axis
+        self.am_sig.manav.mask_circle(center=(5, 5), radius=5)
+        self.assertEqual(self.am_sig.manav[5, 5], True)
+
+    def test_mask_ring(self):
+        # signal axis
+        self.am_sig.masig.mask_rings(center=(5, 5), inner_radius=2, outer_radius=7)
+        self.assertEqual(self.am_sig.masig[5, 5], False)
+        # navigation axis
+        self.am_sig.manav.mask_rings(center=(5, 5), inner_radius=2, outer_radius=7)
+        self.assertEqual(self.am_sig.manav[5, 5], False)
+
+    def test_sig_slice_mask(self):
+        # testing using integers
+        self.am_sig.masig[0:15, 0:15] = True
+        self.assertEqual(self.am_sig.metadata.Mask.sig_mask[1, 1], True)
+        # testing using floats
+        self.am_sig.masig[0.0:15.0, 0.0:15.0] = True
+        self.assertEqual(self.am_sig.metadata.Mask.sig_mask[1, 1], True)
+
+    def test_nav_slice_mask(self):
+        # testing using integers
+        self.am_sig.manav[0:15, 0:15] = True
+        self.assertEqual(self.am_sig.metadata.Mask.nav_mask[1, 1], True)
+        # testing using floats
+        self.am_sig.manav[0.0:15.0, 0.0:15.0] = True
+        self.assertEqual(self.am_sig.metadata.Mask.nav_mask[1, 1], True)
+
+    # Testing polar converion
+    def test_estimate_distortion(self):
+        self.am_sig.estimate_distortion()
+
+    def test_to_polar_signal(self):
+        polar = self.am_sig.to_polar(inplace=False, ragged=False)
+        print(polar)

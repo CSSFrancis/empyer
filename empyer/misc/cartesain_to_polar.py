@@ -1,10 +1,11 @@
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
-
+from scipy.ndimage import map_coordinates
 from empyer.misc.image import ellipsoid_list_to_cartesian
+import time
 
 
-def convert(img, center=None, angle=None, lengths=None, radius=[0,100], phase_width=720):
+def to_polar_image(img, center=None, angle=None, lengths=None, radius=[0, 100], phase_width=720, normalized=False):
     """ Function for converting an image in cartesian coordinates to polar coordinates.
 
     Parameters
@@ -21,15 +22,16 @@ def convert(img, center=None, angle=None, lengths=None, radius=[0,100], phase_wi
         The inner and outer indexes to define the radius by.
     phase_width: int
         The number of "pixels" in the polar image along the x direction
+    normalized: bool
+        If True the intensity is conserved in the image.  If there is another normalization step this isn't necessarily
+        needed.
 
     Returns
     -----------
     polar_img: array-like
         A numpy array of the input img  in polar coordiates. Dim (radius[1]-radius[0]) x phase_width
     """
-
     img_shape = np.shape(img)
-    initial_y, initial_x = range(0, img_shape[-2]), range(0, img_shape[-1])
     if center is None:
         center = np.true_divide(img_shape[-2:], 2)
     final_the = np.linspace(0, 2*np.pi, num=phase_width)
@@ -39,19 +41,13 @@ def convert(img, center=None, angle=None, lengths=None, radius=[0,100], phase_wi
                                                    center,
                                                    axes_lengths=lengths,
                                                    angle=angle)
-    intensity = img.data
 
-    # setting masked values to negative values. Anything interpolated from masked values becomes negative
-    try:
-        intensity[img.mask] = -999999
-    except AttributeError:
-        pass
-    spline = RectBivariateSpline(initial_x, initial_y, intensity, kx=1, ky=1)  # bi-linear spline (Takes 90% of time)
-    polar_img = np.array(spline.ev(final_x, final_y))
-    polar_img = np.reshape(polar_img, (int(radius[1]-radius[0]), phase_width))
+    pol = np.array([final_x,final_y])
+    polar_img = map_coordinates(img, pol, order=1)
+    if normalized:
+        # Normalizing based on pixels. This involves knowing the area belonging to each pixel.
+        polar_img = [rad_pix*(rad+rad-1)*np.pi/phase_width for rad_pix,rad in zip(polar_img[:],final_rad) if final_rad is not 0]
 
-    # outputting new mask
-    polar_img[polar_img < -10] = -10
     return polar_img
 
 

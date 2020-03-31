@@ -1,13 +1,13 @@
 from unittest import TestCase
 import numpy as np
 import matplotlib.pyplot as plt
-from empyer.signals.power_signal import PowerSignal
+from empyer.signals.power2d import Power2D
 
 
 class TestPowerSignal(TestCase):
     def setUp(self):
         setup_array = np.ones(shape=(10, 10, 20, 90))
-        self.ps = PowerSignal(setup_array)
+        self.ps = Power2D(setup_array)
         self.ps.set_axes(3,
                          name="k",
                          scale=.1,

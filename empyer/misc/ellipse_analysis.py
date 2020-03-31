@@ -2,10 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numpy.linalg import eig, inv
 from matplotlib.patches import Ellipse
-from empyer.misc.cartesain_to_polar import convert
+from empyer.misc.cartesain_to_polar import to_polar_image
 
 
-def solve_ellipse(img, interactive=False, num_points=500, plot=False, suspected_radius=None):
+def solve_ellipse(img, mask=None, interactive=False, num_points=500, plot=False, suspected_radius=None):
     """Takes a 2-d array and allows you to solve for the equivalent ellipse. Everything is done in array coord.
 
     Fitzgibbon, A. W., Fisher, R. B., Hill, F., & Eh, E. (1999). Direct Least Squres Fitting of Ellipses.
@@ -29,7 +29,6 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False, suspected_
     angle:float
         In radians based on the major axis
     """
-
     def fit_ellipse(x,y):
         x = x[:, np.newaxis]
         y = y[:, np.newaxis]
@@ -83,8 +82,8 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False, suspected_
                     ang=ang-np.pi/2
                 return ang
 
-
     coords = [[], []]
+    img[mask] = 0
     if interactive:
         figure1 = plt.figure()
         ax = figure1.add_subplot(111)
@@ -127,8 +126,8 @@ def solve_ellipse(img, interactive=False, num_points=500, plot=False, suspected_
     if plot:
         print("plotting")
         plt.scatter(coords[0], coords[1])
-        ellipse = Ellipse((center[1], center[0]), lengths[0] * 2, lengths[1] * 2, angle=angle, fill=False)
-        fig = plt.figure()
+        ellipse = Ellipse((center[1], center[0]), lengths[0] * 2, lengths[1] * 2, angle=angle, fill=False,color='red',w=25)
+        fig = plt.figure(num=None, figsize=(20, 20), dpi=100, facecolor='w', edgecolor='k')
         axe = fig.add_subplot(111)
         axe.imshow(img)
         axe.add_patch(ellipse)
@@ -167,7 +166,7 @@ def advanced_solve_ellipse(img, center, lengths, angle, phase_width, radius, num
     x = np.linspace(-5,5,20)
     y = np.linspace(-5, 5, 20)
 
-    pol =[[convert(img, angle=None, lengths=None, center=np.add(center[x1,y1]), phase_width=phase_width, radius=radius)
+    pol =[[to_polar_image(img, angle=None, lengths=None, center=np.add(center[x1, y1]), phase_width=phase_width, radius=radius)
            for x1 in x]for y1 in y]
     
 

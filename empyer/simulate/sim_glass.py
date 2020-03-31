@@ -75,14 +75,14 @@ def simulate_cube(probe=2, positions=101, length=50, number_clusters=50, radius=
                      np.random.choice(pos_values, number_clusters)]))
     symmetry = np.random.choice([2, 4, 6, 8, 10], number_clusters)  # random symmetry for each cluster
     patterns = [simulate_pattern(symmetry=s,
-                                     k=75,
-                                     num_clusters=1,
-                                     r=radius,
-                                     probe_size=10,
-                                     center=[128, 128],
-                                     angle=0,
-                                     lengths=[75, 75],
-                                     acceptAngle=accept_angle) for s in symmetry]
+                                 k=75,
+                                 num_clusters=1,
+                                 r=radius,
+                                 probe_size=10,
+                                 center=[128, 128],
+                                 angle=0,
+                                 lengths=[75, 75],
+                                 acceptAngle=accept_angle) for s in symmetry]
     four = np.ones((positions, positions, 256, 256))
     c = circle(radius=radius, center=pos, dim=(positions, positions))
     circlesize = np.divide(np.shape(c), 2)
