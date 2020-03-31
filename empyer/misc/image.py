@@ -10,6 +10,11 @@ def square(array):
     return np.power(array, 2)
 
 
+def masked_mean(image, mask, axis):
+    image[mask] = np.nan
+    return np.nanmean(image,axis=axis)
+
+
 def bin_2d(image, binning_factor):
     """Binning a 2-dimensional image  by some factor
 

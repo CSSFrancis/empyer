@@ -461,6 +461,22 @@ class Amorphous2D(Signal2D):
         vdfim = dark_field_sum.as_signal2D((0, 1))
         return vdfim
 
+    def masked_mean(self, axes):
+        """Returns the mean over some axis using the signal and navigation masks
+        Parameters
+        --------------
+        axis: int, str, tuple of axis or None
+            Either one on its own, or many axes in a tuple can be passed. In both cases the axes can be passed directly,
+            or specified using the index in axes_manager or the name of the axis. Any duplicates are removed.
+            If None, the operation is performed over all navigation axes (default).
+        """
+        if axes is None:
+            axes = self.axes_manager.navigation_axes
+        map()
+
+
+
+
 
 class LazyAmorphousSignal(LazySignal, Amorphous2D):
     _lazy = True

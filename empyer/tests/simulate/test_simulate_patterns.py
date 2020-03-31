@@ -69,4 +69,8 @@ class TestSimulations(TestCase):
         plt.imshow(ps[:, 0:12])
         plt.show()
 
+class TestMisallignment(TestCase):
+    def test_make_patterns(self):
+
+
 
