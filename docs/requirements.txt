@@ -20,7 +20,7 @@ ipyparallel==6.2.3
 ipython==7.3.0
 ipython-genutils==0.2.0
 jedi==0.13.3
-Jinja2==2.10
+Jinja2==2.11.3
 jupyter-client==5.2.4
 jupyter-core==4.4.0
 kiwisolver==1.0.1
