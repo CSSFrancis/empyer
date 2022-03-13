@@ -1,3 +1,5 @@
+** Note that this project is no long supported in favor of https://github.com/pyxem/pyxem**
+
 **EMpyer**
 
 Empyer is an extension of the hyperspy_ package.  It provides additional functionality related to analyzing 4 and 5
